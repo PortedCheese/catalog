@@ -2,7 +2,7 @@
 
 @section('page-title', 'Обновить категорию - ')
 @section('header-title')
-    Обновить категорию {{ $category->title }}
+    {{ $category->title }}
 @endsection
 
 @section('admin')

@@ -1,16 +1,17 @@
 @extends('admin.layout')
 
 @section('page-title', 'Просмотр - ')
-@section('header-title', "Просмотр {$category->title}")
+@section('header-title', "{$category->title}")
 
 @section('admin')
+    @include("catalog::admin.categories.pills", ['category' => $category])
     <div class="col-12 mb-3">
         <div class="row">
             @php
-                $class = $image ? "col-9" : "col-12";
+                $class = $image ? "col-12 col-md-9" : "col-12";
             @endphp
             @if ($image)
-                <div class="col-3">
+                <div class="col-12 col-md-3">
                     <img src="{{ route('imagecache', [
                                 'template' => 'medium',
                                 'filename' => $image->file_name
@@ -36,17 +37,6 @@
         </div>
     </div>
     <div class="col-12">
-        <div class="btn-group"
-             role="group">
-            <a href="{{ route('admin.category.metas', ['category' => $category]) }}"
-               class="btn btn-secondary">
-                Мета
-            </a>
-            <a href="{{ route('admin.category.field.index', ['category' => $category]) }}"
-               class="btn btn-primary">
-                Просмотр характеристик <span class="badge badge-light">{{ $category->fields->count() }}</span>
-            </a>
-        </div>
         @include(
             "catalog::admin.categories.table-list",
             ['categories' => $category->children->sortBy('weight')]
@@ -73,17 +63,17 @@
             </template>
             <template slot="other">
                 <a href="{{ route('admin.category.index') }}"
-                   class="btn btn-secondary">
+                   class="btn btn-outline-secondary">
                     Список
                 </a>
                 @if ($parent)
                     <a href="{{ route('admin.category.show', ['category' => $parent]) }}"
-                       class="btn btn-secondary">
+                       class="btn btn-outline-secondary">
                         {{ $parent->title }}
                     </a>
                 @endif
                 <a href="{{ route('admin.category.create-child', ['category' => $category]) }}"
-                   class="btn btn-success">
+                   class="btn btn-outline-success">
                     Добавить
                 </a>
             </template>

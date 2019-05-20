@@ -4,7 +4,8 @@
     "type": "library",
     "require": {
         "portedcheese/base-settings": "dev-master",
-        "portedcheese/seo-integration": "dev-master"
+        "portedcheese/seo-integration": "dev-master",
+        "portedcheese/admin-site-menu": "dev-master"
     },
     "license": "MIT",
     "authors": [

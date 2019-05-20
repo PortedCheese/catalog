@@ -2,11 +2,12 @@
 
 namespace PortedCheese\Catalog\Http\Controllers\Admin;
 
+use App\Category;
+use App\CategoryField;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use PortedCheese\Catalog\Events\CategoryFieldUpdate;
 use PortedCheese\Catalog\Http\Requests\CategoryFieldCreateRequest;
-use PortedCheese\Catalog\Models\Category;
-use PortedCheese\Catalog\Models\CategoryField;
 
 class CategoryFieldController extends Controller
 {
@@ -55,6 +56,7 @@ class CategoryFieldController extends Controller
             'title' => $request->get('title'),
             'filter' => $request->has('filter') ? 1 : 0
         ]);
+        event(new CategoryFieldUpdate($category));
         return redirect()
             ->route('admin.category.field.index', ['category' => $category])
             ->with('success', 'Характеристика добавлена');
@@ -89,6 +91,7 @@ class CategoryFieldController extends Controller
                 'title' => $request->get('title'),
                 'filter' => $request->has('filter') ? 1 : 0
             ]);
+        event(new CategoryFieldUpdate($category));
         return redirect()
             ->route('admin.category.field.index', ['category' => $category])
             ->with('success', 'Успешно обновлено');
@@ -102,9 +105,14 @@ class CategoryFieldController extends Controller
      */
     public function destroy(Category $category, CategoryField $field)
     {
-        // TODO check values.
+        if ($field->values->where('category_id', $category->id)->count()) {
+            return redirect()
+                ->back()
+                ->with('danger', 'У данной характеристики есть заполненные значения');
+        }
         $category->fields()->detach($field);
         $field->checkCategoryOnDetach();
+        event(new CategoryFieldUpdate($category));
         return redirect()
             ->route("admin.category.field.index", ['category' => $category])
             ->with('success', 'Поле успешно откреплено');

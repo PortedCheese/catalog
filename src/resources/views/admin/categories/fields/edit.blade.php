@@ -1,9 +1,10 @@
 @extends('admin.layout')
 
 @section('page-title', 'Редактировать поле категории - ')
-@section('header-title', "Редактировать поле {$pivot->title} категории {$category->title}")
+@section('header-title', "{$pivot->title}")
 
 @section('admin')
+    @include("catalog::admin.categories.pills", ['category' => $category])
     <div class="col-12">
         <form action="{{ route('admin.category.field.update', ['category' => $category, 'field' => $field]) }}"
               method="post">

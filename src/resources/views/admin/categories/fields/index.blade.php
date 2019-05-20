@@ -1,9 +1,10 @@
 @extends('admin.layout')
 
 @section('page-title', 'Характеристики категории - ')
-@section('header-title', "Характеристики категории {$category->title}")
+@section('header-title', "{$category->title}")
 
 @section('admin')
+    @include("catalog::admin.categories.pills", ['category' => $category])
     <div class="col-12">
         <div class="table-responsive">
             <table class="table">
@@ -57,16 +58,12 @@
     <div class="col-12">
         <div class="btn-group"
              role="group">
-            <a href="{{ route('admin.category.show', ['category' => $category]) }}"
-               class="btn btn-secondary">
-                К категории
-            </a>
             <a href="{{ route('admin.category.field.create', ['category' => $category]) }}"
-               class="btn btn-success">
+               class="btn btn-outline-success">
                 Добавить
             </a>
             <button type="button"
-                    class="btn btn-warning"
+                    class="btn btn-outline-warning"
                     data-toggle="tooltip"
                     data-placement="top"
                     onclick="event.preventDefault();document.getElementById('sycn-fields').submit();"

@@ -4,6 +4,11 @@ namespace PortedCheese\Catalog\Models;
 
 use App\Image;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Route;
+use PortedCheese\Catalog\Events\CategoryFieldUpdate;
 use PortedCheese\SeoIntegration\Models\Meta;
 
 class Category extends Model
@@ -19,24 +24,36 @@ class Category extends Model
     {
         parent::boot();
 
-        static::deleting(function ($category) {
+        static::deleting(function ($model) {
             // Удаляем главное изображение.
-            $category->clearMainImage();
+            $model->clearMainImage();
             // Удаляем метатеги.
-            $category->clearMetas();
+            $model->clearMetas();
             // Убираем поля.
-            foreach ($category->fields as $field) {
-                $category->fields()->detach($field);
+            foreach ($model->fields as $field) {
+                $model->fields()->detach($field);
                 $field->checkCategoryOnDetach();
             }
+            // Очистка кэша.
+            $model->forgetFieldsCache();
         });
 
-        static::created(function ($category) {
+        static::created(function ($model) {
             // Создать метатеги по умолчанию.
-            $category->createDefaultMetas();
+            $model->createDefaultMetas();
             // Поля родителя.
-            $category->setParentFields();
+            $model->setParentFields();
         });
+    }
+
+    /**
+     * У категории много товаров.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function products()
+    {
+        return $this->hasMany(\App\Product::class);
     }
 
     /**
@@ -46,7 +63,7 @@ class Category extends Model
      */
     public function children()
     {
-        return $this->hasMany(Category::class, 'parent_id');
+        return $this->hasMany(\App\Category::class, 'parent_id');
     }
 
     /**
@@ -56,7 +73,7 @@ class Category extends Model
      */
     public function parent()
     {
-        return $this->belongsTo(Category::class, 'parent_id');
+        return $this->belongsTo(\App\Category::class, 'parent_id');
     }
 
     /**
@@ -66,7 +83,7 @@ class Category extends Model
      */
     public function fields()
     {
-        return $this->belongsToMany(CategoryField::class)
+        return $this->belongsToMany(\App\CategoryField::class)
             ->withPivot('title')
             ->withPivot('filter')
             ->withTimestamps();
@@ -99,6 +116,62 @@ class Category extends Model
     public function getRouteKeyName()
     {
         return 'slug';
+    }
+
+    /**
+     * Категории в виде дерева.
+     *
+     * @return array
+     */
+    public static function getTree()
+    {
+        $tree = [];
+        $categories = DB::table('categories')
+            ->select(['id', 'title', 'slug', 'parent_id'])
+            ->orderBy('parent_id')
+            ->get();
+        $noParent = [];
+        foreach ($categories as $category) {
+            $tree[$category->id] = (object) [
+                'title' => $category->title,
+                'slug' => $category->slug,
+                'parent' => $category->parent_id,
+                'children' => [],
+            ];
+            if (empty($category->parent_id)) {
+                $noParent[] = $category->id;
+            }
+        }
+        foreach ($tree as $id => $item) {
+            if (empty($item->parent)) {
+                continue;
+            }
+            $tree[$item->parent]->children[$id] = $item;
+        }
+        foreach ($noParent as $id) {
+            self::removeChildren($tree, $id);
+        }
+        return $tree;
+    }
+
+    /**
+     * Убираем подкатегории.
+     *
+     * @param $tree
+     * @param $id
+     */
+    private static function removeChildren(&$tree, $id)
+    {
+        if (empty($tree[$id])) {
+            return;
+        }
+        $item = $tree[$id];
+        foreach ($item->children as $key => $child) {
+            self::removeChildren($tree, $key);
+            if (!empty($tree[$key])) {
+                unset($tree[$key]);
+            }
+        }
     }
 
     /**
@@ -176,6 +249,7 @@ class Category extends Model
         foreach ($this->children as $child) {
             $child->setParentFields();
             $child->addChildFields();
+            event(new CategoryFieldUpdate($child));
         }
     }
 
@@ -234,5 +308,84 @@ class Category extends Model
             $parents[$item->id] = $item->title;
         }
         return $parents;
+    }
+
+    /**
+     * Информация о полях категории.
+     *
+     * @return mixed
+     */
+    public function getFieldsInfo()
+    {
+        $key = "category-fields-info:{$this->id}";
+        $cached = Cache::get($key);
+        if (!empty($cached)) {
+            return $cached;
+        }
+
+        $fields = Cache::rememberForever($key, function () {
+            $fields = [];
+            foreach ($this->fields as $field) {
+                $pivot = $field->pivot;
+                $fields[$field->id] = (object) [
+                    'id' => $field->id,
+                    'title' => $pivot->title,
+                    'filter' => $pivot->filter,
+                    'type' => $field->type,
+                    'machine' => $field->machine,
+                ];
+            }
+            return $fields;
+        });
+
+        return $fields;
+    }
+
+    /**
+     * Очистить кэш информации полей.
+     */
+    public function forgetFieldsCache()
+    {
+        Cache::forget("category-fields-info:{$this->id}");
+    }
+
+    /**
+     * Хлебные крошки для админки.
+     *
+     * @return array
+     */
+    public function getAdminBreadcrumb($productPage = false)
+    {
+        $breadcrumb = [];
+        // TODO: add cache.
+        if (!empty($this->parent)) {
+            $breadcrumb = $this->parent->getAdminBreadcrumb();
+        }
+        else {
+            $breadcrumb[] = (object) [
+                'title' => 'Категории',
+                'url' => route('admin.category.index'),
+                'active' => false,
+            ];
+        }
+        $routeParams = Route::current()->parameters();
+        $productPage = $productPage && !empty($routeParams['product']);
+        $active = !empty($routeParams['category']) &&
+            $routeParams['category']->id == $this->id &&
+            !$productPage;
+        $breadcrumb[] = (object) [
+            'title' => $this->title,
+            'url' => route('admin.category.show', ['category' => $this]),
+            'active' => $active,
+        ];
+        if ($productPage) {
+            $product = $routeParams['product'];
+            $breadcrumb[] = (object) [
+                'title' => $product->title,
+                'url' => route('admin.category.product.show', ['category' => $this, 'product' => $product]),
+                'active' => true,
+            ];
+        }
+        return $breadcrumb;
     }
 }

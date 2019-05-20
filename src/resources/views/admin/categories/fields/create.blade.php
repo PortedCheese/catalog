@@ -1,9 +1,11 @@
+
 @extends('admin.layout')
 
 @section('page-title', 'Добавить поле категории - ')
-@section('header-title', "Добавить поле категории {$category->title}")
+@section('header-title', "{$category->title}")
 
 @section('admin')
+    @include("catalog::admin.categories.pills", ['category' => $category])
     <div class="col-12">
         <form action="{{ route('admin.category.field.store', ['category' => $category]) }}"
               method="post">
@@ -79,7 +81,6 @@
                 @endif
             </div>
 
-
             <div class="form-check">
                 <input type="checkbox"
                        @if(old('filter'))
@@ -96,6 +97,10 @@
 
             <div class="btn-group"
                  role="group">
+                <a href="{{ route('admin.category.show', ['category' => $category]) }}"
+                   class="btn btn-secondary">
+                    Категория
+                </a>
                 <button type="submit" class="btn btn-success">Добавить</button>
             </div>
         </form>

@@ -19,13 +19,23 @@ class CategoryField extends Model
     ];
 
     /**
+     * Зачения у поля.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function values()
+    {
+        return $this->hasMany(\App\ProductField::class, 'field_id');
+    }
+
+    /**
      * Поле может относится ко многим категориям.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function categories()
     {
-        return $this->belongsToMany(Category::class)
+        return $this->belongsToMany(\App\Category::class)
             ->withPivot('title')
             ->withPivot('filter')
             ->withTimestamps();
@@ -48,12 +58,12 @@ class CategoryField extends Model
      * @param Category $category
      * @return mixed
      */
-    public static function getForCategory(Category $category)
+    public static function getForCategory(\App\Category $category)
     {
         $ids = [];
         foreach ($category->fields as $field) {
             $ids[] = $field->id;
         }
-        return CategoryField::whereNotIn('id', $ids)->get();
+        return \App\CategoryField::whereNotIn('id', $ids)->get();
     }
 }

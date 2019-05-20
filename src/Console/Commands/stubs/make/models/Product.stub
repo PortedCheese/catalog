@@ -1,0 +1,11 @@
+<?php
+
+namespace {{namespace}};
+
+use PortedCheese\Catalog\Models\Product as VendorProduct;
+
+
+class Product extends VendorProduct
+{
+
+}

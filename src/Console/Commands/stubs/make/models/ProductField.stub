@@ -1,0 +1,11 @@
+<?php
+
+namespace {{namespace}};
+
+use PortedCheese\Catalog\Models\ProductField as VendorProductField;
+
+
+class ProductField extends VendorProductField
+{
+
+}

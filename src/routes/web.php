@@ -9,39 +9,72 @@ if (! siteconf()->get('catalog.useOwnAdminRoutes')) {
     ], function () {
         // Управление категориями.
         Route::resource('category', 'CategoryController');
+
+        // Все товары.
+        Route::get('product', 'ProductController@index')
+            ->name('product.index');
+
         Route::group([
-            'prefix' => 'category',
+            'prefix' => 'category/{category}',
             'as' => 'category.'
         ], function () {
             // Мета.
-            Route::get('{category}/metas', 'CategoryController@metas')
+            Route::get('metas', 'CategoryController@metas')
                 ->name('metas');
+
             // Добавить подкатегорию.
-            Route::get('{category}/create-child', 'CategoryController@create')
+            Route::get('create-child', 'CategoryController@create')
                 ->name('create-child');
+
             // Удалить изображение.
-            Route::delete('{category}/delete-image', 'CategoryController@destroyImage')
+            Route::delete('delete-image', 'CategoryController@destroyImage')
                 ->name('destroy-image');
+
             // Изменить родителя.
-            Route::put('{category}/change-parent', 'CategoryController@changeParent')
+            Route::put('change-parent', 'CategoryController@changeParent')
                 ->name('change-parent');
+
             // Изменить вес.
-            Route::put('{category}/change-weight', 'CategoryController@changeWeight')
+            Route::put('change-weight', 'CategoryController@changeWeight')
                 ->name('change-weight');
+
             // Поля категории.
+            Route::resource('field', 'CategoryFieldController')->except([
+                'show'
+            ]);
+
+            // Синхронизация полей.
+            Route::post('field/sync', 'CategoryFieldController@syncChildren')
+                ->name('field.sync');
+
+            // Товары категории.
+            Route::resource('product', 'ProductController');
+
             Route::group([
-                'prefix' => '{category}',
+                'prefix' => 'product/{product}',
+                'as' => 'product.',
             ], function () {
-                Route::resource('field', 'CategoryFieldController')->except([
+                // Мета.
+                Route::get('metas', 'ProductController@metas')
+                    ->name('metas');
+
+                // Характеристики.
+                Route::resource('field', 'ProductFieldController')->except([
                     'show'
                 ]);
-                Route::group([
-                    'prefix' => 'field',
-                    'as' => 'field.',
-                ], function () {
-                    Route::post('sync', 'CategoryFieldController@syncChildren')
-                        ->name('sync');
-                });
+
+                // Удалить изображение.
+                Route::delete('delete-image', 'ProductController@destroyImage')
+                    ->name('destroy-image');
+
+                // Галлерея.
+                Route::get('gallery', 'ProductController@gallery')
+                    ->name('gallery');
+
+                // Вариации товара.
+                Route::resource('variation', 'ProductVariationController')->except([
+                    'show'
+                ]);
             });
         });
     });

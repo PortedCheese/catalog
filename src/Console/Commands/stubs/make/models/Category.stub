@@ -1,0 +1,11 @@
+<?php
+
+namespace {{namespace}};
+
+use PortedCheese\Catalog\Models\Category as VendorCategory;
+
+
+class Category extends VendorCategory
+{
+
+}

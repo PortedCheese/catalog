@@ -17,20 +17,26 @@ class CreateCategoriesTable extends Migration
             $table->increments('id');
             $table->string('title')
                 ->comment('Заголовок категории');
+
             $table->string('description')
                 ->nullable()
                 ->comment('Описание категории');
+
             $table->string('slug')
                 ->comment('Машинное имя');
+
             $table->integer('parent_id')
                 ->nullable()
                 ->comment('Родительская категория');
+
             $table->integer('main_image')
                 ->nullable()
                 ->comment('Изображение категрии');
+
             $table->integer('weight')
                 ->default(1)
                 ->comment('Вес категории');
+
             $table->timestamps();
         });
     }

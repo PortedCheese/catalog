@@ -2,11 +2,11 @@
 
 namespace PortedCheese\Catalog\Http\Controllers\Admin;
 
+use App\Category;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use PortedCheese\Catalog\Http\Requests\CategoryUpdateRequest;
-use PortedCheese\Catalog\Models\Category;
 use PortedCheese\Catalog\Http\Requests\CategoryCreateRequest;
 
 class CategoryController extends Controller
@@ -20,12 +20,17 @@ class CategoryController extends Controller
     {
         $query = $request->query;
         $view = $query->get('view', 'default');
-        $collection = Category::where('parent_id', null)
-            ->orderBy('weight', 'desc')
-            ->get();
         $parents = [];
-        foreach ($collection as $item) {
-            $parents[$item->id] = $item->title;
+        if ($view == 'tree') {
+            $collection = Category::getTree();
+        }
+        else {
+            $collection = Category::where('parent_id', null)
+                ->orderBy('weight', 'desc')
+                ->get();
+            foreach ($collection as $item) {
+                $parents[$item->id] = $item->title;
+            }
         }
         return view('catalog::admin.categories.index', [
             'categories' => $collection,
@@ -131,7 +136,12 @@ class CategoryController extends Controller
         if ($category->children->count()) {
             return redirect()
                 ->back()
-                ->with('danger', 'Невозможно удалить категорию, пока у нее есть подкатегории');
+                ->with('danger', 'Невозможно удалить категорию, у нее есть подкатегории');
+        }
+        if ($category->products->count()) {
+            return redirect()
+                ->back()
+                ->with('danger', 'Невозможно удалить категорию, у нее есть товары');
         }
         $category->delete();
         if ($parent) {
