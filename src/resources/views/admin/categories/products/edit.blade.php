@@ -55,6 +55,27 @@
             </div>
 
             <div class="form-group">
+                <label>Метки</label>
+                @foreach($states as $state)
+                    <div class="form-check">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               @if (old('check-' . $state->id))
+                               checked
+                               @elseif(in_array($state->id, $productStateIds))
+                               checked
+                               @endif
+                               value="{{ $state->id }}"
+                               id="check-{{ $state->id }}"
+                               name="check-{{ $state->id }}">
+                        <label class="form-check-label" for="check-{{ $state->id }}">
+                            {{ $state->title }}
+                        </label>
+                    </div>
+                @endforeach
+            </div>
+
+            <div class="form-group">
                 <label for="short">Краткое описание</label>
                 <input type="text"
                        id="short"

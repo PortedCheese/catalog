@@ -33,8 +33,19 @@ class CatalogMakeCommand extends BaseConfigModelCommand
         'Category.stub' => 'Category.php',
         'CategoryField.stub' => 'CategoryField.php',
         'Product.stub' => 'Product.php',
+        'ProductState.stub' => 'ProductState.php',
         'ProductVariation.stub' => 'ProductVariation.php',
         'ProductField.stub' => 'ProductField.php',
+        'Order.stub' => 'Order.php',
+        'OrderState.stub' => 'OrderState.php',
+        'OrderItem.stub' => 'OrderItem.php',
+    ];
+
+    protected $configName = 'catalog';
+
+    protected $configValues = [
+        'useOwnSiteRoutes' => false,
+        'useOwnAdminRoutes' => false,
     ];
 
     protected $dir = __DIR__;
@@ -69,12 +80,20 @@ class CatalogMakeCommand extends BaseConfigModelCommand
         catch (\Exception $e) {
             return;
         }
-        $title = "Категории";
+
+        $this->makeCategoryMenu($menu);
+        $this->makeOrderMenu($menu);
+    }
+
+    private function makeOrderMenu($menu)
+    {
+        $title = "Заказы";
         $itemData = [
             'title' => $title,
-            'route' => '@admin.category.*|admin.category.field.*|admin.category.product.*|admin.product.*|admin.category.product.field.*|admin.category.product.variation.*',
-            'class' =>'@fas fa-stream',
+            'route' => '@admin.order-state.*|admin.order.*',
+            'class' =>'@fab fa-jedi-order',
             'menu_id' => $menu->id,
+            'url' => '#',
         ];
         try {
             $menuItem = MenuItem::where('title', $title)->firstOrFail();
@@ -91,34 +110,96 @@ class CatalogMakeCommand extends BaseConfigModelCommand
             $titles[] = $child->title;
         }
 
-        if (! in_array('Список', $titles)) {
+        $title = "Статусы";
+        if (! in_array($title, $titles)) {
             MenuItem::create([
-                'title' => "Список",
+                'title' => $title,
+                'menu_id' => $menu->id,
+                'parent_id' => $menuItem->id,
+                'route' => 'admin.order-state.index',
+            ]);
+            $this->info("Элемент меню 'Заказы.{$title}' создан");
+        }
+
+        $title = "Список";
+        if (! in_array($title, $titles)) {
+            MenuItem::create([
+                'title' => $title,
+                'menu_id' => $menu->id,
+                'parent_id' => $menuItem->id,
+                'route' => 'admin.order.index',
+            ]);
+            $this->info("Элемент меню 'Заказы.{$title}' создан");
+        }
+    }
+
+    private function makeCategoryMenu($menu)
+    {
+        $title = "Категории";
+        $itemData = [
+            'title' => $title,
+            'route' => '@admin.category.*|admin.category.field.*|admin.category.product.*|admin.product.*|admin.category.product.field.*|admin.category.product.variation.*|admin.product-state.*',
+            'class' =>'@fas fa-stream',
+            'menu_id' => $menu->id,
+            'url' => '#',
+        ];
+        try {
+            $menuItem = MenuItem::where('title', $title)->firstOrFail();
+            $menuItem->update($itemData);
+            $this->info("Элемент меню '$title' обновлен");
+        }
+        catch (\Exception $e) {
+            $menuItem = MenuItem::create($itemData);
+            $this->info("Элемент меню '$title' создан");
+        }
+        $children = $menuItem->children;
+        $titles = [];
+        foreach ($children as $child) {
+            $titles[] = $child->title;
+        }
+
+        $title = "Список";
+        if (! in_array($title, $titles)) {
+            MenuItem::create([
+                'title' => $title,
                 'menu_id' => $menu->id,
                 'parent_id' => $menuItem->id,
                 'route' => 'admin.category.index',
             ]);
-            $this->info("Элемент меню '{$title}.Список' создан");
+            $this->info("Элемент меню 'Категории.{$title}' создан");
         }
 
-        if (! in_array('Создать', $titles)) {
+        $title = 'Создать';
+        if (! in_array($title, $titles)) {
             MenuItem::create([
-                'title' => 'Создать',
+                'title' => $title,
                 'menu_id' => $menu->id,
                 'parent_id' => $menuItem->id,
                 'route' => 'admin.category.create',
             ]);
-            $this->info("Элемент меню '{$title}.Создать' создан");
+            $this->info("Элемент меню 'Категории.{$title}' создан");
         }
 
-        if (! in_array('Товары', $titles)) {
+        $title = 'Товары';
+        if (! in_array($title, $titles)) {
             MenuItem::create([
-                'title' => 'Товары',
+                'title' => $title,
                 'menu_id' => $menu->id,
                 'parent_id' => $menuItem->id,
                 'route' => 'admin.product.index',
             ]);
-            $this->info("Элемент меню '{$title}.Товары' создан");
+            $this->info("Элемент меню 'Категории.{$title}' создан");
+        }
+
+        $title = 'Метки товара';
+        if (! in_array($title, $titles)) {
+            MenuItem::create([
+                'title' => $title,
+                'menu_id' => $menu->id,
+                'parent_id' => $menuItem->id,
+                'route' => 'admin.product-state.index',
+            ]);
+            $this->info("Элемент меню 'Категории.{$title}' создан");
         }
     }
 }

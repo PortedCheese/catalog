@@ -6,7 +6,11 @@ use App\Category;
 use App\Product;
 use PortedCheese\Catalog\Console\Commands\CatalogMakeCommand;
 use PortedCheese\Catalog\Events\CategoryFieldUpdate;
+use PortedCheese\Catalog\Events\CreateNewOrder;
+use PortedCheese\Catalog\Events\ProductFieldUpdate;
 use PortedCheese\Catalog\Listeners\CategoryFieldClearCache;
+use PortedCheese\Catalog\Listeners\ProductFieldClearCache;
+use PortedCheese\Catalog\Listeners\SendNewOrderNotify;
 
 class ServiceProvider extends \Illuminate\Support\ServiceProvider
 {
@@ -49,6 +53,9 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
 
         // Подписаться на обновление полей.
         $this->app['events']->listen(CategoryFieldUpdate::class, CategoryFieldClearCache::class);
+        $this->app['events']->listen(ProductFieldUpdate::class, ProductFieldClearCache::class);
+        // Создание заказа.
+        $this->app['events']->listen(CreateNewOrder::class, SendNewOrderNotify::class);
     }
 
     public function register()

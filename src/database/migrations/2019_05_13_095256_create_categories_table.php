@@ -23,6 +23,7 @@ class CreateCategoriesTable extends Migration
                 ->comment('Описание категории');
 
             $table->string('slug')
+                ->unique()
                 ->comment('Машинное имя');
 
             $table->integer('parent_id')

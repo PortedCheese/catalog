@@ -3,7 +3,9 @@
 namespace PortedCheese\Catalog\Models;
 
 use App\Image;
+use function foo\func;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use PortedCheese\SeoIntegration\Models\Meta;
 
 class Product extends Model
@@ -33,12 +35,37 @@ class Product extends Model
             $model->clearVariations();
             // Очистить значения полей.
             $model->clearFields();
+            // Очистить кэш значений полей.
+            $model->forgetFieldsCache();
+            // Очистить метки.
+            $model->states()->detach();
         });
 
         static::created(function ($model) {
             // Создать метатеги по умолчанию.
             $model->createDefaultMetas();
         });
+    }
+
+    /**
+     * Может находится во многих позициях заказа.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function orderItems()
+    {
+        return $this->hasMany(\App\OrderItem::class);
+    }
+
+    /**
+     * У товара может быть несколько меток.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function states()
+    {
+        return $this->belongsToMany(\App\ProductState::class)
+            ->withTimestamps();
     }
 
     /**
@@ -204,5 +231,77 @@ class Product extends Model
         foreach ($this->fields as $field) {
             $field->delete();
         }
+    }
+
+    /**
+     * Получить тизер категории.
+     *
+     * @return string
+     * @throws \Throwable
+     */
+    public function getTeaser()
+    {
+        $cached = Cache::get("product-teaser:{$this->id}");
+        if (!empty($cached)) {
+            return $cached;
+        }
+        $view = view("catalog::site.products.teaser", ['product' => $this]);
+        $html = $view->render();
+//        Cache::forever("category-teaser:{$this->id}", $html);
+        return $html;
+    }
+
+    /**
+     * Информация по заполненным полям.
+     *
+     * @param null $category
+     * @return array
+     */
+    public function getFieldsInfo($category = null)
+    {
+        $key = "product-fields:{$this->id}";
+        $productFieldsInfo = Cache::get($key);
+        if (empty($productFieldsInfo)) {
+            $productFieldsInfo =  Cache::rememberForever($key, function () {
+
+                $fieldsInfo = [];
+                foreach ($this->fields as $field) {
+                    $fieldId = $field->field_id;
+                    if (empty($fieldsInfo[$fieldId])) {
+                        $fieldsInfo[$fieldId] = (object) [
+                            'values' => [],
+                            'id' => $field->id,
+                            'title' => '',
+                        ];
+                    }
+                    $fieldsInfo[$fieldId]->values[] = $field->value;
+                }
+
+                return $fieldsInfo;
+            });
+        }
+
+        if (empty($category)) {
+            $category = $this->category;
+        }
+
+        $categoryFieldsInfo = $category->getFieldsInfo();
+
+        foreach ($productFieldsInfo as $id => &$item) {
+            if (empty($categoryFieldsInfo[$id])) {
+                unset($productFieldsInfo[$id]);
+            }
+            $item->title = $categoryFieldsInfo[$id]->title;
+        }
+
+        return $productFieldsInfo;
+    }
+
+    /**
+     * Очистить кэш информации полей.
+     */
+    public function forgetFieldsCache()
+    {
+        Cache::forget("product-fields:{$this->id}");
     }
 }

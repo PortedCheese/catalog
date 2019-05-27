@@ -58,7 +58,7 @@
             </div>
 
             <div class="form-group">
-                <label for="sale_price">Цена со скидкой</label>
+                <label for="sale_price">Старая цена</label>
                 <input type="number"
                        step="0.01"
                        min="0"

@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Product;
 use App\ProductField;
 use Illuminate\Http\Request;
+use PortedCheese\Catalog\Events\ProductFieldUpdate;
 use PortedCheese\Catalog\Http\Requests\ProductFieldStoreRequest;
 use PortedCheese\Catalog\Http\Requests\ProductFieldUpdateRequest;
 
@@ -49,6 +50,7 @@ class ProductFieldController extends Controller
     public function store(ProductFieldStoreRequest $request, Category $category, Product $product)
     {
         ProductField::create($request->all());
+        event(new ProductFieldUpdate($product));
         return redirect()
             ->route('admin.category.product.field.index', ['category' => $category, 'product' => $product])
             ->with('success', 'Значение добавлено');
@@ -79,6 +81,7 @@ class ProductFieldController extends Controller
     public function update(ProductFieldUpdateRequest $request, Category $category, Product $product, ProductField $field)
     {
         $field->update($request->all());
+        event(new ProductFieldUpdate($product));
         return redirect()
             ->route('admin.category.product.field.index', [
                 'category' => $category,

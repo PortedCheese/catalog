@@ -5,6 +5,7 @@ namespace PortedCheese\Catalog\Http\Controllers\Admin;
 use App\Category;
 use App\Http\Controllers\Controller;
 use App\Product;
+use App\ProductState;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use PortedCheese\Catalog\Http\Requests\ProductStoreRequest;
@@ -34,6 +35,12 @@ class ProductController extends Controller
         if ($query->get('title')) {
             $title = trim($query->get('title'));
             $products->where('title', 'LIKE', "%$title%");
+        }
+        if ($query->has('published')) {
+            $value = $query->get('published', 'all');
+            if (in_array($value, ['1', '0'])) {
+                $products->where('published', '=', $query->get('published'));
+            }
         }
         $products->orderBy('created_at', 'desc');
         $perPage = env("CATALOG_PRODUCT_ADMIN_PAGER", self::PAGER);
@@ -115,11 +122,17 @@ class ProductController extends Controller
         foreach (Category::all()->sortBy('title') as $item) {
             $categories[$item->id] = $item->title;
         }
+        $productStateIds = [];
+        foreach ($product->states as $state) {
+            $productStateIds[] = $state->id;
+        }
         return view("catalog::admin.categories.products.edit", [
             'category' => $category,
             'product' => $product,
             'image' => $product->image,
             'categories' => $categories,
+            'states' => ProductState::all(),
+            'productStateIds' => $productStateIds,
         ]);
     }
 
@@ -145,6 +158,14 @@ class ProductController extends Controller
         }
         $product->update($userInput);
         $product->uploadMainImage($request);
+        // Обновляем метки.
+        $stateIds = [];
+        foreach ($userInput as $key => $value) {
+            if (strstr($key, 'check-') !== FALSE) {
+                $stateIds[] = $value;
+            }
+        }
+        $product->states()->sync($stateIds);
         return redirect()
             ->route("admin.category.product.show", ['category' => $product->category, 'product' => $product])
             ->with('success', 'Товар успешно обновлен');
@@ -160,6 +181,11 @@ class ProductController extends Controller
      */
     public function destroy(Category $category, Product $product)
     {
+        if ($count = $product->orderItems->count()) {
+            return redirect()
+                ->back()
+                ->with('danger', "Товар нахотидся в {$count} заказах");
+        }
         $product->delete();
 
         return redirect()
@@ -180,6 +206,22 @@ class ProductController extends Controller
         return redirect()
             ->back()
             ->with('success', 'Изображение удалено');
+    }
+
+    /**
+     * Изменить статус публикации.
+     *
+     * @param Category $category
+     * @param Product $product
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function published(Category $category, Product $product)
+    {
+        $product->published = !$product->published;
+        $product->save();
+        return redirect()
+            ->back()
+            ->with('success', 'Статус публикации изменен');
     }
 
     /**

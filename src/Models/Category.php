@@ -3,6 +3,9 @@
 namespace PortedCheese\Catalog\Models;
 
 use App\Image;
+use App\ProductField;
+use App\Product;
+use App\ProductVariation;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +16,9 @@ use PortedCheese\SeoIntegration\Models\Meta;
 
 class Category extends Model
 {
+    const PAGE_NAME = "Каталог";
+    const PAGE_ROUTE = 'site.catalog.index';
+
     protected $fillable = [
         'title',
         'description',
@@ -44,6 +50,62 @@ class Category extends Model
             // Поля родителя.
             $model->setParentFields();
         });
+    }
+
+    /**
+     * Категории в виде дерева.
+     *
+     * @return array
+     */
+    public static function getTree()
+    {
+        $tree = [];
+        $categories = DB::table('categories')
+            ->select(['id', 'title', 'slug', 'parent_id'])
+            ->orderBy('parent_id')
+            ->get();
+        $noParent = [];
+        foreach ($categories as $category) {
+            $tree[$category->id] = (object) [
+                'title' => $category->title,
+                'slug' => $category->slug,
+                'parent' => $category->parent_id,
+                'children' => [],
+            ];
+            if (empty($category->parent_id)) {
+                $noParent[] = $category->id;
+            }
+        }
+        foreach ($tree as $id => $item) {
+            if (empty($item->parent)) {
+                continue;
+            }
+            $tree[$item->parent]->children[$id] = $item;
+        }
+        foreach ($noParent as $id) {
+            self::removeChildren($tree, $id);
+        }
+        return $tree;
+    }
+
+    /**
+     * Убираем подкатегории.
+     *
+     * @param $tree
+     * @param $id
+     */
+    private static function removeChildren(&$tree, $id)
+    {
+        if (empty($tree[$id])) {
+            return;
+        }
+        $item = $tree[$id];
+        foreach ($item->children as $key => $child) {
+            self::removeChildren($tree, $key);
+            if (!empty($tree[$key])) {
+                unset($tree[$key]);
+            }
+        }
     }
 
     /**
@@ -116,62 +178,6 @@ class Category extends Model
     public function getRouteKeyName()
     {
         return 'slug';
-    }
-
-    /**
-     * Категории в виде дерева.
-     *
-     * @return array
-     */
-    public static function getTree()
-    {
-        $tree = [];
-        $categories = DB::table('categories')
-            ->select(['id', 'title', 'slug', 'parent_id'])
-            ->orderBy('parent_id')
-            ->get();
-        $noParent = [];
-        foreach ($categories as $category) {
-            $tree[$category->id] = (object) [
-                'title' => $category->title,
-                'slug' => $category->slug,
-                'parent' => $category->parent_id,
-                'children' => [],
-            ];
-            if (empty($category->parent_id)) {
-                $noParent[] = $category->id;
-            }
-        }
-        foreach ($tree as $id => $item) {
-            if (empty($item->parent)) {
-                continue;
-            }
-            $tree[$item->parent]->children[$id] = $item;
-        }
-        foreach ($noParent as $id) {
-            self::removeChildren($tree, $id);
-        }
-        return $tree;
-    }
-
-    /**
-     * Убираем подкатегории.
-     *
-     * @param $tree
-     * @param $id
-     */
-    private static function removeChildren(&$tree, $id)
-    {
-        if (empty($tree[$id])) {
-            return;
-        }
-        $item = $tree[$id];
-        foreach ($item->children as $key => $child) {
-            self::removeChildren($tree, $key);
-            if (!empty($tree[$key])) {
-                unset($tree[$key]);
-            }
-        }
     }
 
     /**
@@ -315,11 +321,14 @@ class Category extends Model
      *
      * @return mixed
      */
-    public function getFieldsInfo()
+    public function getFieldsInfo($filter = false)
     {
         $key = "category-fields-info:{$this->id}";
         $cached = Cache::get($key);
         if (!empty($cached)) {
+            if ($filter) {
+                return $this->getOnlyFilter($cached);
+            }
             return $cached;
         }
 
@@ -338,6 +347,9 @@ class Category extends Model
             return $fields;
         });
 
+        if ($filter) {
+            return $this->getOnlyFilter($fields);
+        }
         return $fields;
     }
 
@@ -387,5 +399,213 @@ class Category extends Model
             ];
         }
         return $breadcrumb;
+    }
+
+    /**
+     * Получить тизер категории.
+     *
+     * @return string
+     * @throws \Throwable
+     */
+    public function getTeaser()
+    {
+        $cached = Cache::get("category-teaser:{$this->id}");
+        if (!empty($cached)) {
+            return $cached;
+        }
+        $view = view("catalog::site.categories.teaser", ['category' => $this]);
+        $html = $view->render();
+//        Cache::forever("category-teaser:{$this->id}", $html);
+        return $html;
+    }
+
+    /**
+     * Хлебные крошки для сайта.
+     *
+     * @return array
+     */
+    public function getSiteBreadcrumb($productPage = false)
+    {
+        $breadcrumb = [];
+        // TODO: add cache.
+        if (!empty($this->parent)) {
+            $breadcrumb = $this->parent->getSiteBreadcrumb();
+        }
+        else {
+            $breadcrumb[] = (object) [
+                'title' => self::PAGE_NAME,
+                'url' => route(self::PAGE_ROUTE),
+                'active' => false,
+            ];
+        }
+        $routeParams = Route::current()->parameters();
+        $productPage = $productPage && !empty($routeParams['product']);
+        $active = !empty($routeParams['category']) &&
+            $routeParams['category']->id == $this->id &&
+            !$productPage;
+        $breadcrumb[] = (object) [
+            'title' => $this->title,
+            'url' => route('site.catalog.category.show', ['category' => $this]),
+            'active' => $active,
+        ];
+        if ($productPage) {
+            $product = $routeParams['product'];
+            $breadcrumb[] = (object) [
+                'title' => $product->title,
+                'url' => route('admin.category.product.show', ['category' => $this, 'product' => $product]),
+                'active' => true,
+            ];
+        }
+        return $breadcrumb;
+    }
+
+    /**
+     * Получаем фильтры для категории.
+     *
+     * @return mixed
+     */
+    public function getFilters()
+    {
+        // TODO: get from cache.
+
+        $fieldsInfo = $this->getFieldsInfo(true);
+
+        $pids = $this->getPids();
+
+        $fieldValues = $this->getProductValues($pids);
+
+        $this->setProductValuesToFilter($fieldsInfo, $fieldValues);
+
+        $this->addPriceFilter($fieldsInfo, $pids);
+
+        return $fieldsInfo;
+    }
+
+    /**
+     * Добавить фильтр по цене.
+     *
+     * @param $fieldsInfo
+     * @param $pids
+     */
+    private function addPriceFilter(&$fieldsInfo, $pids)
+    {
+        // Добавляем цену.
+        $variations = ProductVariation::query()
+            ->select(['id', 'price'])
+            ->whereIn('product_id', $pids)
+            ->where('available', '=', 1)
+            ->get();
+        $prices = [];
+        foreach ($variations as $variation) {
+            $price = false;
+            if (!empty($variation->price)) {
+                $price = $variation->price;
+            }
+            if ($price && !in_array($price, $prices)) {
+                $prices[] = $price;
+            }
+        }
+        if (!empty($prices)) {
+            array_unshift($fieldsInfo, (object) [
+                'id' => 0,
+                'title' => 'Цена',
+                'filter' => 1,
+                'type' => 'range',
+                'machine' => 'product_price',
+                'values' => $prices,
+            ]);
+        }
+        debugbar()->info($fieldsInfo);
+    }
+
+    /**
+     * Только поля включенные в фильтр.
+     *
+     * @param $fields
+     * @return array
+     */
+    private function getOnlyFilter($fields)
+    {
+        $filtered = [];
+        foreach ($fields as $field) {
+            if ($field->filter) {
+                $filtered[] = $field;
+            }
+        }
+        return $filtered;
+    }
+
+    /**
+     * Заполняем фильтр.
+     *
+     * @param $fieldInfo
+     * @param $fieldValues
+     */
+    private function setProductValuesToFilter(&$fieldsInfo, $fieldValues)
+    {
+        // Записываем значения для полей.
+        foreach ($fieldsInfo as &$field) {
+            if (!isset($field->values)) {
+                $field->values = [];
+            }
+            $fieldId = $field->id;
+            if (empty($fieldValues[$fieldId])) {
+                continue;
+            }
+            $field->values = $fieldValues[$fieldId];
+        }
+
+        // Убираем пустые.
+        foreach ($fieldsInfo as $key => $item) {
+            if (empty($item->values)) {
+                unset($fieldsInfo[$key]);
+            }
+        }
+    }
+
+    /**
+     * Получить значения товаров.
+     *
+     * @return array
+     */
+    private function getProductValues($pids)
+    {
+        // Ищем значения у этих товаров.
+        $productValues = ProductField::query()
+            ->select(['field_id', 'value'])
+            ->whereIn('product_id', $pids)
+            ->orderBy('product_id')
+            ->get();
+        $fieldValues = [];
+        // Группируем по полю.
+        foreach ($productValues as $productValue) {
+            $fieldId = $productValue->field_id;
+            if (empty($fieldValues[$fieldId])) {
+                $fieldValues[$fieldId] = [];
+            }
+            if (!in_array($productValue->value, $fieldValues[$fieldId])) {
+                $fieldValues[$fieldId][] = $productValue->value;
+            }
+        }
+
+        return $fieldValues;
+    }
+
+    /**
+     * Ищем товары категории.
+     *
+     * @return array
+     */
+    private function getPids()
+    {
+        $products = Product::query()
+            ->select('id')
+            ->where('category_id', $this->id)
+            ->get();
+        $pids = [];
+        foreach ($products as $product) {
+            $pids[] = $product->id;
+        }
+        return $pids;
     }
 }

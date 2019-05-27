@@ -26,6 +26,7 @@
                 <tr>
                     <th>SKU</th>
                     <th>Цена</th>
+                    <th>Старая цена</th>
                     <th>Скидка</th>
                     <th>Описание</th>
                     <th>В наличии</th>
@@ -37,11 +38,8 @@
                     <tr>
                         <td>{{ $variation->sku }}</td>
                         <td>{{ $variation->price }}</td>
-                        <td>
-                            @if ($variation->sale)
-                                {{ $variation->sale_price }}
-                            @endif
-                        </td>
+                        <td>{{ $variation->sale_price }}</td>
+                        <td>{{ $variation->sale ? 'Да' : "Нет" }}</td>
                         <td>{{ $variation->description }}</td>
                         <td>{{ $variation->available ? "Да" : "Нет" }}</td>
                         <td>

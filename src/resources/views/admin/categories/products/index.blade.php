@@ -19,6 +19,7 @@
         <form action="{{ $formRoute }}"
               method="get"
               class="form-inline">
+
             <label class="sr-only" for="title">Заголовок</label>
             <input type="text"
                    class="form-control mb-2 mr-sm-2"
@@ -26,6 +27,19 @@
                    name="title"
                    value="{{ $query->get('title') }}"
                    placeholder="Заголовок">
+
+            <select class="custom-select mb-2 mr-sm-2" name="published">
+                <option value="all"{{ !$query->has('published') || $query->get('published') == 'all' ? " selected" : '' }}>
+                    Статус публикации
+                </option>
+                <option value="1"{{ $query->get('published') === '1' ? " selected" : '' }}>
+                    Опубликованно
+                </option>
+                <option value="0"{{ $query->get('published') === '0' ? " selected" : '' }}>
+                    Снято с публикации
+                </option>
+            </select>
+
             <div class="btn-group mb-2"
                  role="group">
                 <button class="btn btn-primary" type="submit">Искать</button>
@@ -76,6 +90,21 @@
                         @endif
                         <td>
                             <confirm-delete-model-button model-id="{{ $product->id }}">
+                                <template slot="forms">
+                                    <form id="change-publushed-{{ $product->id }}"
+                                          action="{{ route("admin.category.product.published", ['category' => $category, 'product' => $product]) }}"
+                                          method="post">
+                                        @method('put')
+                                        @csrf
+                                    </form>
+                                </template>
+                                <template slot="other">
+                                    <a href="#"
+                                       class="btn btn-{{ $product->published ? "success" : "secondary" }}"
+                                       onclick="event.preventDefault();document.getElementById('change-publushed-{{ $product->id }}').submit();">
+                                        <i class="fas fa-toggle-{{ $product->published ? "on" : "off" }}"></i>
+                                    </a>
+                                </template>
                                 <template slot="edit">
                                     <a href="{{ route('admin.category.product.edit', ['category' => $category, 'product' => $product]) }}"
                                        class="btn btn-primary">

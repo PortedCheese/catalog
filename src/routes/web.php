@@ -7,6 +7,21 @@ if (! siteconf()->get('catalog.useOwnAdminRoutes')) {
         'as' => 'admin.',
         'prefix' => 'admin',
     ], function () {
+        // Статусы заказа.
+        Route::resource('order-state', 'OrderStateController')->parameters([
+            'order-state' => 'state',
+        ]);
+
+        // Заказы.
+        Route::resource('order', 'OrderController')->except([
+            'create', 'store', 'edit'
+        ]);
+
+        // Метки товара.
+        Route::resource('product-state', 'ProductStateController')->parameters([
+            'product-state' => 'state',
+        ]);
+
         // Управление категориями.
         Route::resource('category', 'CategoryController');
 
@@ -14,6 +29,7 @@ if (! siteconf()->get('catalog.useOwnAdminRoutes')) {
         Route::get('product', 'ProductController@index')
             ->name('product.index');
 
+        // Категории.
         Route::group([
             'prefix' => 'category/{category}',
             'as' => 'category.'
@@ -67,6 +83,10 @@ if (! siteconf()->get('catalog.useOwnAdminRoutes')) {
                 Route::delete('delete-image', 'ProductController@destroyImage')
                     ->name('destroy-image');
 
+                // Сменить статус публикации.
+                Route::put('published', 'ProductController@published')
+                    ->name('published');
+
                 // Галлерея.
                 Route::get('gallery', 'ProductController@gallery')
                     ->name('gallery');
@@ -77,5 +97,27 @@ if (! siteconf()->get('catalog.useOwnAdminRoutes')) {
                 ]);
             });
         });
+    });
+}
+
+if (! siteconf()->get('catalog.useOwnSiteRoutes')) {
+    Route::group([
+        'namespace' => 'PortedCheese\Catalog\Http\Controllers\Site',
+        'middleware' => ['web'],
+        'as' => 'site.catalog.',
+        'prefix' => 'catalog',
+    ], function () {
+        // Категории товара.
+        Route::get('/', 'CatalogController@index')
+            ->name('index');
+        Route::get('/{category}', 'CatalogController@showCategory')
+            ->name('category.show');
+        // Просмотр товара.
+        Route::get('/{category}/{product}', 'CatalogController@showProduct')
+            ->name('product.show');
+
+        // Заказ одного товара.
+        Route::post('/{product}/make-order', 'OrderController@makeProductOrder')
+            ->name('order-product');
     });
 }

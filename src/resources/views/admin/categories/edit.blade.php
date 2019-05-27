@@ -34,7 +34,12 @@
                        id="slug"
                        name="slug"
                        value="{{ old('slug') ? old('slug') : $category->slug }}"
-                       class="form-control">
+                       class="form-control{{ $errors->has('slug') ? ' is-invalid' : '' }}">
+                @if ($errors->has('slug'))
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $errors->first('slug') }}</strong>
+                    </span>
+                @endif
             </div>
 
             @if ($image)

@@ -1,0 +1,11 @@
+<?php
+
+namespace {{namespace}};
+
+use PortedCheese\Catalog\Models\ProductState as VendorProductState;
+
+
+class ProductState extends VendorProductState
+{
+
+}
