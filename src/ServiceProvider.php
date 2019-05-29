@@ -2,9 +2,13 @@
 
 namespace PortedCheese\Catalog;
 
+use App\Cart;
 use App\Category;
 use App\Product;
+use Illuminate\Contracts\Events\Dispatcher;
+use PortedCheese\Catalog\Console\Commands\CatalogClearCardsCommand;
 use PortedCheese\Catalog\Console\Commands\CatalogMakeCommand;
+use PortedCheese\Catalog\Console\Kernel;
 use PortedCheese\Catalog\Events\CategoryFieldUpdate;
 use PortedCheese\Catalog\Events\CreateNewOrder;
 use PortedCheese\Catalog\Events\ProductFieldUpdate;
@@ -44,10 +48,16 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         // Подгрузка шаблонов.
         $this->loadViewsFrom(__DIR__ . '/resources/views', 'catalog');
 
+        // Assets.
+        $this->publishes([
+            __DIR__ . '/resources/js/components' => resource_path('js/components/vendor/catalog'),
+        ], 'public');
+
         // Console.
         if ($this->app->runningInConsole()) {
             $this->commands([
                 CatalogMakeCommand::class,
+                CatalogClearCardsCommand::class,
             ]);
         }
 
@@ -56,11 +66,34 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         $this->app['events']->listen(ProductFieldUpdate::class, ProductFieldClearCache::class);
         // Создание заказа.
         $this->app['events']->listen(CreateNewOrder::class, SendNewOrderNotify::class);
+
+        // Информация о текущей корзине.
+        view()->composer('catalog::site.cart.cart-state', function ($view) {
+            $cartData = (object) [
+                'total' => 0,
+                'count' => 0,
+            ];
+            $cart = Cart::getCart();
+            if ($cart) {
+                $cartData->total = $cart->total;
+                $cartData->count = $cart->getCount();
+            }
+            else {
+            }
+            $view->with('cartData', $cartData);
+        });
     }
 
     public function register()
     {
+        if (env("CATALOG_CRON", false)) {
+            $this->app->singleton('portedcheese.catalog.console.kernel', function ($app) {
+                $dispatcher = $app->make(Dispatcher::class);
+                return new Kernel($app, $dispatcher);
+            });
 
+            $this->app->make('portedcheese.catalog.console.kernel');
+        }
     }
 
 }

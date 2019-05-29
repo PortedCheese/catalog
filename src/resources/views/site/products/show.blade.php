@@ -16,7 +16,11 @@
                 </div>
             @endif
             <div class="product-variations {{ $class }}">
-                @include("catalog::site.products.variations", ['variations' => $variations, 'product' => $product])
+                @include("catalog::site.products.variations", [
+                                'variations' => $variations,
+                                'product' => $product,
+                                'useCart' => $useCart,
+                            ])
 
             </div>
         </div>

@@ -81,6 +81,7 @@ class CatalogController extends Controller
             'fields' => $product->getFieldsInfo($category),
             'variations' => $variations,
             'gallery' => $product->images,
+            'useCart' => siteconf()->get('catalog.useCart'),
         ];
         return view('catalog::site.products.show', $data);
     }

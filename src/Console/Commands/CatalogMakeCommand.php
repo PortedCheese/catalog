@@ -39,6 +39,7 @@ class CatalogMakeCommand extends BaseConfigModelCommand
         'Order.stub' => 'Order.php',
         'OrderState.stub' => 'OrderState.php',
         'OrderItem.stub' => 'OrderItem.php',
+        'Cart.stub' => 'Cart.php',
     ];
 
     protected $configName = 'catalog';
@@ -46,6 +47,7 @@ class CatalogMakeCommand extends BaseConfigModelCommand
     protected $configValues = [
         'useOwnSiteRoutes' => false,
         'useOwnAdminRoutes' => false,
+        'useCart' => false,
     ];
 
     protected $dir = __DIR__;
@@ -71,6 +73,7 @@ class CatalogMakeCommand extends BaseConfigModelCommand
             $this->exportModels();
         }
         $this->makeMenu();
+        $this->makeConfig();
     }
 
     protected function makeMenu() {
