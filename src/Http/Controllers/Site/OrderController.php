@@ -65,6 +65,11 @@ class OrderController extends Controller
         $order = Order::create($orderData);
         
         $cart = Cart::getCart();
+        if (! $cart) {
+            return redirect()
+                ->route('site.cart.index')
+                ->with('danger', "Корзина не найдена");
+        }
         $variations = [];
         foreach ($cart->items as $product) {
             foreach ($product['variations'] as $vid => $quantity) {
@@ -100,7 +105,7 @@ class OrderController extends Controller
             'states' => OrderState::getList(),
             'page' => $query->get('page', 1) - 1,
             'query' => $query,
-            'per' => self::PAGER,
+            'per' => $perPage,
         ]);
     }
 

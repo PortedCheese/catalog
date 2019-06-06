@@ -82,12 +82,27 @@ class Cart extends Model
     public static function getCart()
     {
         $cookie = Cookie::get('cartUuid', false);
+        // Ищем по куке.
         if ($cookie) {
             $cart = self::findByUuid($cookie);
             if ($cart) {
+                // Если авторизован, нужно записать ему эту корзину.
+                if (Auth::check()) {
+                    $user = Auth::user();
+                    $userCart = self::findByUserId($user->id);
+                    // Если у пользователя была корзина,
+                    // но он заполнил новую под гостем,
+                    // новая корзина приоритетней.
+                    if ($userCart && $userCart->id != $cart->id) {
+                        $userCart->delete();
+                        $cart->user_id = $user->id;
+                        $cart->save();
+                    }
+                }
                 return $cart;
             }
         }
+        // Ищем по пользователю.
         if (Auth::check()) {
             $user = Auth::user();
             $cart = self::findByUserId($user->id);

@@ -93,7 +93,7 @@ class CatalogMakeCommand extends BaseConfigModelCommand
         $title = "Заказы";
         $itemData = [
             'title' => $title,
-            'route' => '@admin.order-state.*|admin.order.*',
+            'route' => '@admin.order-state.*|admin.order.*|admin.cart.*',
             'class' =>'@fab fa-jedi-order',
             'menu_id' => $menu->id,
             'url' => '#',
@@ -131,6 +131,17 @@ class CatalogMakeCommand extends BaseConfigModelCommand
                 'menu_id' => $menu->id,
                 'parent_id' => $menuItem->id,
                 'route' => 'admin.order.index',
+            ]);
+            $this->info("Элемент меню 'Заказы.{$title}' создан");
+        }
+
+        $title = "Корзины";
+        if (! in_array($title, $titles)) {
+            MenuItem::create([
+                'title' => $title,
+                'menu_id' => $menu->id,
+                'parent_id' => $menuItem->id,
+                'route' => 'admin.cart.index',
             ]);
             $this->info("Элемент меню 'Заказы.{$title}' создан");
         }

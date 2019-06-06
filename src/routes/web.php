@@ -12,7 +12,12 @@ if (! siteconf()->get('catalog.useOwnAdminRoutes')) {
                 'as' => 'cart.',
                 'prefix' => 'cart',
             ], function () {
-
+                Route::get('/', 'CartController@index')
+                    ->name('index');
+                Route::get('/{cart}', 'CartController@show')
+                    ->name('show');
+                Route::delete('/{cart}', 'CartController@destroy')
+                    ->name('destroy');
             });
         }
 

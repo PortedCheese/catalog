@@ -38,3 +38,9 @@
         </div>
     </div>
 @endsection
+
+@section('links')
+    <div class="col-12">
+        {{ $orders->links() }}
+    </div>
+@endsection
