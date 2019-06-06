@@ -1,8 +1,8 @@
 <template>
     <form class="variationQuantityForm">
-        <div class="input-group input-group-sm">
+        <div class="input-group input-group mb-2 mr-2">
             <div class="input-group-prepend">
-                <button class="btn btn-outline-secondary"
+                <button class="btn btn-outline-secondary px-1"
                         type="button"
                         :disabled="quantity <= 1 || loading"
                         @click="changeQuantity(true)">
@@ -15,7 +15,7 @@
                    @change.self="sendQuantity"
                    v-model.lazy="quantity" min="1">
             <div class="input-group-append">
-                <button class="btn btn-outline-secondary"
+                <button class="btn btn-outline-secondary px-1"
                         type="button"
                         :disabled="loading"
                         @click="changeQuantity(false)">
@@ -71,6 +71,7 @@
                         let $tr = $("#variation-" + this.variationId);
                         $tr.find('.variation-price').html(result.itemPrice);
                         $tr.find('.variation-total').html(result.itemTotal);
+                        $("#cart-total-side").html(result.cart.total);
                     })
                     .catch(error => {
                         this.error = true;
@@ -92,7 +93,7 @@
 
 <style scoped>
     .variationQuantityForm {
-        width: 120px;
+        /*width: 120px;*/
     }
     .variationQuantityForm input.form-control {
         text-align: center;

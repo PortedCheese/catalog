@@ -42,3 +42,5 @@ CATALOG_OLD_CARD_LIVE=7 - Сколько дней живут корзины ан
 CATALOG_ORDERS_ADMIN_PAGER=20 - Сколько заказов на страницу в админке
 CATALOG_PRODUCT_ADMIN_PAGER=20 - Сколько товаров на страницу в админке
 CATALOG_PRODUCT_STATE_ADMIN_PAGER=20 - Сколько статусов товара на странице в админке
+
+CATALOG_ORDERS_PROFILE_PAGER=10 - Сколько заказов в профиле пользователя

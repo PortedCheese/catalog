@@ -245,7 +245,19 @@ class Product extends Model
         if (!empty($cached)) {
             return $cached;
         }
-        $view = view("catalog::site.products.teaser", ['product' => $this]);
+        $states = $this->states;
+        $variation = \App\ProductVariation::query()
+            ->select('price')
+            ->where('product_id', $this->id)
+            ->orderBy('price')
+            ->first();
+        $view = view("catalog::site.products.teaser", [
+            'product' => $this,
+            'image' => $this->image,
+            'hasStates' => $states->count(),
+            'states' => $states,
+            'variation' => $variation,
+        ]);
         $html = $view->render();
 //        Cache::forever("category-teaser:{$this->id}", $html);
         return $html;

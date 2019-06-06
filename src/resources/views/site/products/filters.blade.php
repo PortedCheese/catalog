@@ -26,8 +26,8 @@
                     <div class="form-group">
                         <label>{{ $filter->title }}</label>
                         @foreach($filter->values as $value)
-                            <div class="form-check">
-                                <input class="form-check-input"
+                            <div class="custom-control custom-checkbox">
+                                <input class="custom-control-input"
                                        type="checkbox"
                                        @if (in_array($value, $query->get("check-{$filter->machine}", [])))
                                        checked
@@ -35,7 +35,7 @@
                                        value="{{ $value }}"
                                        id="check-{{ "{$loop->iteration}-{$filter->machine}" }}"
                                        name="check-{{ "{$filter->machine}" }}[]">
-                                <label class="form-check-label" for="check-{{ "{$loop->iteration}-{$filter->machine}" }}">
+                                <label class="custom-control-label" for="check-{{ "{$loop->iteration}-{$filter->machine}" }}">
                                     {{ $value }}
                                 </label>
                             </div>
@@ -69,7 +69,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-12">
+                            <div class="col-12 mt-2">
                                 <div class="steps-slider"></div>
                             </div>
                         </div>
@@ -78,11 +78,11 @@
             @endswitch
         @endforeach
 
-        <div class="btn-group"
+        <div class="btn-group-vertical btn-block mt-2"
              role="group">
             <button type="submit" class="btn btn-primary">Применить</button>
             <a href="{{ route("site.catalog.category.show", ['category' => $category]) }}"
-               class="btn btn-secondary">
+               class="btn btn-link">
                 Сбросить
             </a>
         </div>

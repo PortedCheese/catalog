@@ -47,7 +47,7 @@
                        min="0"
                        id="price"
                        name="price"
-                       value="{{ old('price') }}"
+                       value="{{ old('price', 0) }}"
                        required
                        class="form-control{{ $errors->has('price') ? ' is-invalid' : '' }}">
                 @if ($errors->has('price'))
@@ -64,7 +64,7 @@
                        min="0"
                        id="sale_price"
                        name="sale_price"
-                       value="{{ old('sale_price') }}"
+                       value="{{ old('sale_price', 0) }}"
                        class="form-control">
             </div>
 

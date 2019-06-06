@@ -72,7 +72,12 @@ class CatalogController extends Controller
         if (!$product->published) {
             abort(404);
         }
-        $variations = $product->variations;
+        $collection = $product->variations->sortBy('price');
+        $variations = [];
+        foreach ($collection as $item) {
+            $variations[] = $item;
+        }
+        $states = $product->states;
         $data = [
             'category' => $category,
             'product' => $product,
@@ -82,6 +87,8 @@ class CatalogController extends Controller
             'variations' => $variations,
             'gallery' => $product->images,
             'useCart' => siteconf()->get('catalog.useCart'),
+            'hasStates' => $states->count(),
+            'states' => $states,
         ];
         return view('catalog::site.products.show', $data);
     }

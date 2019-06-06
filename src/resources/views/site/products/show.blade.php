@@ -7,21 +7,29 @@
 @section('content')
     <div class="col-12 mt-2">
         <div class="row mb-3">
-            @php
-                $class = $image ? "col-12 col-md-8" : "col-12";
-            @endphp
-            @if ($image)
-                <div class="col-12 col-md-4">
+            <div class="col-12 col-md-4{{ $image ? '' : " text-center" }}">
+                @if ($hasStates)
+                    <div class="states left pl-3">
+                        @foreach($states as $state)
+                            <span class="badge badge-{{ $state->color }} px-3 py-2 mt-2">
+                                {{ $state->title }}
+                            </span>
+                            <br>
+                        @endforeach
+                    </div>
+                @endif
+                @if ($image)
                     @image(['image' => $image, 'template' => 'large'])@endimage
-                </div>
-            @endif
-            <div class="product-variations {{ $class }}">
+                @else
+                    <i class="far fa-image fa-9x"></i>
+                @endif
+            </div>
+            <div class="product-variations col-12 col-md-8">
                 @include("catalog::site.products.variations", [
                                 'variations' => $variations,
                                 'product' => $product,
                                 'useCart' => $useCart,
                             ])
-
             </div>
         </div>
         <div class="clearfix"></div>

@@ -49,8 +49,9 @@
                 <thead>
                 <tr>
                     <th>#</th>
-                    <th>Пользователь</th>
+                    <th>Имя</th>
                     <th>E-mail</th>
+                    <th>Телефон</th>
                     <th>Статус</th>
                     <th>Сумма</th>
                     <th>Создан</th>
@@ -67,14 +68,33 @@
                             $name = $user->full_name;
                         }
                         else {
-                            $email = $userData['email'];
+                            $user = false;
+                            $email = !empty($userData['email']) ? $userData['email'] : false;
                             $name = $userData['name'];
                         }
+                        $phone = !empty($userData['phone']) ? $userData['phone'] : false;
                     @endphp
                     <tr>
                         <td>{{ $page * $per + $loop->iteration }}</td>
-                        <td>{{ $name }}</td>
-                        <td>{{ $email }}</td>
+                        <td>
+                            @if ($user)
+                                <a target="_blank" href="{{ route('admin.users.index', ['user' => $user, 'login' => $user->login]) }}">
+                                    {{ $name }}
+                                </a>
+                            @else
+                                {{ $name }}
+                            @endif
+                        </td>
+                        <td>
+                            @if ($email)
+                                <a href="mailto:{{ $email }}">{{ $email }}</a>
+                            @endif
+                        </td>
+                        <td>
+                            @if ($phone)
+                                <a href="phone:{{ $phone }}">{{ $phone }}</a>
+                            @endif
+                        </td>
                         <td>
                             <form action="{{ route('admin.order.update', ['order' => $order]) }}"
                                   method="post"

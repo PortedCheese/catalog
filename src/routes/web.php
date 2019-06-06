@@ -112,6 +112,18 @@ if (! siteconf()->get('catalog.useOwnAdminRoutes')) {
 if (! siteconf()->get('catalog.useOwnSiteRoutes')) {
     Route::group([
         'namespace' => 'PortedCheese\Catalog\Http\Controllers\Site',
+        'as' => 'profile.order.',
+        'prefix' => 'profile/orders',
+        'middleware' => ['web', 'auth', 'verified'],
+    ], function () {
+        Route::get('/', "OrderController@userList")
+            ->name('index');
+        Route::get("/{order}", "OrderController@showOrder")
+            ->name('show');
+    });
+
+    Route::group([
+        'namespace' => 'PortedCheese\Catalog\Http\Controllers\Site',
         'middleware' => ['web'],
         'as' => 'site.',
     ], function () {

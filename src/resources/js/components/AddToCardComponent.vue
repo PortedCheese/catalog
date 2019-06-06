@@ -1,13 +1,13 @@
 <template>
     <div class="col-12">
-        <form>
+        <form v-if="variations.length">
             <product-variations :variations="variations" v-model="chosenVariation"></product-variations>
 
             <div class="form-group">
                 <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
-                    <div class="input-group input-group-sm">
+                    <div class="input-group input-group-lg mb-2 mr-2">
                         <div class="input-group-prepend">
-                            <button class="btn btn-outline-secondary"
+                            <button class="btn btn-outline-secondary px-1"
                                     type="button"
                                     :disabled="quantity <= 1"
                                     @click="changeQuantity(true)">
@@ -16,7 +16,7 @@
                         </div>
                         <input type="number" class="form-control" id="variationQuantity" v-model="quantity" min="1">
                         <div class="input-group-append">
-                            <button class="btn btn-outline-secondary"
+                            <button class="btn btn-outline-secondary px-1"
                                     type="button"
                                     @click="changeQuantity(false)">
                                 <i class="fas fa-plus"></i>
@@ -24,7 +24,7 @@
                         </div>
                     </div>
 
-                    <div class="btn-group btn-group-sm ml-2"
+                    <div class="btn-group btn-group-lg mb-2"
                          role="group">
                         <button type="button"
                                 class="btn btn-primary"
@@ -106,7 +106,7 @@
 
 <style scoped>
     #variationQuantity {
-        width: 60px;
+        width: 80px;
         text-align: center;
     }
 </style>

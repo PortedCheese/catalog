@@ -1,8 +1,14 @@
-<div class="card category-teaser shadow h-100">
+<div class="card card-base category-teaser h-100">
     @isset ($category->image)
-        <img src="{{ route('imagecache', ['template' => 'large', 'filename' => $category->image->file_name]) }}"
-             class="card-img-top"
-             alt="{{ $category->image->name }}">
+        @picture([
+            'image' => $category->image,
+            'template' => "sm-grid-12",
+            'grid' => [
+                "lg-grid-3" => 992,
+                'md-grid-6' => 768,
+            ],
+            'imgClass' => 'card-img-top',
+        ])@endpicture
     @endisset
     <div class="card-body">
         <h5 class="card-title">{{ $category->title }}</h5>
@@ -10,7 +16,7 @@
     </div>
     <div class="card-footer">
         <a href="{{ route('site.catalog.category.show', ['category' => $category]) }}"
-           class="card-link">
+           class="btn btn-primary px-4 py-2">
             Подробнее
         </a>
     </div>

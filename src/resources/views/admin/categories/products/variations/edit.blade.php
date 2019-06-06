@@ -41,13 +41,15 @@
             </div>
 
             <div class="form-group">
+                {{ debugbar()->info(number_format($variation->price, 2, '.', '')) }}
+                {{ debugbar()->info($variation->price) }}
                 <label for="price">Цена</label>
                 <input type="number"
                        step="0.01"
                        min="0"
                        id="price"
                        name="price"
-                       value="{{ old('price') ? old('price') : $variation->price }}"
+                       value="{{ old('price') ? old('price') : number_format($variation->price, 2, '.', '') }}"
                        required
                        class="form-control{{ $errors->has('price') ? ' is-invalid' : '' }}">
                 @if ($errors->has('price'))
@@ -64,7 +66,7 @@
                        min="0"
                        id="sale_price"
                        name="sale_price"
-                       value="{{ old('sale_price') ? old('sale_price') : $variation->sale_price }}"
+                       value="{{ old('sale_price') ? old('sale_price') : number_format($variation->sale_price, 2, '.', '') }}"
                        class="form-control">
             </div>
 
