@@ -263,6 +263,7 @@ class Product extends Model
         $variation = \App\ProductVariation::query()
             ->select('price')
             ->where('product_id', $this->id)
+            ->where('available', 1)
             ->orderBy('price')
             ->first();
         $view = view("catalog::site.products.teaser", [

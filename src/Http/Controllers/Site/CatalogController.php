@@ -5,6 +5,7 @@ namespace PortedCheese\Catalog\Http\Controllers\Site;
 use App\Category;
 use App\Http\Controllers\Controller;
 use App\Product;
+use App\ProductVariation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use PortedCheese\Catalog\Http\Services\ProductFilterService;
@@ -75,7 +76,11 @@ class CatalogController extends Controller
         if (!$product->published) {
             abort(404);
         }
-        $collection = $product->variations->sortBy('price');
+        $collection = ProductVariation::query()
+            ->where('product_id', $product->id)
+            ->orderByDesc('available')
+            ->orderBy('price')
+            ->get();
         $variations = [];
         foreach ($collection as $item) {
             $variations[] = $item;

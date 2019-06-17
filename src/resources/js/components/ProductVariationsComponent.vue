@@ -40,8 +40,10 @@
             variationData() {
                 let variation = false;
                 for (let item in this.variations) {
-                    if (this.variations[item].id === this.chosenVariation) {
-                        variation = this.variations[item];
+                    if (this.variations.hasOwnProperty(item)) {
+                        if (this.variations[item].id === this.chosenVariation) {
+                            variation = this.variations[item];
+                        }
                     }
                 }
                 return variation;
@@ -51,10 +53,13 @@
             this.chosenVariation = this.chosen;
             if (! this.chosenVariation && this.variations.length) {
                 for (let item in this.variations) {
-                    if (this.variations[item].available) {
-                        this.chosenVariation = this.variations[0].id;
-                        this.$emit('change', this.chosenVariation);
-                        break;
+                    if (this.variations.hasOwnProperty(item)) {
+                        console.log(this.variations[item].available);
+                        if (this.variations[item].available) {
+                            this.chosenVariation = this.variations[item].id;
+                            this.$emit('change', this.chosenVariation);
+                            break;
+                        }
                     }
                 }
             }
