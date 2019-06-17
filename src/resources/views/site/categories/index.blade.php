@@ -30,6 +30,7 @@
                             @include("catalog::site.products.filters", [
                                 'product' => $products,
                                 'category' => $category,
+                                'filters' => $filters,
                                 'query' => $query,
                             ])
                         </div>
@@ -62,6 +63,7 @@
         @include("catalog::site.products.filters", [
                             'product' => $products,
                             'category' => $category,
+                            'filters' => $filters,
                             'query' => $query,
                         ])
     @endsection

@@ -1,7 +1,7 @@
 <div class="col-12">
     <form action="{{ route("site.catalog.category.show", ['category' => $category]) }}"
           method="get">
-        @foreach ($category->getFilters() as $filter)
+        @foreach ($filters as $filter)
             @switch($filter->type)
                 @case('select')
                     <div class="form-group">
@@ -50,9 +50,9 @@
                             <div class="col-6">
                                 <input type="number"
                                        name="range-from-{{ $filter->machine }}"
-                                       step="10"
-                                       min="{{ min($filter->values) }}"
-                                       max="{{ max($filter->values) }}"
+                                       step="1"
+                                       min="{{ min($filter->values) - 10 }}"
+                                       max="{{ max($filter->values) + 10 }}"
                                        data-value="{{ min($filter->values) }}"
                                        data-init="{{ $query->get("range-from-{$filter->machine}", min($filter->values)) }}"
                                        class="form-control from-input">
@@ -60,9 +60,9 @@
                             <div class="col-6">
                                 <input type="number"
                                        name="range-to-{{ $filter->machine }}"
-                                       step="10"
-                                       min="{{ min($filter->values) }}"
-                                       max="{{ max($filter->values) }}"
+                                       step="1"
+                                       min="{{ min($filter->values) - 10 }}"
+                                       max="{{ max($filter->values) + 10 }}"
                                        data-value="{{ max($filter->values) }}"
                                        data-init="{{ $query->get("range-to-{$filter->machine}", max($filter->values)) }}"
                                        class="form-control to-input">
@@ -82,7 +82,7 @@
              role="group">
             <button type="submit" class="btn btn-primary">Применить</button>
             <a href="{{ route("site.catalog.category.show", ['category' => $category]) }}"
-               class="btn btn-link">
+               class="btn btn-outline-secondary">
                 Сбросить
             </a>
         </div>

@@ -67,7 +67,7 @@ class ProductFilterService
         if (!empty($this->having)) {
             $this->products->havingRaw(implode(" and ", $this->having));
         }
-        $this->products->orderBy('products.created_at', 'desc');
+        $this->products->orderBy('products.updated_at', 'desc');
         $perPage = env("CATALOG_PRODUCT_SITE_PAGER", self::PAGER);
 
         return $this->products->paginate($perPage)->appends($this->request->input());

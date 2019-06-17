@@ -45,15 +45,18 @@ class CatalogController extends Controller
     {
         $categories = $category->children;
         $products = NULL;
+        $filters = [];
 
-        if (!$categories->count()) {
+        if (! $categories->count()) {
             $filter = new ProductFilterService($request, $category);
             $products = $filter->makeFilter();
+            $filters = $category->getFilters();
         }
 
         return view("catalog::site.categories.index", [
             'categories' => $categories,
             'products' => $products,
+            'filters' => $filters,
             'category' => $category,
             'siteBreadcrumb' => $category->getSiteBreadcrumb(),
             'query' => $request->query,

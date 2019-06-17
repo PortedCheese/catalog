@@ -42,6 +42,7 @@ class Category extends Model
             }
             // Очистка кэша.
             $model->forgetFieldsCache();
+            $model->forgetTeaserCache();
         });
 
         static::created(function ($model) {
@@ -49,6 +50,12 @@ class Category extends Model
             $model->createDefaultMetas();
             // Поля родителя.
             $model->setParentFields();
+        });
+
+        static::updated(function ($model) {
+            // Очистка кэша.
+            $model->forgetTeaserCache();
+            $model->forgetBreadcrumbCache();
         });
     }
 
@@ -331,7 +338,6 @@ class Category extends Model
             }
             return $cached;
         }
-
         $fields = Cache::rememberForever($key, function () {
             $fields = [];
             foreach ($this->fields as $field) {
@@ -351,14 +357,6 @@ class Category extends Model
             return $this->getOnlyFilter($fields);
         }
         return $fields;
-    }
-
-    /**
-     * Очистить кэш информации полей.
-     */
-    public function forgetFieldsCache()
-    {
-        Cache::forget("category-fields-info:{$this->id}");
     }
 
     /**
@@ -409,13 +407,14 @@ class Category extends Model
      */
     public function getTeaser()
     {
-        $cached = Cache::get("category-teaser:{$this->id}");
+        $key = "category-teaser:{$this->id}";
+        $cached = Cache::get($key);
         if (!empty($cached)) {
             return $cached;
         }
         $view = view("catalog::site.categories.teaser", ['category' => $this]);
         $html = $view->render();
-//        Cache::forever("category-teaser:{$this->id}", $html);
+        Cache::forever($key, $html);
         return $html;
     }
 
@@ -426,37 +425,47 @@ class Category extends Model
      */
     public function getSiteBreadcrumb($productPage = false)
     {
-        $breadcrumb = [];
-        // TODO: add cache.
-        if (!empty($this->parent)) {
-            $breadcrumb = $this->parent->getSiteBreadcrumb();
+        $key = "category-breadcrumb:{$this->id}-" . ($productPage ? '1' : '0');
+
+        $cached = Cache::get($key);
+        if (!empty($cached)) {
+            return $cached;
         }
-        else {
+
+        return Cache::rememberForever($key, function () use ($productPage) {
+            $breadcrumb = [];
+
+            if (!empty($this->parent)) {
+                $breadcrumb = $this->parent->getSiteBreadcrumb();
+            }
+            else {
+                $breadcrumb[] = (object) [
+                    'title' => self::PAGE_NAME,
+                    'url' => route(self::PAGE_ROUTE),
+                    'active' => false,
+                ];
+            }
+            $routeParams = Route::current()->parameters();
+            $productPage = $productPage && !empty($routeParams['product']);
+            $active = !empty($routeParams['category']) &&
+                $routeParams['category']->id == $this->id &&
+                !$productPage;
             $breadcrumb[] = (object) [
-                'title' => self::PAGE_NAME,
-                'url' => route(self::PAGE_ROUTE),
-                'active' => false,
+                'title' => $this->title,
+                'url' => route('site.catalog.category.show', ['category' => $this]),
+                'active' => $active,
             ];
-        }
-        $routeParams = Route::current()->parameters();
-        $productPage = $productPage && !empty($routeParams['product']);
-        $active = !empty($routeParams['category']) &&
-            $routeParams['category']->id == $this->id &&
-            !$productPage;
-        $breadcrumb[] = (object) [
-            'title' => $this->title,
-            'url' => route('site.catalog.category.show', ['category' => $this]),
-            'active' => $active,
-        ];
-        if ($productPage) {
-            $product = $routeParams['product'];
-            $breadcrumb[] = (object) [
-                'title' => $product->title,
-                'url' => route('admin.category.product.show', ['category' => $this, 'product' => $product]),
-                'active' => true,
-            ];
-        }
-        return $breadcrumb;
+            if ($productPage) {
+                $product = $routeParams['product'];
+                $breadcrumb[] = (object) [
+                    'title' => $product->title,
+                    'url' => route('admin.category.product.show', ['category' => $this, 'product' => $product]),
+                    'active' => true,
+                ];
+            }
+
+            return $breadcrumb;
+        });
     }
 
     /**
@@ -466,8 +475,6 @@ class Category extends Model
      */
     public function getFilters()
     {
-        // TODO: get from cache.
-
         $fieldsInfo = $this->getFieldsInfo(true);
 
         $pids = $this->getPids();
@@ -515,7 +522,6 @@ class Category extends Model
                 'values' => $prices,
             ]);
         }
-        debugbar()->info($fieldsInfo);
     }
 
     /**
@@ -603,9 +609,37 @@ class Category extends Model
             ->where('category_id', $this->id)
             ->get();
         $pids = [];
+
         foreach ($products as $product) {
             $pids[] = $product->id;
         }
+
         return $pids;
+    }
+
+    /**
+     * Очистить кэш информации полей.
+     */
+    public function forgetFieldsCache()
+    {
+        Cache::forget("category-fields-info:{$this->id}");
+    }
+
+    /**
+     * Очистить кэш тизера.
+     */
+    public function forgetTeaserCache()
+    {
+        Cache::forget("category-teaser:{$this->id}");
+    }
+
+    /**
+     * Очистить кэш хлебных крошек.
+     */
+    public function forgetBreadcrumbCache()
+    {
+        $key = "category-breadcrumb:{$this->id}-";
+        Cache::forget($key . "1");
+        Cache::forget($key . "0");
     }
 }

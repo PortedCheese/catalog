@@ -87,7 +87,7 @@ class Cart extends Model
             $cart = self::findByUuid($cookie);
             if ($cart) {
                 // Если авторизован, нужно записать ему эту корзину.
-                if (Auth::check()) {
+                if (Auth::check() && empty($cart->user_id)) {
                     $user = Auth::user();
                     $userCart = self::findByUserId($user->id);
                     // Если у пользователя была корзина,

@@ -3,6 +3,7 @@
 namespace PortedCheese\Catalog\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use PortedCheese\Catalog\Events\ProductVariationUpdate;
 
 class ProductVariation extends Model
 {
@@ -15,6 +16,23 @@ class ProductVariation extends Model
         'sale',
         'available',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($model) {
+            event(new ProductVariationUpdate($model));
+        });
+
+        static::updated(function ($model) {
+            event(new ProductVariationUpdate($model));
+        });
+
+        static::deleting(function ($model) {
+            event(new ProductVariationUpdate($model));
+        });
+    }
 
     /**
      * Относится к товару.

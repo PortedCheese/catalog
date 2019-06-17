@@ -6,6 +6,7 @@ use App\Image;
 use function foo\func;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
+use PortedCheese\Catalog\Events\ProductUpdate;
 use PortedCheese\SeoIntegration\Models\Meta;
 
 class Product extends Model
@@ -27,18 +28,30 @@ class Product extends Model
         static::deleting(function ($model) {
             // Удаляем главное изображение.
             $model->clearMainImage();
+
             // Удаляем метатеги.
             $model->clearMetas();
+
             // Чистим галлерею.
             $model->clearImages();
+
             // Очистить вариации.
             $model->clearVariations();
+
             // Очистить значения полей.
             $model->clearFields();
-            // Очистить кэш значений полей.
+
+            // Очистить кэш.
             $model->forgetFieldsCache();
+            $model->forgetTeaserCache();
+
             // Очистить метки.
             $model->states()->detach();
+        });
+
+        static::updated(function ($model) {
+            // Очистить кэш.
+            $model->forgetTeaserCache();
         });
 
         static::created(function ($model) {
@@ -234,14 +247,15 @@ class Product extends Model
     }
 
     /**
-     * Получить тизер категории.
+     * Получить тизер товара.
      *
      * @return string
      * @throws \Throwable
      */
     public function getTeaser()
     {
-        $cached = Cache::get("product-teaser:{$this->id}");
+        $key = "product-teaser:{$this->id}";
+        $cached = Cache::get($key);
         if (!empty($cached)) {
             return $cached;
         }
@@ -259,7 +273,7 @@ class Product extends Model
             'variation' => $variation,
         ]);
         $html = $view->render();
-//        Cache::forever("category-teaser:{$this->id}", $html);
+        Cache::forever($key, $html);
         return $html;
     }
 
@@ -315,5 +329,13 @@ class Product extends Model
     public function forgetFieldsCache()
     {
         Cache::forget("product-fields:{$this->id}");
+    }
+
+    /**
+     * Очистить кэш тизера.
+     */
+    public function forgetTeaserCache()
+    {
+        Cache::forget("product-teaser:{$this->id}");
     }
 }

@@ -1,5 +1,5 @@
 <div class="card card-base category-teaser h-100">
-    @isset ($category->image)
+    @if ($category->image)
         @picture([
             'image' => $category->image,
             'template' => "sm-grid-12",
@@ -9,7 +9,11 @@
             ],
             'imgClass' => 'card-img-top',
         ])@endpicture
-    @endisset
+    @else
+        <div class="empty-image">
+            <i class="far fa-image fa-9x"></i>
+        </div>
+    @endempty
     <div class="card-body">
         <h5 class="card-title">{{ $category->title }}</h5>
         <p class="card-text">{{ $category->description }}</p>

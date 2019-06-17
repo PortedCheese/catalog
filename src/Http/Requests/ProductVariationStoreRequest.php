@@ -28,6 +28,7 @@ class ProductVariationStoreRequest extends FormRequest
             'product_id' => 'required|exists:products,id',
             'price' => 'required|numeric|min:0',
             'sale_price' => 'nullable|numeric|min:0',
+            'description' => 'required|min:2',
         ];
     }
 
@@ -38,6 +39,7 @@ class ProductVariationStoreRequest extends FormRequest
             'product_id' => "Товар",
             'price' => 'Цена',
             'sale_price' => 'Цена со скидкой',
+            'description' => 'Описание',
         ];
     }
 }

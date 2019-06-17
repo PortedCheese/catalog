@@ -37,7 +37,13 @@
                        id="description"
                        name="description"
                        value="{{ old('description') ? old('description') : $variation->description }}"
-                       class="form-control">
+                       required
+                       class="form-control{{ $errors->has('description') ? ' is-invalid' : '' }}">
+                @if ($errors->has('description'))
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $errors->first('description') }}</strong>
+                    </span>
+                @endif
             </div>
 
             <div class="form-group">
