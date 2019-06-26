@@ -47,8 +47,6 @@
             </div>
 
             <div class="form-group">
-                {{ debugbar()->info(number_format($variation->price, 2, '.', '')) }}
-                {{ debugbar()->info($variation->price) }}
                 <label for="price">Цена</label>
                 <input type="number"
                        step="0.01"

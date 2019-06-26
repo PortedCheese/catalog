@@ -423,20 +423,15 @@ class Category extends Model
      *
      * @return array
      */
-    public function getSiteBreadcrumb($productPage = false)
+    public function getSiteBreadcrumb($productPage = false, $parent = false)
     {
-        $key = "category-breadcrumb:{$this->id}-" . ($productPage ? '1' : '0');
+        $key = "category-breadcrumb:{$this->id}";
 
-        $cached = Cache::get($key);
-        if (!empty($cached)) {
-            return $cached;
-        }
-
-        return Cache::rememberForever($key, function () use ($productPage) {
+        $breadcrumb = Cache::rememberForever($key, function () {
             $breadcrumb = [];
 
             if (!empty($this->parent)) {
-                $breadcrumb = $this->parent->getSiteBreadcrumb();
+                $breadcrumb = $this->parent->getSiteBreadcrumb(false, true);
             }
             else {
                 $breadcrumb[] = (object) [
@@ -445,27 +440,30 @@ class Category extends Model
                     'active' => false,
                 ];
             }
-            $routeParams = Route::current()->parameters();
-            $productPage = $productPage && !empty($routeParams['product']);
-            $active = !empty($routeParams['category']) &&
-                $routeParams['category']->id == $this->id &&
-                !$productPage;
+
             $breadcrumb[] = (object) [
                 'title' => $this->title,
                 'url' => route('site.catalog.category.show', ['category' => $this]),
-                'active' => $active,
+                'active' => false,
             ];
-            if ($productPage) {
-                $product = $routeParams['product'];
-                $breadcrumb[] = (object) [
-                    'title' => $product->title,
-                    'url' => route('admin.category.product.show', ['category' => $this, 'product' => $product]),
-                    'active' => true,
-                ];
-            }
 
             return $breadcrumb;
         });
+
+        if ($productPage) {
+            $routeParams = Route::current()->parameters();
+            $product = $routeParams['product'];
+            $breadcrumb[] = (object) [
+                'title' => $product->title,
+                'url' => route('admin.category.product.show', ['category' => $this, 'product' => $product]),
+                'active' => true,
+            ];
+        }
+        elseif (! $parent) {
+            $length = count($breadcrumb);
+            $breadcrumb[$length - 1]->active = true;
+        }
+        return $breadcrumb;
     }
 
     /**
@@ -638,8 +636,6 @@ class Category extends Model
      */
     public function forgetBreadcrumbCache()
     {
-        $key = "category-breadcrumb:{$this->id}-";
-        Cache::forget($key . "1");
-        Cache::forget($key . "0");
+        Cache::forget("category-breadcrumb:{$this->id}");
     }
 }

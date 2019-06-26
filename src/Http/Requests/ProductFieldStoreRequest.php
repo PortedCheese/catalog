@@ -24,7 +24,7 @@ class ProductFieldStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'value' => 'required|min:2',
+            'value' => 'required|min:1',
             'field_id' => 'required|exists:category_fields,id',
         ];
     }
