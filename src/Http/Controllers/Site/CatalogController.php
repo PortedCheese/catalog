@@ -9,6 +9,7 @@ use App\ProductVariation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use PortedCheese\Catalog\Http\Services\ProductFilterService;
+use PortedCheese\SeoIntegration\Models\Meta;
 
 class CatalogController extends Controller
 {
@@ -26,6 +27,7 @@ class CatalogController extends Controller
         return view("catalog::site.categories.index", [
             'categories' => $collection,
             'category' => null,
+            'pageMetas' => Meta::getByPageKey('catalog'),
             'siteBreadcrumb' => [
                 (object) [
                     'active' => true,
@@ -61,6 +63,7 @@ class CatalogController extends Controller
             'category' => $category,
             'siteBreadcrumb' => $category->getSiteBreadcrumb(),
             'query' => $request->query,
+            'pageMetas' => Meta::getByModelKey($category),
         ]);
     }
 
@@ -97,6 +100,7 @@ class CatalogController extends Controller
             'useCart' => siteconf()->get('catalog.useCart'),
             'hasStates' => $states->count(),
             'states' => $states,
+            'pageMetas' => Meta::getByModelKey($product),
         ];
         return view('catalog::site.products.show', $data);
     }

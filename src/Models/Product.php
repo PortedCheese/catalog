@@ -167,7 +167,7 @@ class Product extends Model
         if ($result['success'] && !empty($this->short)) {
             $meta = Meta::create([
                 'name' => 'description',
-                'content' => $this->description,
+                'content' => $this->short,
             ]);
             $meta->metable()->associate($this);
             $meta->save();
