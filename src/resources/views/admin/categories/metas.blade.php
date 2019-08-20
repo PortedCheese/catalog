@@ -6,10 +6,20 @@
 @section('admin')
     @include("catalog::admin.categories.pills", ['category' => $category])
     <div class="col-12">
-        <h2>Добавить тег</h2>
-        @include("seo-integration::admin.meta.create", ['model' => 'categories', 'id' => $category->id])
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Добавить тег</h5>
+            </div>
+            <div class="card-body">
+                @include("seo-integration::admin.meta.create", ['model' => 'categories', 'id' => $category->id])
+            </div>
+        </div>
     </div>
     <div class="col-12 mt-2">
-        @include("seo-integration::admin.meta.table-models", ['metas' => $category->metas])
+        <div class="card">
+            <div class="card-body">
+                @include("seo-integration::admin.meta.table-models", ['metas' => $category->metas])
+            </div>
+        </div>
     </div>
 @endsection

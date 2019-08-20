@@ -12,27 +12,35 @@
             @endphp
             @if ($image)
                 <div class="col-12 col-md-3">
-                    <img src="{{ route('imagecache', [
+                    <div class="card">
+                        <div class="card-body">
+                            <img src="{{ route('imagecache', [
                                 'template' => 'medium',
                                 'filename' => $image->file_name
                             ]) }}"
-                         class="img-thumbnail"
-                         alt="{{ $image->name }}">
-                    <confirm-delete-model-button model-id="{{ $category->id }}">
-                        <template slot="delete">
-                            <form action="{{ route('admin.category.destroy-image', ['category' => $category]) }}"
-                                  id="delete-{{ $category->id }}"
-                                  class="btn-group"
-                                  method="post">
-                                @csrf
-                                <input type="hidden" name="_method" value="DELETE">
-                            </form>
-                        </template>
-                    </confirm-delete-model-button>
+                                 class="img-thumbnail"
+                                 alt="{{ $image->name }}">
+                            <confirm-delete-model-button model-id="{{ $category->id }}">
+                                <template slot="delete">
+                                    <form action="{{ route('admin.category.destroy-image', ['category' => $category]) }}"
+                                          id="delete-{{ $category->id }}"
+                                          class="btn-group"
+                                          method="post">
+                                        @csrf
+                                        <input type="hidden" name="_method" value="DELETE">
+                                    </form>
+                                </template>
+                            </confirm-delete-model-button>
+                        </div>
+                    </div>
                 </div>
             @endif
             <div class="category-description {{ $class }}">
-                {{ $category->description }}
+                <div class="card">
+                    <div class="card-body">
+                        {{ $category->description }}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -46,37 +54,41 @@
 
 @section('links')
     <div class="col-12">
-        <confirm-delete-model-button model-id="{{ $category->id }}">
-            <template slot="edit">
-                <a href="{{ route('admin.category.edit', ['category' => $category]) }}" class="btn btn-primary">
-                    <i class="far fa-edit"></i>
-                </a>
-            </template>
-            <template slot="delete">
-                <form action="{{ route('admin.category.destroy', ['category' => $category]) }}"
-                      id="delete-{{ $category->id }}"
-                      class="btn-group"
-                      method="post">
-                    @csrf
-                    <input type="hidden" name="_method" value="DELETE">
-                </form>
-            </template>
-            <template slot="other">
-                <a href="{{ route('admin.category.index') }}"
-                   class="btn btn-outline-secondary">
-                    Список
-                </a>
-                @if ($parent)
-                    <a href="{{ route('admin.category.show', ['category' => $parent]) }}"
-                       class="btn btn-outline-secondary">
-                        {{ $parent->title }}
-                    </a>
-                @endif
-                <a href="{{ route('admin.category.create-child', ['category' => $category]) }}"
-                   class="btn btn-outline-success">
-                    Добавить
-                </a>
-            </template>
-        </confirm-delete-model-button>
+        <div class="card">
+            <div class="card-body">
+                <confirm-delete-model-button model-id="{{ $category->id }}">
+                    <template slot="edit">
+                        <a href="{{ route('admin.category.edit', ['category' => $category]) }}" class="btn btn-primary">
+                            <i class="far fa-edit"></i>
+                        </a>
+                    </template>
+                    <template slot="delete">
+                        <form action="{{ route('admin.category.destroy', ['category' => $category]) }}"
+                              id="delete-{{ $category->id }}"
+                              class="btn-group"
+                              method="post">
+                            @csrf
+                            <input type="hidden" name="_method" value="DELETE">
+                        </form>
+                    </template>
+                    <template slot="other">
+                        <a href="{{ route('admin.category.index') }}"
+                           class="btn btn-outline-secondary">
+                            Список
+                        </a>
+                        @if ($parent)
+                            <a href="{{ route('admin.category.show', ['category' => $parent]) }}"
+                               class="btn btn-outline-secondary">
+                                {{ $parent->title }}
+                            </a>
+                        @endif
+                        <a href="{{ route('admin.category.create-child', ['category' => $category]) }}"
+                           class="btn btn-outline-success">
+                            Добавить
+                        </a>
+                    </template>
+                </confirm-delete-model-button>
+            </div>
+        </div>
     </div>
 @endsection

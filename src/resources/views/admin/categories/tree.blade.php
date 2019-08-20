@@ -1,14 +1,18 @@
-<ul>
-    @foreach ($categories as $category)
-        <li>
-            <a href="{{ route('admin.category.show', ['category' => $category->slug]) }}"
-               class="btn btn-link">
-                {{ $category->title }}
-            </a>
-            <span class="badge badge-secondary">{{ count($category->children) }}</span>
-            @if (count($category->children))
-                @include("catalog::admin.categories.tree", ['categories' => $category->children])
-            @endif
-        </li>
-    @endforeach
-</ul>
+<div class="card">
+    <div class="card-body">
+        <ul>
+            @foreach ($categories as $category)
+                <li>
+                    <a href="{{ route('admin.category.show', ['category' => $category->slug]) }}"
+                       class="btn btn-link">
+                        {{ $category->title }}
+                    </a>
+                    <span class="badge badge-secondary">{{ count($category->children) }}</span>
+                    @if (count($category->children))
+                        @include("catalog::admin.categories.tree", ['categories' => $category->children])
+                    @endif
+                </li>
+            @endforeach
+        </ul>
+    </div>
+</div>

@@ -12,34 +12,39 @@
             @endphp
             @if ($image)
                 <div class="col-12 col-md-3">
-                    <img src="{{ route('imagecache', [
-                                'template' => 'medium',
-                                'filename' => $image->file_name
-                            ]) }}"
-                         class="img-thumbnail"
-                         alt="{{ $image->name }}">
-                    <confirm-delete-model-button model-id="{{ $product->id }}">
-                        <template slot="delete">
-                            <form action="{{ route('admin.category.product.destroy-image', [
+                    <div class="card">
+                        <div class="card-body">
+                            <img src="{{ route('imagecache', ['template' => 'medium', 'filename' => $image->file_name]) }}"
+                                 class="img-thumbnail"
+                                 alt="{{ $image->name }}">
+                            <confirm-delete-model-button model-id="{{ $product->id }}">
+                                <template slot="delete">
+                                    <form action="{{ route('admin.category.product.destroy-image', [
                                                 'category' => $category,
                                                 'product' => $product
                                             ]) }}"
-                                  id="delete-{{ $product->id }}"
-                                  class="btn-group"
-                                  method="post">
-                                @csrf
-                                <input type="hidden" name="_method" value="DELETE">
-                            </form>
-                        </template>
-                    </confirm-delete-model-button>
+                                          id="delete-{{ $product->id }}"
+                                          class="btn-group"
+                                          method="post">
+                                        @csrf
+                                        <input type="hidden" name="_method" value="DELETE">
+                                    </form>
+                                </template>
+                            </confirm-delete-model-button>
+                        </div>
+                    </div>
                 </div>
             @endif
             <div class="product-description {{ $class }}">
-                <div class="short mb-3">
-                    {{ $product->short }}
-                </div>
-                <div class="full">
-                    {!! $product->description !!}
+                <div class="card">
+                    <div class="card-body">
+                        <div class="short mb-3">
+                            {{ $product->short }}
+                        </div>
+                        <div class="full">
+                            {!! $product->description !!}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

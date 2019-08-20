@@ -7,20 +7,24 @@
     <div class="col-12">
         <div class="row">
             <div class="col-12">
-                <ul class="nav nav-pills mb-3">
-                    <li class="nav-item">
-                        <a href="{{ route('admin.category.index') }}"
-                           class="nav-link{{ $tree ? "" : " active" }}">
-                            Таблицей
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('admin.category.index') }}?view=tree"
-                           class="nav-link{{ $tree ? " active" : "" }}">
-                            Списком
-                        </a>
-                    </li>
-                </ul>
+                <div class="card">
+                    <div class="card-body">
+                        <ul class="nav nav-pills mb-3">
+                            <li class="nav-item">
+                                <a href="{{ route('admin.category.index') }}"
+                                   class="nav-link{{ $tree ? "" : " active" }}">
+                                    Таблицей
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.category.index') }}?view=tree"
+                                   class="nav-link{{ $tree ? " active" : "" }}">
+                                    Списком
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
             @if ($tree)
                 @include("catalog::admin.categories.tree", ['categories' => $categories])

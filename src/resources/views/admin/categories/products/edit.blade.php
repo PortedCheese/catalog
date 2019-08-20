@@ -6,133 +6,137 @@
 @section('admin')
     @include("catalog::admin.categories.products.pills", ['category' => $category, 'product' => $product])
     <div class="col-12">
-        <form action="{{ route('admin.category.product.update', ['category' => $category, 'product' => $product]) }}"
-              enctype="multipart/form-data"
-              method="post">
-            @csrf
-            @method('put')
+        <div class="card">
+            <div class="card-body">
+                <form action="{{ route('admin.category.product.update', ['category' => $category, 'product' => $product]) }}"
+                      enctype="multipart/form-data"
+                      method="post">
+                    @csrf
+                    @method('put')
 
-            <div class="form-group">
-                <label for="title">Заголовок</label>
-                <input type="text"
-                       id="title"
-                       name="title"
-                       value="{{ old('title') ? old('title') : $product->title }}"
-                       required
-                       class="form-control{{ $errors->has('title') ? ' is-invalid' : '' }}">
-                @if ($errors->has('title'))
-                    <span class="invalid-feedback" role="alert">
+                    <div class="form-group">
+                        <label for="title">Заголовок</label>
+                        <input type="text"
+                               id="title"
+                               name="title"
+                               value="{{ old('title') ? old('title') : $product->title }}"
+                               required
+                               class="form-control{{ $errors->has('title') ? ' is-invalid' : '' }}">
+                        @if ($errors->has('title'))
+                            <span class="invalid-feedback" role="alert">
                         <strong>{{ $errors->first('title') }}</strong>
                     </span>
-                @endif
-            </div>
-
-            <div class="form-group">
-                <label for="slug">Slug</label>
-                <input type="text"
-                       id="slug"
-                       name="slug"
-                       value="{{ old('slug') ? old('slug') : $product->slug }}"
-                       class="form-control">
-            </div>
-
-            <div class="form-group">
-                <label for="category_id">Категория</label>
-                <select name="category_id"
-                        id="category_id"
-                        class="form-control chosen-select">
-                    @foreach($categories as $key => $value)
-                        <option value="{{ $key }}"
-                                @if ($key == $category->id)
-                                    selected
-                                @elseif (old('category_id'))
-                                    selected
-                                @endif>
-                            {{ $value }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Метки</label>
-                @foreach($states as $state)
-                    <div class="form-check">
-                        <input class="form-check-input"
-                               type="checkbox"
-                               @if (old('check-' . $state->id))
-                               checked
-                               @elseif(in_array($state->id, $productStateIds))
-                               checked
-                               @endif
-                               value="{{ $state->id }}"
-                               id="check-{{ $state->id }}"
-                               name="check-{{ $state->id }}">
-                        <label class="form-check-label" for="check-{{ $state->id }}">
-                            {{ $state->title }}
-                        </label>
+                        @endif
                     </div>
-                @endforeach
-            </div>
 
-            <div class="form-group">
-                <label for="short">Краткое описание</label>
-                <input type="text"
-                       id="short"
-                       name="short"
-                       value="{{ old('short') ? old('short') : $product->short }}"
-                       class="form-control">
-            </div>
+                    <div class="form-group">
+                        <label for="slug">Slug</label>
+                        <input type="text"
+                               id="slug"
+                               name="slug"
+                               value="{{ old('slug') ? old('slug') : $product->slug }}"
+                               class="form-control">
+                    </div>
 
-            <div class="form-group">
-                <label for="description">Описание</label>
-                <textarea class="form-control"
-                          name="description"
-                          id="ckDescription"
-                          rows="3"
-                          required>
+                    <div class="form-group">
+                        <label for="category_id">Категория</label>
+                        <select name="category_id"
+                                id="category_id"
+                                class="form-control chosen-select">
+                            @foreach($categories as $key => $value)
+                                <option value="{{ $key }}"
+                                        @if ($key == $category->id)
+                                        selected
+                                        @elseif (old('category_id'))
+                                        selected
+                                        @endif>
+                                    {{ $value }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Метки</label>
+                        @foreach($states as $state)
+                            <div class="form-check">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       @if (old('check-' . $state->id))
+                                       checked
+                                       @elseif(in_array($state->id, $productStateIds))
+                                       checked
+                                       @endif
+                                       value="{{ $state->id }}"
+                                       id="check-{{ $state->id }}"
+                                       name="check-{{ $state->id }}">
+                                <label class="form-check-label" for="check-{{ $state->id }}">
+                                    {{ $state->title }}
+                                </label>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <div class="form-group">
+                        <label for="short">Краткое описание</label>
+                        <input type="text"
+                               id="short"
+                               name="short"
+                               value="{{ old('short') ? old('short') : $product->short }}"
+                               class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Описание</label>
+                        <textarea class="form-control"
+                                  name="description"
+                                  id="ckDescription"
+                                  rows="3"
+                                  required>
                     {{ old('description') ? old('description') : $product->description }}
                 </textarea>
-                @if ($errors->has('description'))
-                    <div class="invalid-feedback">
-                        <strong>{{ $errors->first('description') }}</strong>
+                        @if ($errors->has('description'))
+                            <div class="invalid-feedback">
+                                <strong>{{ $errors->first('description') }}</strong>
+                            </div>
+                        @endif
                     </div>
-                @endif
-            </div>
 
-            @if ($image)
-                <div class="form-group">
-                    <img src="{{ route('imagecache', ['template' => 'small', 'filename' => $image->file_name]) }}"
-                         class="img-thumbnail"
-                         alt="{{ $image->name }}">
-                </div>
-            @endif
-
-            <div class="form-group">
-                <div class="custom-file">
-                    <input type="file"
-                           class="custom-file-input{{ $errors->has('main_image') ? ' is-invalid' : '' }}"
-                           id="custom-file-input"
-                           lang="ru"
-                           name="main_image"
-                           aria-describedby="inputGroupMainImage">
-                    <label class="custom-file-label"
-                           for="custom-file-input">
-                        Выберите файл изображения
-                    </label>
-                    @if ($errors->has('main_image'))
-                        <div class="invalid-feedback">
-                            <strong>{{ $errors->first('main_image') }}</strong>
+                    @if ($image)
+                        <div class="form-group">
+                            <img src="{{ route('imagecache', ['template' => 'small', 'filename' => $image->file_name]) }}"
+                                 class="img-thumbnail"
+                                 alt="{{ $image->name }}">
                         </div>
                     @endif
-                </div>
-            </div>
 
-            <div class="btn-group"
-                 role="group">
-                <button type="submit" class="btn btn-success">Обновить</button>
-            </div>
+                    <div class="form-group">
+                        <div class="custom-file">
+                            <input type="file"
+                                   class="custom-file-input{{ $errors->has('main_image') ? ' is-invalid' : '' }}"
+                                   id="custom-file-input"
+                                   lang="ru"
+                                   name="main_image"
+                                   aria-describedby="inputGroupMainImage">
+                            <label class="custom-file-label"
+                                   for="custom-file-input">
+                                Выберите файл изображения
+                            </label>
+                            @if ($errors->has('main_image'))
+                                <div class="invalid-feedback">
+                                    <strong>{{ $errors->first('main_image') }}</strong>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
 
-        </form>
+                    <div class="btn-group"
+                         role="group">
+                        <button type="submit" class="btn btn-success">Обновить</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
     </div>
 @endsection

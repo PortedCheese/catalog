@@ -18,6 +18,17 @@ class CategoryField extends Model
         'range' => "Диапазон",
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        self::creating(function ($model) {
+            $machine = $model->machine;
+            $machine = str_replace([" ", "-"], ["_", "_"], $machine);
+            $model->machine = $machine;
+        });
+    }
+
     /**
      * Зачения у поля.
      *

@@ -46,7 +46,7 @@ class NewOrderClient extends Notification
         return (new MailMessage)
             ->subject("Новый заказ")
             ->greeting('Здравствуйте!')
-            ->line("На сайте был офрмлен новый заказ на сумму {$this->order->total} рублей.")
+            ->line("На сайте был офомлен новый заказ на сумму {$this->order->total} рублей.")
             ->action("Просмотр", route("admin.order.show", ['order' => $this->order]));
     }
 
