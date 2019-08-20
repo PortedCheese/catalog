@@ -3,6 +3,7 @@
 namespace PortedCheese\Catalog\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class CategoryField extends Model
 {
@@ -24,7 +25,13 @@ class CategoryField extends Model
 
         self::creating(function ($model) {
             $machine = $model->machine;
-            $machine = str_replace([" ", "-"], ["_", "_"], $machine);
+            $machine = Str::slug($machine, '_');
+            $machine = str_replace("-", "_", $machine);
+            $buf = $machine;
+            $i = 1;
+            while (self::where('machine', $machine)->count()) {
+                $machine = $buf . '_' . $i++;
+            }
             $model->machine = $machine;
         });
     }
