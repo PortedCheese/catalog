@@ -26,11 +26,17 @@
                     </div>
                 </div>
             </div>
-            @if ($tree)
-                @include("catalog::admin.categories.tree", ['categories' => $categories])
-            @else
-                @include("catalog::admin.categories.table-list", ['categories' => $categories])
-            @endif
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        @if ($tree)
+                            @include("catalog::admin.categories.tree", ['categories' => $categories])
+                        @else
+                            @include("catalog::admin.categories.table-list", ['categories' => $categories])
+                        @endif
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 @endsection
