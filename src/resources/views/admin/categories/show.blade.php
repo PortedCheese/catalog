@@ -45,10 +45,11 @@
         </div>
     </div>
     <div class="col-12">
-        @include(
-            "catalog::admin.categories.table-list",
-            ['categories' => $category->children->sortBy('weight')]
-            )
+        <div class="card">
+            <div class="card-body">
+                @include("catalog::admin.categories.table-list", ['categories' => $category->children->sortBy('weight')])
+            </div>
+        </div>
     </div>
 @endsection
 
