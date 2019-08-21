@@ -26,7 +26,7 @@ class ProductUpdateRequest extends FormRequest
         $product = $this->route()->parameter('product', NULL);
         $id = !empty($product) ? $product->id : NULL;
         return [
-            'title' => "required|min:2|unique:products,title,{$id}",
+            'title' => "required|min:2",
             'slug' => "nullable|min:2|unique:products,slug,{$id}",
             'main_image' => 'nullable|image',
         ];
