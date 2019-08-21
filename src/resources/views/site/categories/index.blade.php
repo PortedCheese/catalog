@@ -11,7 +11,7 @@
 @endsection
 
 @section('content')
-    @if (! $categories->count() && ! empty($products))
+    @if (! empty($products))
         <div class="col-12 d-block d-lg-none">
             <button type="button" class="btn btn-outline-primary mb-3" data-toggle="modal" data-target="#filterModal">
                 Фильтры
@@ -41,24 +41,35 @@
     @endif
     <div class="col-12">
         @if($categories->count())
-            <div class="row">
-                @foreach ($categories as $item)
-                    <div class="col-12 col-md-6 col-lg-3 mb-3">
-                        {!! $item->getTeaser() !!}
+            @if (empty($products))
+                <div class="row">
+                    @foreach ($categories as $item)
+                        <div class="col-12 col-md-6 col-lg-3 mb-3">
+                            {!! $item->getTeaser() !!}
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="row">
+                    <div class="col-12 my-3">
+                        @foreach ($categories as $item)
+                            <a href="{{ route('site.catalog.category.show', ['category' => $item]) }}" class="btn btn-outline-primary">
+                                {{ $item->title }}
+                            </a>
+                        @endforeach
                     </div>
-                @endforeach
-            </div>
-        @else
-            @isset($products)
-                @if ($products->count())
-                    @include("catalog::site.products.index", ['products' => $products])
-                @endif
-            @endisset
+                </div>
+            @endif
         @endif
+        @isset($products)
+            @if ($products->count())
+                @include("catalog::site.products.index", ['products' => $products])
+            @endif
+        @endisset
     </div>
 @endsection
 
-@if (!$categories->count() && ! empty($products))
+@if (! empty($products))
     @section('sidebar')
         @include("catalog::site.products.filters", [
                             'product' => $products,

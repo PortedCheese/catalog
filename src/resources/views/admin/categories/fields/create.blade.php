@@ -12,7 +12,7 @@
                 <form action="{{ route('admin.category.field.store', ['category' => $category]) }}"
                       method="post">
                     @csrf
-
+                    {{ debugbar()->info($errors) }}
                     <div class="form-group">
                         <label for="title">Заголовок</label>
                         <input type="text"
@@ -20,12 +20,12 @@
                                name="title"
                                value="{{ old('title') }}"
                                required
-                               class="form-control{{ $errors->has('title') ? ' is-invalid' : '' }}">
-                        @if ($errors->has('title'))
+                               class="form-control @error('title') is-invalid @enderror">
+                        @error ('title')
                             <span class="invalid-feedback" role="alert">
-                        <strong>{{ $errors->first('title') }}</strong>
-                    </span>
-                        @endif
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
                     </div>
 
                     @if($available->count())
@@ -33,7 +33,7 @@
                             <label for="exists">Выбрать из существующих</label>
                             <select name="exists"
                                     id="exists"
-                                    class="form-control">
+                                    class="form-control @error('exists') is-invalid @enderror">
                                 <option value="">--Выберите--</option>
                                 @foreach($available as $field)
                                     <option value="{{ $field->id }}"
@@ -44,11 +44,11 @@
                                     </option>
                                 @endforeach
                             </select>
-                            @if ($errors->has('exists'))
+                            @error ('exists')
                                 <span class="invalid-feedback" role="alert">
-                            <strong>{{ $errors->first('exists') }}</strong>
-                        </span>
-                            @endif
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
                     @endif
 
@@ -56,7 +56,7 @@
                         <label for="type">Виджет поля</label>
                         <select name="type"
                                 id="type"
-                                class="form-control">
+                                class="form-control @error('type') is-invalid @enderror">
                             <option value="">--Выберите--</option>
                             @foreach($types as $key => $value)
                                 <option value="{{ $key }}"
@@ -67,6 +67,11 @@
                                 </option>
                             @endforeach
                         </select>
+                        @error ('type')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
                     </div>
 
                     <div class="form-group">
@@ -75,12 +80,12 @@
                                id="machine"
                                name="machine"
                                value="{{ old('machine') }}"
-                               class="form-control{{ $errors->has('machine') ? ' is-invalid' : '' }}">
-                        @if ($errors->has('machine'))
+                               class="form-control @error('machine') is-invalid @enderror">
+                        @error ('machine')
                             <span class="invalid-feedback" role="alert">
-                        <strong>{{ $errors->first('machine') }}</strong>
-                    </span>
-                        @endif
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
                     </div>
 
                     <div class="form-group">

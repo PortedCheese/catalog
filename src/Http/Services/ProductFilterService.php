@@ -14,6 +14,7 @@ class ProductFilterService
 
     protected $request;
     protected $category;
+    protected $categoryIds;
     protected $having;
     protected $products;
     protected $machineId;
@@ -23,16 +24,18 @@ class ProductFilterService
     {
         $this->request = $request;
         $this->category = $category;
+        $this->categoryIds = $this->category->getChildren(true);
         $this->having = [];
         $this->machineId = [];
         $this->ranges = [];
         // Инициализация запроса.
-        // Только опубликованные товары и относящиеся к текущей категории.
+        // Только опубликованные товары и относящиеся к текущей категории и ее подкатегориям.
         $this->products = Product::query()
             ->where('products.published', 1)
-            ->where('products.category_id', $this->category->id);
+            ->whereIn('products.category_id', $this->categoryIds);
         // Получить информацию о полях категории.
-        $fieldsInfo = $this->category->getFieldsInfo(true);
+        $fieldsInfo = $this->category->getChildrenFieldsFilterInfo();
+        debugbar()->info($this->categoryIds);
         foreach ($fieldsInfo as $item) {
             $this->machineId[$item->machine] = [
                 'id' => $item->id,

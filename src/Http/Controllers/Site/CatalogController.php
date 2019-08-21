@@ -47,14 +47,10 @@ class CatalogController extends Controller
     public function showCategory(Request $request, Category $category)
     {
         $categories = $category->children;
-        $products = NULL;
-        $filters = [];
 
-        if (! $categories->count()) {
-            $filter = new ProductFilterService($request, $category);
-            $products = $filter->makeFilter();
-            $filters = $category->getFilters();
-        }
+        $filter = new ProductFilterService($request, $category);
+        $products = $filter->makeFilter();
+        $filters = $category->getFilters(true);
 
         return view("catalog::site.categories.index", [
             'categories' => $categories,

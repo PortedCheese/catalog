@@ -44,36 +44,48 @@
                     @break
 
                 @case('range')
-                    <div class="form-group steps-slider-cover">
-                        <label>{{ $filter->title }}</label>
-                        <div class="row justify-content-between mb-2">
-                            <div class="col-6">
-                                <input type="number"
-                                       name="range-from-{{ $filter->machine }}"
-                                       step="1"
-                                       min="{{ min($filter->values) - 10 }}"
-                                       max="{{ max($filter->values) + 10 }}"
-                                       data-value="{{ min($filter->values) }}"
-                                       data-init="{{ $query->get("range-from-{$filter->machine}", min($filter->values)) }}"
-                                       class="form-control from-input">
+                    @php
+                        $render = true;
+                        if (! empty($filter->values)) {
+                            foreach ($filter->values as $value) {
+                                if (! is_numeric($value)) {
+                                    $render = false;
+                                }
+                            }
+                        }
+                    @endphp
+                    @if ($render)
+                        <div class="form-group steps-slider-cover">
+                            <label>{{ $filter->title }}</label>
+                            <div class="row justify-content-between mb-2">
+                                <div class="col-6">
+                                    <input type="number"
+                                           name="range-from-{{ $filter->machine }}"
+                                           step="1"
+                                           min="{{ min($filter->values) - 10 }}"
+                                           max="{{ max($filter->values) + 10 }}"
+                                           data-value="{{ min($filter->values) }}"
+                                           data-init="{{ $query->get("range-from-{$filter->machine}", min($filter->values)) }}"
+                                           class="form-control from-input">
+                                </div>
+                                <div class="col-6">
+                                    <input type="number"
+                                           name="range-to-{{ $filter->machine }}"
+                                           step="1"
+                                           min="{{ min($filter->values) - 10 }}"
+                                           max="{{ max($filter->values) + 10 }}"
+                                           data-value="{{ max($filter->values) }}"
+                                           data-init="{{ $query->get("range-to-{$filter->machine}", max($filter->values)) }}"
+                                           class="form-control to-input">
+                                </div>
                             </div>
-                            <div class="col-6">
-                                <input type="number"
-                                       name="range-to-{{ $filter->machine }}"
-                                       step="1"
-                                       min="{{ min($filter->values) - 10 }}"
-                                       max="{{ max($filter->values) + 10 }}"
-                                       data-value="{{ max($filter->values) }}"
-                                       data-init="{{ $query->get("range-to-{$filter->machine}", max($filter->values)) }}"
-                                       class="form-control to-input">
+                            <div class="row">
+                                <div class="col-12 mt-2">
+                                    <div class="steps-slider"></div>
+                                </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-12 mt-2">
-                                <div class="steps-slider"></div>
-                            </div>
-                        </div>
-                    </div>
+                    @endif
                     @break
             @endswitch
         @endforeach

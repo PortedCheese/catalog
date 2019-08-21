@@ -30,7 +30,7 @@ class Category extends Model
     {
         parent::boot();
 
-        static::deleting(function ($model) {
+        static::deleting(function (self $model) {
             // Удаляем главное изображение.
             $model->clearMainImage();
             // Удаляем метатеги.
@@ -43,19 +43,23 @@ class Category extends Model
             // Очистка кэша.
             $model->forgetFieldsCache();
             $model->forgetTeaserCache();
+            $model->forgetChildrenListCache();
         });
 
-        static::created(function ($model) {
+        static::created(function (self $model) {
             // Создать метатеги по умолчанию.
             $model->createDefaultMetas();
             // Поля родителя.
             $model->setParentFields();
+            // Очистка кэша.
+            $model->forgetChildrenListCache();
         });
 
-        static::updated(function ($model) {
+        static::updated(function (self $model) {
             // Очистка кэша.
             $model->forgetTeaserCache();
             $model->forgetBreadcrumbCache();
+            $model->forgetChildrenListCache();
         });
     }
 
@@ -310,7 +314,7 @@ class Category extends Model
     public function getParents()
     {
         $id = $this->id;
-        $collection = Category::where('parent_id', $id)
+        $collection = self::where('parent_id', $id)
             ->orderBy('weight', 'desc')
             ->get();
         $parents = [];
@@ -321,6 +325,34 @@ class Category extends Model
             $parents[$item->id] = $item->title;
         }
         return $parents;
+    }
+
+    /**
+     * Список дочерних категорий.
+     *
+     * @param bool $includeSelf
+     * @return array|mixed
+     */
+    public function getChildren($includeSelf = false)
+    {
+        $key = "category-children-all:{$this->id}";
+        $children = Cache::rememberForever($key, function () {
+            $children = [];
+            foreach (self::where("parent_id", $this->id)->get() as $category) {
+                $children[] = $category->id;
+                $categories = $category->getChildren();
+                if (! empty($categories)) {
+                    foreach ($categories as $item) {
+                        $children[] = $item;
+                    }
+                }
+            }
+            return $children;
+        });
+        if ($includeSelf) {
+            $children[] = $this->id;
+        }
+        return $children;
     }
 
     /**
@@ -357,6 +389,32 @@ class Category extends Model
             return $this->getOnlyFilter($fields);
         }
         return $fields;
+    }
+
+    /**
+     * Получить все поля для фильтра.
+     *
+     * @return mixed
+     */
+    public function getChildrenFieldsFilterInfo()
+    {
+        $key = "category-children-fields-info:{$this->id}";
+        return Cache::rememberForever($key, function () {
+            $fields = $this->getFieldsInfo(true);
+            $ids = [];
+            foreach ($fields as $field) {
+                $ids[] = $field->id;
+            }
+            foreach ($this->children as $child) {
+                foreach ($child->getChildrenFieldsFilterInfo() as $field) {
+                    if (! in_array($field->id, $ids)) {
+                        $fields[] = $field;
+                        $ids[] = $field->id;
+                    }
+                }
+            }
+            return $fields;
+        });
     }
 
     /**
@@ -469,21 +527,75 @@ class Category extends Model
     /**
      * Получаем фильтры для категории.
      *
+     * @param bool $includeSubs
      * @return mixed
      */
-    public function getFilters()
+    public function getFilters($includeSubs = false)
     {
-        $fieldsInfo = $this->getFieldsInfo(true);
+        if ($includeSubs) {
+            $fieldsInfo = $this->getChildrenFieldsFilterInfo();
+        }
+        else {
+            $fieldsInfo = $this->getFieldsInfo(true);
+        }
 
-        $pids = $this->getPids();
+        $pIds = $this->getPIds($includeSubs);
 
-        $fieldValues = $this->getProductValues($pids);
+        $fieldValues = $this->getProductValues($pIds);
 
         $this->setProductValuesToFilter($fieldsInfo, $fieldValues);
 
-        $this->addPriceFilter($fieldsInfo, $pids);
+        $this->addPriceFilter($fieldsInfo, $pIds);
 
         return $fieldsInfo;
+    }
+
+    /**
+     * Очистить кэш информации полей.
+     */
+    public function forgetFieldsCache()
+    {
+        Cache::forget("category-fields-info:{$this->id}");
+    }
+
+    /**
+     * Очистить кэш информации полей для фильтров.
+     */
+    public function forgetChildrenFieldsCache()
+    {
+        Cache::forget("category-children-fields-info:{$this->id}");
+        $parent = $this->parent;
+        if (! empty($parent)) {
+            $parent->forgetChildrenFieldsCache();
+        }
+    }
+
+    /**
+     * Очистить кэш тизера.
+     */
+    public function forgetTeaserCache()
+    {
+        Cache::forget("category-teaser:{$this->id}");
+    }
+
+    /**
+     * Очистить кэш хлебных крошек.
+     */
+    public function forgetBreadcrumbCache()
+    {
+        Cache::forget("category-breadcrumb:{$this->id}");
+    }
+
+    /**
+     * Очистить кэш дочерних категорий.
+     */
+    public function forgetChildrenListCache()
+    {
+        Cache::forget("category-children-all:{$this->id}");
+        $parent = $this->parent;
+        if (! empty($parent)) {
+            $parent->forgetChildrenListCache();
+        }
     }
 
     /**
@@ -600,42 +712,23 @@ class Category extends Model
      *
      * @return array
      */
-    private function getPids()
+    private function getPIds($includeSubs)
     {
-        $products = Product::query()
-            ->select('id')
-            ->where('category_id', $this->id)
-            ->get();
-        $pids = [];
+        $query = Product::query()
+            ->select('id');
+        if ($includeSubs) {
+            $query->whereIn("category_id", $this->getChildren(true));
+        }
+        else {
+            $query->where('category_id', $this->id);
+        }
+        $products = $query->get();
+        $pIds = [];
 
         foreach ($products as $product) {
-            $pids[] = $product->id;
+            $pIds[] = $product->id;
         }
 
-        return $pids;
-    }
-
-    /**
-     * Очистить кэш информации полей.
-     */
-    public function forgetFieldsCache()
-    {
-        Cache::forget("category-fields-info:{$this->id}");
-    }
-
-    /**
-     * Очистить кэш тизера.
-     */
-    public function forgetTeaserCache()
-    {
-        Cache::forget("category-teaser:{$this->id}");
-    }
-
-    /**
-     * Очистить кэш хлебных крошек.
-     */
-    public function forgetBreadcrumbCache()
-    {
-        Cache::forget("category-breadcrumb:{$this->id}");
+        return $pIds;
     }
 }
