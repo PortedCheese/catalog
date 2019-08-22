@@ -20,9 +20,8 @@ class ProductVariationUpdate
     public $product;
 
     /**
-     * Create a new event instance.
-     *
-     * @return void
+     * ProductVariationUpdate constructor.
+     * @param ProductVariation $variation
      */
     public function __construct(ProductVariation $variation)
     {

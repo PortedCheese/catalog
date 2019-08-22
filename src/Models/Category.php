@@ -335,7 +335,7 @@ class Category extends Model
      */
     public function getChildren($includeSelf = false)
     {
-        $key = "category-children-all:{$this->id}";
+        $key = "category-getChildren:{$this->id}";
         $children = Cache::rememberForever($key, function () {
             $children = [];
             foreach (self::where("parent_id", $this->id)->get() as $category) {
@@ -362,7 +362,7 @@ class Category extends Model
      */
     public function getFieldsInfo($filter = false)
     {
-        $key = "category-fields-info:{$this->id}";
+        $key = "category-getFieldsInfo:{$this->id}";
         $cached = Cache::get($key);
         if (!empty($cached)) {
             if ($filter) {
@@ -398,7 +398,7 @@ class Category extends Model
      */
     public function getChildrenFieldsFilterInfo()
     {
-        $key = "category-children-fields-info:{$this->id}";
+        $key = "category-getChildrenFieldsFilterInfo:{$this->id}";
         return Cache::rememberForever($key, function () {
             $fields = $this->getFieldsInfo(true);
             $ids = [];
@@ -465,7 +465,7 @@ class Category extends Model
      */
     public function getTeaser()
     {
-        $key = "category-teaser:{$this->id}";
+        $key = "category-getTeaser:{$this->id}";
         $cached = Cache::get($key);
         if (!empty($cached)) {
             return $cached;
@@ -479,11 +479,13 @@ class Category extends Model
     /**
      * Хлебные крошки для сайта.
      *
+     * @param $productPage
+     * @param $parent
      * @return array
      */
     public function getSiteBreadcrumb($productPage = false, $parent = false)
     {
-        $key = "category-breadcrumb:{$this->id}";
+        $key = "category-getSiteBreadcrumb:{$this->id}";
 
         $breadcrumb = Cache::rememberForever($key, function () {
             $breadcrumb = [];
@@ -539,13 +541,12 @@ class Category extends Model
             $fieldsInfo = $this->getFieldsInfo(true);
         }
 
-        $pIds = $this->getPIds($includeSubs);
+        $fieldValues = $this->getProductValues($includeSubs);
 
-        $fieldValues = $this->getProductValues($pIds);
-
+        // Обход полученных значений и распределение по полям.
         $this->setProductValuesToFilter($fieldsInfo, $fieldValues);
 
-        $this->addPriceFilter($fieldsInfo, $pIds);
+        $this->addPriceFilter($fieldsInfo, $includeSubs);
 
         return $fieldsInfo;
     }
@@ -555,7 +556,7 @@ class Category extends Model
      */
     public function forgetFieldsCache()
     {
-        Cache::forget("category-fields-info:{$this->id}");
+        Cache::forget("category-getFieldsInfo:{$this->id}");
     }
 
     /**
@@ -563,7 +564,7 @@ class Category extends Model
      */
     public function forgetChildrenFieldsCache()
     {
-        Cache::forget("category-children-fields-info:{$this->id}");
+        Cache::forget("category-getChildrenFieldsFilterInfo:{$this->id}");
         $parent = $this->parent;
         if (! empty($parent)) {
             $parent->forgetChildrenFieldsCache();
@@ -575,7 +576,7 @@ class Category extends Model
      */
     public function forgetTeaserCache()
     {
-        Cache::forget("category-teaser:{$this->id}");
+        Cache::forget("category-getTeaser:{$this->id}");
     }
 
     /**
@@ -583,7 +584,7 @@ class Category extends Model
      */
     public function forgetBreadcrumbCache()
     {
-        Cache::forget("category-breadcrumb:{$this->id}");
+        Cache::forget("category-getSiteBreadcrumb:{$this->id}");
     }
 
     /**
@@ -591,7 +592,7 @@ class Category extends Model
      */
     public function forgetChildrenListCache()
     {
-        Cache::forget("category-children-all:{$this->id}");
+        Cache::forget("category-getChildren:{$this->id}");
         $parent = $this->parent;
         if (! empty($parent)) {
             $parent->forgetChildrenListCache();
@@ -599,29 +600,82 @@ class Category extends Model
     }
 
     /**
+     * Очистить кэш значений товаров для фильтра.
+     */
+    public function forgetProductValuesCache()
+    {
+        $key = "category-getProductValues:{$this->id}";
+        Cache::forget("$key-1");
+        Cache::forget("$key-0");
+        $parent = $this->parent;
+        if (! empty($parent)) {
+            $parent->forgetProductValuesCache();
+        }
+    }
+
+    /**
+     * Очистить кэш продуктов для фильтра.
+     */
+    public function forgetFilterPIdsCache()
+    {
+        $key = "category-getPIds:{$this->id}";
+        Cache::forget("$key-1");
+        Cache::forget("$key-0");
+        $parent = $this->parent;
+        if (! empty($parent)) {
+            $parent->forgetFilterPIdsCache();
+        }
+    }
+
+    /**
+     * Очистить цены товаров.
+     */
+    public function forgetFilterVariationsCache()
+    {
+        $key = "category-addPriceFilter:{$this->id}";
+        Cache::forget("$key-1");
+        Cache::forget("$key-0");
+        $parent = $this->parent;
+        if (! empty($parent)) {
+            $parent->forgetFilterVariationsCache();
+        }
+    }
+
+    /**
      * Добавить фильтр по цене.
      *
      * @param $fieldsInfo
-     * @param $pids
+     * @param $includeSubs
      */
-    private function addPriceFilter(&$fieldsInfo, $pids)
+    private function addPriceFilter(&$fieldsInfo, $includeSubs)
     {
-        // Добавляем цену.
-        $variations = ProductVariation::query()
-            ->select(['id', 'price'])
-            ->whereIn('product_id', $pids)
-            ->where('available', '=', 1)
-            ->get();
-        $prices = [];
-        foreach ($variations as $variation) {
-            $price = false;
-            if (!empty($variation->price)) {
-                $price = $variation->price;
-            }
-            if ($price && !in_array($price, $prices)) {
-                $prices[] = $price;
-            }
+        $key = "category-addPriceFilter:{$this->id}";
+        if ($includeSubs) {
+            $key .= "-1";
         }
+        else {
+            $key .= "-0";
+        }
+        $prices = Cache::rememberForever($key, function () use ($includeSubs) {
+            // Добавляем цену.
+            $pIds = $this->getPIds($includeSubs);
+            $variations = ProductVariation::query()
+                ->select(['id', 'price'])
+                ->whereIn('product_id', $pIds)
+                ->where('available', '=', 1)
+                ->get();
+            $prices = [];
+            foreach ($variations as $variation) {
+                $price = false;
+                if (!empty($variation->price)) {
+                    $price = $variation->price;
+                }
+                if ($price && !in_array($price, $prices)) {
+                    $prices[] = $price;
+                }
+            }
+            return $prices;
+        });
         if (!empty($prices)) {
             array_unshift($fieldsInfo, (object) [
                 'id' => 0,
@@ -654,7 +708,7 @@ class Category extends Model
     /**
      * Заполняем фильтр.
      *
-     * @param $fieldInfo
+     * @param $fieldsInfo
      * @param $fieldValues
      */
     private function setProductValuesToFilter(&$fieldsInfo, $fieldValues)
@@ -682,53 +736,75 @@ class Category extends Model
     /**
      * Получить значения товаров.
      *
+     * @param $includeSubs
      * @return array
      */
-    private function getProductValues($pids)
+    private function getProductValues($includeSubs)
     {
-        // Ищем значения у этих товаров.
-        $productValues = ProductField::query()
-            ->select(['field_id', 'value'])
-            ->whereIn('product_id', $pids)
-            ->orderBy('product_id')
-            ->get();
-        $fieldValues = [];
-        // Группируем по полю.
-        foreach ($productValues as $productValue) {
-            $fieldId = $productValue->field_id;
-            if (empty($fieldValues[$fieldId])) {
-                $fieldValues[$fieldId] = [];
-            }
-            if (!in_array($productValue->value, $fieldValues[$fieldId])) {
-                $fieldValues[$fieldId][] = $productValue->value;
-            }
+        $key = "category-getProductValues:{$this->id}";
+        if ($includeSubs) {
+            $key .= "-1";
         }
+        else {
+            $key .= "-0";
+        }
+        return Cache::rememberForever($key, function () use ($includeSubs) {
+            $pIds = $this->getPIds($includeSubs);
 
-        return $fieldValues;
+            // Ищем значения у этих товаров.
+            $productValues = ProductField::query()
+                ->select(['field_id', 'value'])
+                ->whereIn('product_id', $pIds)
+                ->orderBy('product_id')
+                ->get();
+            $fieldValues = [];
+            // Группируем по полю.
+            foreach ($productValues as $productValue) {
+                $fieldId = $productValue->field_id;
+                if (empty($fieldValues[$fieldId])) {
+                    $fieldValues[$fieldId] = [];
+                }
+                if (!in_array($productValue->value, $fieldValues[$fieldId])) {
+                    $fieldValues[$fieldId][] = $productValue->value;
+                }
+            }
+
+            return $fieldValues;
+        });
     }
 
     /**
      * Ищем товары категории.
      *
+     * @param $includeSubs
      * @return array
      */
     private function getPIds($includeSubs)
     {
-        $query = Product::query()
-            ->select('id');
+        $key = "category-getPIds:{$this->id}";
         if ($includeSubs) {
-            $query->whereIn("category_id", $this->getChildren(true));
+            $key .= "-1";
         }
         else {
-            $query->where('category_id', $this->id);
+            $key .= "-0";
         }
-        $products = $query->get();
-        $pIds = [];
+        return Cache::rememberForever($key, function () use ($includeSubs) {
+            $query = Product::query()
+                ->select('id');
+            if ($includeSubs) {
+                $query->whereIn("category_id", $this->getChildren(true));
+            }
+            else {
+                $query->where('category_id', $this->id);
+            }
+            $products = $query->get();
+            $pIds = [];
 
-        foreach ($products as $product) {
-            $pIds[] = $product->id;
-        }
+            foreach ($products as $product) {
+                $pIds[] = $product->id;
+            }
 
-        return $pIds;
+            return $pIds;
+        });
     }
 }

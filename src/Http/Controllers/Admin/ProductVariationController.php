@@ -112,8 +112,11 @@ class ProductVariationController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Category $category
+     * @param Product $product
+     * @param ProductVariation $variation
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Exception
      */
     public function destroy(Category $category, Product $product, ProductVariation $variation)
     {

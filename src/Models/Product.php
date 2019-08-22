@@ -3,10 +3,9 @@
 namespace PortedCheese\Catalog\Models;
 
 use App\Image;
-use function foo\func;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
-use PortedCheese\Catalog\Events\ProductUpdate;
+use PortedCheese\Catalog\Events\ProductListChange;
 use PortedCheese\SeoIntegration\Models\Meta;
 
 class Product extends Model
@@ -25,7 +24,7 @@ class Product extends Model
     {
         parent::boot();
 
-        static::deleting(function ($model) {
+        static::deleting(function (\App\Product $model) {
             // Удаляем главное изображение.
             $model->clearMainImage();
 
@@ -49,14 +48,33 @@ class Product extends Model
             $model->states()->detach();
         });
 
-        static::updated(function ($model) {
-            // Очистить кэш.
-            $model->forgetTeaserCache();
+        static::deleted(function (\App\Product $model) {
+            event(new ProductListChange($model));
         });
 
-        static::created(function ($model) {
+        static::updated(function (\App\Product $model) {
+            // Очистить кэш.
+            $model->forgetTeaserCache();
+
+            // Тут это нужно если изменили категорию.
+            $changes = $model->getChanges();
+            if (! empty($changes['category_id'])) {
+                $original = $model->getOriginal();
+                if (! empty($original['category_id'])) {
+                    $categoryId = $original['category_id'];
+                }
+                else {
+                    $categoryId = false;
+                }
+                event(new ProductListChange($model, $categoryId));
+            }
+        });
+
+        static::created(function (\App\Product $model) {
             // Создать метатеги по умолчанию.
             $model->createDefaultMetas();
+
+            event(new ProductListChange($model));
         });
     }
 
@@ -73,7 +91,7 @@ class Product extends Model
     /**
      * У товара может быть несколько меток.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function states()
     {

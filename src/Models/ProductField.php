@@ -3,6 +3,7 @@
 namespace PortedCheese\Catalog\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use PortedCheese\Catalog\Events\ProductFieldUpdate;
 
 class ProductField extends Model
 {
@@ -12,6 +13,23 @@ class ProductField extends Model
         'product_id',
         'category_id',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function (\App\ProductField $model) {
+            $model->runEvent();
+        });
+
+        static::updated(function (\App\ProductField $model) {
+            $model->runEvent();
+        });
+
+        static::deleted(function (\App\ProductField $model) {
+            $model->runEvent();
+        });
+    }
 
     /**
      * К какому полю относится значение.
@@ -41,5 +59,16 @@ class ProductField extends Model
     public function category()
     {
         return $this->belongsTo(\App\Category::class);
+    }
+
+    /**
+     * Событие обновления характеристики.
+     */
+    private function runEvent()
+    {
+        $product = $this->product;
+        if (! empty($product)) {
+            event(new ProductFieldUpdate($product));
+        }
     }
 }

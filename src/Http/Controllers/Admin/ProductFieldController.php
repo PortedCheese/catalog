@@ -16,7 +16,9 @@ class ProductFieldController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param Category $category
+     * @param Product $product
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function index(Category $category, Product $product)
     {
@@ -30,7 +32,9 @@ class ProductFieldController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param Category $category
+     * @param Product $product
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function create(Category $category, Product $product)
     {
@@ -44,13 +48,14 @@ class ProductFieldController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param ProductFieldStoreRequest $request
+     * @param Category $category
+     * @param Product $product
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(ProductFieldStoreRequest $request, Category $category, Product $product)
     {
         ProductField::create($request->all());
-        event(new ProductFieldUpdate($product));
         return redirect()
             ->route('admin.category.product.field.index', ['category' => $category, 'product' => $product])
             ->with('success', 'Значение добавлено');
@@ -59,8 +64,10 @@ class ProductFieldController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Category $category
+     * @param Product $product
+     * @param ProductField $field
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function edit(Category $category, Product $product, ProductField $field)
     {
@@ -74,14 +81,15 @@ class ProductFieldController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param ProductFieldUpdateRequest $request
+     * @param Category $category
+     * @param Product $product
+     * @param ProductField $field
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function update(ProductFieldUpdateRequest $request, Category $category, Product $product, ProductField $field)
     {
         $field->update($request->all());
-        event(new ProductFieldUpdate($product));
         return redirect()
             ->route('admin.category.product.field.index', [
                 'category' => $category,
@@ -93,8 +101,11 @@ class ProductFieldController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Category $category
+     * @param Product $product
+     * @param ProductField $field
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Exception
      */
     public function destroy(Category $category, Product $product, ProductField $field)
     {

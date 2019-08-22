@@ -44,6 +44,7 @@ class Cart extends Model
      * @param Product $product
      * @param $variationId
      * @param int $quantity
+     * @return bool|mixed
      */
     public static function addToCard(Product $product, $variationId, $quantity = 1)
     {

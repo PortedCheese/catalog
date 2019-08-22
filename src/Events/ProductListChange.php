@@ -7,18 +7,23 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 
-class ProductFieldUpdate
+class ProductListChange
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $product;
+    public $categoryId;
 
     /**
-     * ProductFieldUpdate constructor.
+     * Create a new event instance.
+     *
      * @param Product $product
+     * @param $categoryId
+     * @return void
      */
-    public function __construct(Product $product)
+    public function __construct(Product $product, $categoryId = false)
     {
         $this->product = $product;
+        $this->categoryId = $categoryId;
     }
 }

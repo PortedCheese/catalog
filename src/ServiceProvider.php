@@ -12,12 +12,15 @@ use PortedCheese\Catalog\Console\Kernel;
 use PortedCheese\Catalog\Events\CategoryFieldUpdate;
 use PortedCheese\Catalog\Events\CreateNewOrder;
 use PortedCheese\Catalog\Events\ProductFieldUpdate;
-use PortedCheese\Catalog\Events\ProductUpdate;
+use PortedCheese\Catalog\Events\ProductListChange;
 use PortedCheese\Catalog\Events\ProductVariationUpdate;
 use PortedCheese\Catalog\Listeners\CategoryFieldClearCache;
 use PortedCheese\Catalog\Listeners\ClearCategoryProductsCache;
 use PortedCheese\Catalog\Listeners\ProductFieldClearCache;
+use PortedCheese\Catalog\Listeners\ProductFilterClearCache;
 use PortedCheese\Catalog\Listeners\ProductTeaserClearCache;
+use PortedCheese\Catalog\Listeners\ProductValuesFilterClearCache;
+use PortedCheese\Catalog\Listeners\ProductVariationsFilterClearCache;
 use PortedCheese\Catalog\Listeners\SendNewOrderNotify;
 
 class ServiceProvider extends \Illuminate\Support\ServiceProvider
@@ -72,6 +75,10 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         $this->app['events']->listen(CreateNewOrder::class, SendNewOrderNotify::class);
         // Обновление вариации.
         $this->app['events']->listen(ProductVariationUpdate::class, ProductTeaserClearCache::class);
+        // Изменение фильтров.
+        $this->app['events']->listen(ProductListChange::class, ProductFilterClearCache::class);
+        $this->app['events']->listen(ProductFieldUpdate::class, ProductValuesFilterClearCache::class);
+        $this->app['events']->listen(ProductVariationUpdate::class, ProductVariationsFilterClearCache::class);
 
         // Информация о текущей корзине.
         view()->composer('catalog::site.cart.cart-state', function ($view) {

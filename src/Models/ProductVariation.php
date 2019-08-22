@@ -29,7 +29,7 @@ class ProductVariation extends Model
             event(new ProductVariationUpdate($model));
         });
 
-        static::deleting(function ($model) {
+        static::deleted(function ($model) {
             event(new ProductVariationUpdate($model));
         });
     }
