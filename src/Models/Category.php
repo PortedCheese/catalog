@@ -11,7 +11,9 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 use PortedCheese\Catalog\Events\CategoryFieldUpdate;
+use PortedCheese\Catalog\Jobs\CategoryCache;
 use PortedCheese\SeoIntegration\Models\Meta;
 
 class Category extends Model
@@ -557,6 +559,7 @@ class Category extends Model
     public function forgetFieldsCache()
     {
         Cache::forget("category-getFieldsInfo:{$this->id}");
+        $this->addCacheJob("getFieldsInfo");
     }
 
     /**
@@ -569,6 +572,9 @@ class Category extends Model
         if (! empty($parent)) {
             $parent->forgetChildrenFieldsCache();
         }
+        else {
+            $this->addCacheJob("getChildrenFieldsFilterInfo");
+        }
     }
 
     /**
@@ -577,6 +583,7 @@ class Category extends Model
     public function forgetTeaserCache()
     {
         Cache::forget("category-getTeaser:{$this->id}");
+        $this->addCacheJob("getTeaser");
     }
 
     /**
@@ -585,6 +592,7 @@ class Category extends Model
     public function forgetBreadcrumbCache()
     {
         Cache::forget("category-getSiteBreadcrumb:{$this->id}");
+        $this->addCacheJob("getSiteBreadcrumb");
     }
 
     /**
@@ -596,6 +604,9 @@ class Category extends Model
         $parent = $this->parent;
         if (! empty($parent)) {
             $parent->forgetChildrenListCache();
+        }
+        else {
+            $this->addCacheJob("getChildren");
         }
     }
 
@@ -611,6 +622,9 @@ class Category extends Model
         if (! empty($parent)) {
             $parent->forgetProductValuesCache();
         }
+        else {
+            $this->addCacheJob("getProductValues");
+        }
     }
 
     /**
@@ -625,6 +639,9 @@ class Category extends Model
         if (! empty($parent)) {
             $parent->forgetFilterPIdsCache();
         }
+        else {
+            $this->addCacheJob("getPIds");
+        }
     }
 
     /**
@@ -638,6 +655,9 @@ class Category extends Model
         $parent = $this->parent;
         if (! empty($parent)) {
             $parent->forgetFilterVariationsCache();
+        }
+        else {
+            $this->addCacheJob("addPriceFilter");
         }
     }
 
@@ -806,5 +826,19 @@ class Category extends Model
 
             return $pIds;
         });
+    }
+
+    /**
+     * Добавить задачу в очередь.
+     *
+     * @param $method
+     */
+    private function addCacheJob($method)
+    {
+        if (Schema::hasTable('jobs')) {
+            CategoryCache::dispatch($this, $method)
+                ->onQueue("catalogCache")
+                ->delay(now()->addSeconds(2));
+        }
     }
 }

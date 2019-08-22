@@ -5,6 +5,8 @@ namespace PortedCheese\Catalog\Models;
 use App\Image;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use PortedCheese\Catalog\Events\ProductListChange;
 use PortedCheese\SeoIntegration\Models\Meta;
 
@@ -272,7 +274,7 @@ class Product extends Model
      */
     public function getTeaser()
     {
-        $key = "product-teaser:{$this->id}";
+        $key = "product-getTeaser:{$this->id}";
         $cached = Cache::get($key);
         if (!empty($cached)) {
             return $cached;
@@ -304,7 +306,7 @@ class Product extends Model
      */
     public function getFieldsInfo($category = null)
     {
-        $key = "product-fields:{$this->id}";
+        $key = "product-getFieldsInfo:{$this->id}";
         $productFieldsInfo = Cache::get($key);
         if (empty($productFieldsInfo)) {
             $productFieldsInfo =  Cache::rememberForever($key, function () {
@@ -347,7 +349,10 @@ class Product extends Model
      */
     public function forgetFieldsCache()
     {
-        Cache::forget("product-fields:{$this->id}");
+        Cache::forget("product-getFieldsInfo:{$this->id}");
+        if (Schema::hasTable("jobs")) {
+
+        }
     }
 
     /**
@@ -355,6 +360,6 @@ class Product extends Model
      */
     public function forgetTeaserCache()
     {
-        Cache::forget("product-teaser:{$this->id}");
+        Cache::forget("product-getTeaser:{$this->id}");
     }
 }

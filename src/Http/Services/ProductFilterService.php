@@ -35,7 +35,6 @@ class ProductFilterService
             ->whereIn('products.category_id', $this->categoryIds);
         // Получить информацию о полях категории.
         $fieldsInfo = $this->category->getChildrenFieldsFilterInfo();
-        debugbar()->info($this->categoryIds);
         foreach ($fieldsInfo as $item) {
             $this->machineId[$item->machine] = [
                 'id' => $item->id,
