@@ -89,7 +89,7 @@
 @section('links')
     <div class="col-12">
         <div class="card">
-            <div class="crd-body">
+            <div class="card-body">
                 <div class="btn-group"
                      role="group">
                     <a href="{{ route('admin.product-state.index') }}"

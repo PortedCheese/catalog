@@ -7,6 +7,11 @@ use PortedCheese\Catalog\Events\ProductListChange;
 
 class ProductFilterClearCache
 {
+    /**
+     * Категория.
+     *
+     * @var null|Category
+     */
     protected $category;
 
     /**

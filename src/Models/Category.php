@@ -274,11 +274,18 @@ class Category extends Model
 
     /**
      * Скопировать поля у родителя.
+     *
+     * @param bool $customParent
      */
-    public function setParentFields()
+    public function setParentFields($customParent = false)
     {
-        if (! $parent = $this->parent) {
-            return;
+        if (! $customParent) {
+            if (! $parent = $this->parent) {
+                return;
+            }
+        }
+        else {
+            $parent = $customParent;
         }
         $parentFileds = $parent->fields;
         if (! $parentFileds->count()) {

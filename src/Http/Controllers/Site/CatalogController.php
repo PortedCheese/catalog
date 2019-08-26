@@ -82,7 +82,10 @@ class CatalogController extends Controller
             ->get();
         $variations = [];
         foreach ($collection as $item) {
-            $variations[] = $item;
+            $array = $item->toArray();
+            $array['human_price'] = $item->human_price;
+            $array['human_sale_price'] = $item->human_sale_price;
+            $variations[] = $array;
         }
         $states = $product->states;
         $data = [

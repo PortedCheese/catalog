@@ -145,11 +145,13 @@
 @endsection
 
 @section('links')
-    <div class="col-12">
-        <div class="card">
-            <div class="card-body">
-                {{ $products->links() }}
+    @if ($products->lastPage() > 1)
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    {{ $products->links() }}
+                </div>
             </div>
         </div>
-    </div>
+    @endif
 @endsection

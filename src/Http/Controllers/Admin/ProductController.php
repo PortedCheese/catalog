@@ -9,6 +9,7 @@ use App\ProductState;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use PortedCheese\Catalog\Http\Requests\ProductStoreRequest;
+use PortedCheese\Catalog\Http\Requests\ProductUpdateCategoryRequest;
 use PortedCheese\Catalog\Http\Requests\ProductUpdateRequest;
 
 class ProductController extends Controller
@@ -103,9 +104,14 @@ class ProductController extends Controller
      */
     public function show(Category $category, Product $product)
     {
+        $categories = [];
+        foreach (Category::all()->sortBy('title') as $item) {
+            $categories[$item->id] = $item->title;
+        }
         return view("catalog::admin.categories.products.show", [
             'category' => $category,
             'product' => $product,
+            'categories' => $categories,
             'image' => $product->image,
         ]);
     }
@@ -119,10 +125,6 @@ class ProductController extends Controller
      */
     public function edit(Category $category, Product $product)
     {
-        $categories = [];
-        foreach (Category::all()->sortBy('title') as $item) {
-            $categories[$item->id] = $item->title;
-        }
         $productStateIds = [];
         foreach ($product->states as $state) {
             $productStateIds[] = $state->id;
@@ -131,7 +133,6 @@ class ProductController extends Controller
             'category' => $category,
             'product' => $product,
             'image' => $product->image,
-            'categories' => $categories,
             'states' => ProductState::all(),
             'productStateIds' => $productStateIds,
         ]);
@@ -223,6 +224,23 @@ class ProductController extends Controller
         return redirect()
             ->back()
             ->with('success', 'Статус публикации изменен');
+    }
+
+    /**
+     * Изменить категорию товара.
+     *
+     * @param ProductUpdateCategoryRequest $request
+     * @param Category $category
+     * @param Product $product
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function changeCategory(ProductUpdateCategoryRequest $request, Category $category, Product $product)
+    {
+        $product->category_id = $request->get('category_id');
+        $product->save();
+        return redirect()
+            ->route("admin.category.product.show", ['category' => $product->category, 'product' => $product])
+            ->with('success', 'Категория изменена');
     }
 
     /**

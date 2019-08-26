@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use PortedCheese\Catalog\Events\ProductCategoryChange;
 use PortedCheese\Catalog\Events\ProductListChange;
 use PortedCheese\SeoIntegration\Models\Meta;
 
@@ -58,7 +59,6 @@ class Product extends Model
             // Очистить кэш.
             $model->forgetTeaserCache();
 
-            // Тут это нужно если изменили категорию.
             $changes = $model->getChanges();
             if (! empty($changes['category_id'])) {
                 $original = $model->getOriginal();
@@ -68,6 +68,8 @@ class Product extends Model
                 else {
                     $categoryId = false;
                 }
+                event(new ProductCategoryChange($model, $categoryId));
+                // Если меняем категорию, то меняется список продуктов у двух категорий.
                 event(new ProductListChange($model, $categoryId));
             }
         });

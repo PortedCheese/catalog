@@ -39,28 +39,10 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="category_id">Категория</label>
-                        <select name="category_id"
-                                id="category_id"
-                                class="form-control chosen-select">
-                            @foreach($categories as $key => $value)
-                                <option value="{{ $key }}"
-                                        @if ($key == $category->id)
-                                        selected
-                                        @elseif (old('category_id'))
-                                        selected
-                                        @endif>
-                                    {{ $value }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="form-group">
                         <label>Метки</label>
                         @foreach($states as $state)
-                            <div class="form-check">
-                                <input class="form-check-input"
+                            <div class="custom-control custom-checkbox">
+                                <input class="custom-control-input"
                                        type="checkbox"
                                        @if (old('check-' . $state->id))
                                        checked
@@ -70,7 +52,7 @@
                                        value="{{ $state->id }}"
                                        id="check-{{ $state->id }}"
                                        name="check-{{ $state->id }}">
-                                <label class="form-check-label" for="check-{{ $state->id }}">
+                                <label class="custom-control-label" for="check-{{ $state->id }}">
                                     {{ $state->title }}
                                 </label>
                             </div>

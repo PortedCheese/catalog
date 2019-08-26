@@ -18,7 +18,7 @@
                                 'template' => 'medium',
                                 'filename' => $image->file_name
                             ]) }}"
-                                 class="img-thumbnail"
+                                 class="img-thumbnail mb-2"
                                  alt="{{ $image->name }}">
                             <confirm-delete-model-button model-id="{{ $category->id }}">
                                 <template slot="delete">
@@ -35,17 +35,25 @@
                     </div>
                 </div>
             @endif
-            <div class="category-description {{ $class }}">
-                <div class="card">
-                    <div class="card-body">
-                        {{ $category->description }}
+            @if (! empty($category->description))
+                <div class="category-description {{ $class }}">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title">Описание:</h5>
+                        </div>
+                        <div class="card-body">
+                            {{ $category->description }}
+                        </div>
                     </div>
                 </div>
-            </div>
+            @endif
         </div>
     </div>
     <div class="col-12">
         <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Подкатегории</h5>
+            </div>
             <div class="card-body">
                 @include("catalog::admin.categories.table-list", ['categories' => $category->children->sortBy('weight')])
             </div>

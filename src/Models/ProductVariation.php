@@ -43,4 +43,24 @@ class ProductVariation extends Model
     {
         return $this->belongsTo(\App\Product::class);
     }
+
+    /**
+     * Формат цены.
+     *
+     * @return string
+     */
+    public function getHumanPriceAttribute()
+    {
+        return number_format($this->price, 0, ",", " ");
+    }
+
+    /**
+     * Формат цены.
+     *
+     * @return string
+     */
+    public function getHumanSalePriceAttribute()
+    {
+        return number_format($this->sale_price, 0, ",", " ");
+    }
 }
