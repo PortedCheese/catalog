@@ -51,6 +51,7 @@ class OrderController extends Controller
      * Оформление корзины.
      *
      * @param OrderFullCartRequest $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function makeCartOrder(OrderFullCartRequest $request)
     {

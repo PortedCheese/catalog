@@ -26,7 +26,9 @@
                     @csrf
                     @if ($user)
                         <input type="hidden" name="user_id" value="{{ $user->id }}">
-                        <input type="hidden" name="name" value="{{ $user->full_name }}">
+                        @if (! empty($user->full_name))
+                            <input type="hidden" name="name" value="{{ $user->full_name }}">
+                        @endif
                         <input type="hidden" name="email" value="{{ $user->email }}">
                     @endif
 
@@ -35,7 +37,7 @@
                         <input type="text"
                                id="name"
                                name="name"
-                               @if ($user)
+                               @if (!empty($user->full_name))
                                disabled
                                value="{{ $user->full_name }}"
                                @endif

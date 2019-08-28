@@ -43,6 +43,11 @@ class ProductFilterService
         }
     }
 
+    /**
+     * Запуск фильтра.
+     *
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
     public function makeFilter()
     {
         $query = $this->request->query;
@@ -69,7 +74,8 @@ class ProductFilterService
         if (!empty($this->having)) {
             $this->products->havingRaw(implode(" and ", $this->having));
         }
-        $this->products->orderBy('products.updated_at', 'desc');
+
+        Product::addSortFromFilter($this->request, $this->products);
         $perPage = env("CATALOG_PRODUCT_SITE_PAGER", self::PAGER);
 
         return $this->products->paginate($perPage)->appends($this->request->input());
@@ -86,6 +92,7 @@ class ProductFilterService
                     ->select(["price", "product_id", DB::raw("COUNT(product_id) as count")])
                     ->where('available', '=', 1)
                     ->whereBetween("price", [$range['from'], $range['to'] + 1])
+                    ->orderBy("price")
                     ->groupBy("product_id");
             }
             else {
@@ -99,6 +106,19 @@ class ProductFilterService
             $this->products->joinSub($ranges,  $machine, function ($join) use ($machine) {
                 $join->on("products.id", '=', "{$machine}.product_id");
             });
+        }
+        if (! env("DISABLE_CATALOG_PRICE_SORT", false)) {
+            // Если нет фильтра по цене, нужно добавить цены, что бы работала сортировка.
+            if (empty($this->ranges['product_price'])) {
+                $prices = DB::table('product_variations')
+                    ->select(["price", "product_id", DB::raw("COUNT(product_id) as count")])
+                    ->where('available', '=', 1)
+                    ->orderBy("price")
+                    ->groupBy("product_id");
+                $this->products->joinSub($prices, "product_price", function ($join) {
+                    $join->on("products.id", '=', "product_price.product_id");
+                });
+            }
         }
     }
 

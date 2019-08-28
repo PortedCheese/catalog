@@ -8,7 +8,7 @@
 ##Install
 `php artisan migrate` - Создаст необходимые таблицы.
 
-`php artisan make:catalog {--menu : Only config menu}` - Настройки каталога. Создает необходимые модели, методы которых можно переопределить, создает элементы меню и создает конфигурацию.
+`php artisan make:catalog {--menu : Only config menu}` - Настройки каталога. Создает необходимые модели и контроллеры, методы которых можно переопределить, создает элементы меню и создает конфигурацию.
 
 `php artisan vendor:publish --provider="PortedCheese\Catalog\ServiceProvider" --tag=public` - Копирует компоненты.
 
@@ -44,3 +44,5 @@ CATALOG_PRODUCT_ADMIN_PAGER=20 - Сколько товаров на страни
 CATALOG_PRODUCT_STATE_ADMIN_PAGER=20 - Сколько статусов товара на странице в админке
 
 CATALOG_ORDERS_PROFILE_PAGER=10 - Сколько заказов в профиле пользователя
+
+DISABLE_CATALOG_PRICE_SORT=false - Отключить сортировку по цене, это если в каталоге нет цен

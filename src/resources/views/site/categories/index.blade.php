@@ -51,6 +51,7 @@
                 </div>
             @else
                 <div class="row">
+                    @include("catalog::site.categories.sort")
                     <div class="col-12 my-3">
                         @foreach ($categories as $item)
                             <a href="{{ route('site.catalog.category.show', ['category' => $item]) }}" class="btn btn-outline-primary mb-2">

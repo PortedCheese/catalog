@@ -42,14 +42,49 @@ class CatalogMakeCommand extends BaseConfigModelCommand
         'Cart.stub' => 'Cart.php',
     ];
 
+    protected $controllers = [
+        "Admin" => [
+            "CartController",
+            "CategoryController",
+            "CategoryFieldController",
+            "OrderController",
+            "OrderStateController",
+            "ProductController",
+            "ProductFieldController",
+            "ProductStateController",
+            "ProductVariationController",
+        ],
+        "Site" => [
+            "CartController",
+            "CatalogController",
+            "OrderController",
+        ],
+    ];
+    protected $packageName = "Catalog";
+
+    /**
+     * Имя конфига.
+     *
+     * @var string
+     */
     protected $configName = 'catalog';
 
+    /**
+     * Значения конфигов.
+     *
+     * @var array
+     */
     protected $configValues = [
         'useOwnSiteRoutes' => false,
         'useOwnAdminRoutes' => false,
         'useCart' => false,
     ];
 
+    /**
+     * Директория пакета.
+     *
+     * @var string
+     */
     protected $dir = __DIR__;
 
     /**
@@ -71,11 +106,16 @@ class CatalogMakeCommand extends BaseConfigModelCommand
     {
         if (! $this->option('menu')) {
             $this->exportModels();
+            $this->exportControllers("Admin");
+            $this->exportControllers("Site");
         }
         $this->makeMenu();
         $this->makeConfig();
     }
 
+    /**
+     * Заполнить меню.
+     */
     protected function makeMenu() {
         try {
             $menu = Menu::where('key', 'admin')->firstOrFail();
@@ -88,6 +128,11 @@ class CatalogMakeCommand extends BaseConfigModelCommand
         $this->makeOrderMenu($menu);
     }
 
+    /**
+     * Меню заказа.
+     *
+     * @param $menu
+     */
     private function makeOrderMenu($menu)
     {
         $title = "Заказы";
@@ -147,6 +192,11 @@ class CatalogMakeCommand extends BaseConfigModelCommand
         }
     }
 
+    /**
+     * Меню категории.
+     *
+     * @param $menu
+     */
     private function makeCategoryMenu($menu)
     {
         $title = "Категории";

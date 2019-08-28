@@ -1,0 +1,11 @@
+<?php
+
+namespace {{namespace}}Http\Controllers\Vendor\Catalog\Admin;
+
+use Illuminate\Http\Request;
+use PortedCheese\Catalog\Http\Controllers\Admin\CategoryFieldController as VendorController;
+
+class CategoryFieldController extends VendorController
+{
+
+}

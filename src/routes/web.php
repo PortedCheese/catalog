@@ -2,7 +2,7 @@
 
 if (! siteconf()->get('catalog.useOwnAdminRoutes')) {
     Route::group([
-        'namespace' => 'PortedCheese\Catalog\Http\Controllers\Admin',
+        'namespace' => 'App\Http\Controllers\Vendor\Catalog\Admin',
         'middleware' => ['web', 'role:admin|editor'],
         'as' => 'admin.',
         'prefix' => 'admin',
@@ -102,7 +102,7 @@ if (! siteconf()->get('catalog.useOwnAdminRoutes')) {
 
 if (! siteconf()->get('catalog.useOwnSiteRoutes')) {
     Route::group([
-        'namespace' => 'PortedCheese\Catalog\Http\Controllers\Site',
+        'namespace' => 'App\Http\Controllers\Vendor\Catalog\Site',
         'as' => 'profile.order.',
         'prefix' => 'profile/orders',
         'middleware' => ['web', 'auth', 'verified'],
@@ -114,7 +114,7 @@ if (! siteconf()->get('catalog.useOwnSiteRoutes')) {
     });
 
     Route::group([
-        'namespace' => 'PortedCheese\Catalog\Http\Controllers\Site',
+        'namespace' => 'App\Http\Controllers\Vendor\Catalog\Site',
         'middleware' => ['web'],
         'as' => 'site.',
     ], function () {

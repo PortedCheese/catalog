@@ -3,9 +3,10 @@
 namespace PortedCheese\Catalog\Models;
 
 use App\Image;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use PortedCheese\Catalog\Events\ProductCategoryChange;
 use PortedCheese\Catalog\Events\ProductListChange;
@@ -13,6 +14,9 @@ use PortedCheese\SeoIntegration\Models\Meta;
 
 class Product extends Model
 {
+    const DEFAULT_SORT = "title";
+    const DEFAULT_SORT_ORDER = "desc";
+
     protected $fillable = [
         'category_id',
         'title',
@@ -80,6 +84,39 @@ class Product extends Model
 
             event(new ProductListChange($model));
         });
+    }
+
+    /**
+     * Сортировка товаров.
+     *
+     * @param Request $request
+     * @param Builder $products
+     */
+    public static function addSortFromFilter(Request $request, Builder $products)
+    {
+        $defaultSort = true;
+        $query = $request->query;
+        if ($query->has("sort-by")) {
+            $field = $query->get("sort-by");
+            $order = "asc";
+            if ($query->has("sort-order")) {
+                $value = $query->get("sort-order");
+                if (in_array($value, ['asc', 'desc'])) {
+                    $order = $value;
+                }
+            }
+            if (Schema::hasColumn("products", $field)) {
+                $products->orderBy("products.{$field}", $order);
+                $defaultSort = false;
+            }
+            elseif ($field == "price" && ! env("DISABLE_CATALOG_PRICE_SORT", false)) {
+                $products->orderBy("product_price.price", $order);
+                $defaultSort = false;
+            }
+        }
+        if ($defaultSort) {
+            $products->orderBy("products." . self::DEFAULT_SORT, self::DEFAULT_SORT_ORDER);
+        }
     }
 
     /**
@@ -352,9 +389,6 @@ class Product extends Model
     public function forgetFieldsCache()
     {
         Cache::forget("product-getFieldsInfo:{$this->id}");
-        if (Schema::hasTable("jobs")) {
-
-        }
     }
 
     /**

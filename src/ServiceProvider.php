@@ -6,6 +6,9 @@ use App\Cart;
 use App\Category;
 use App\Product;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Route;
 use PortedCheese\Catalog\Console\Commands\CatalogClearCardsCommand;
 use PortedCheese\Catalog\Console\Commands\CatalogMakeCommand;
 use PortedCheese\Catalog\Console\Kernel;
@@ -17,7 +20,6 @@ use PortedCheese\Catalog\Events\ProductListChange;
 use PortedCheese\Catalog\Events\ProductVariationUpdate;
 use PortedCheese\Catalog\Listeners\AddFieldsToProductCategory;
 use PortedCheese\Catalog\Listeners\CategoryFieldClearCache;
-use PortedCheese\Catalog\Listeners\ClearCategoryProductsCache;
 use PortedCheese\Catalog\Listeners\ProductFieldClearCache;
 use PortedCheese\Catalog\Listeners\ProductFilterClearCache;
 use PortedCheese\Catalog\Listeners\ProductTeaserClearCache;
@@ -70,6 +72,85 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
             ]);
         }
 
+        $this->makeEvents();
+        $this->makeViewsVariables();
+    }
+
+    public function register()
+    {
+        if (env("CATALOG_CRON", false)) {
+            $this->app->singleton('portedcheese.catalog.console.kernel', function ($app) {
+                $dispatcher = $app->make(Dispatcher::class);
+                return new Kernel($app, $dispatcher);
+            });
+
+            $this->app->make('portedcheese.catalog.console.kernel');
+        }
+    }
+
+    /**
+     * Передаем переменные в представления.
+     */
+    private function makeViewsVariables()
+    {
+        // Информация о текущей корзине.
+        view()->composer('catalog::site.cart.cart-state', function ($view) {
+            $cartData = (object) [
+                'total' => 0,
+                'count' => 0,
+            ];
+            $cart = Cart::getCart();
+            if ($cart) {
+                $cartData->total = $cart->total;
+                $cartData->count = $cart->getCount();
+            }
+            $view->with('cartData', $cartData);
+        });
+        // Сортировка.
+        view()->composer("catalog::site.categories.sort", function ($view) {
+            $view->with("disablePriceSort", env("DISABLE_CATALOG_PRICE_SORT", false));
+        });
+        view()->composer("catalog::site.categories.sort-link", function ($view) {
+            $request = app(Request::class);
+            $queryParams = $request->query->all();
+
+            if (!empty($queryParams['sort-by'])) {
+                $field = $queryParams['sort-by'];
+                unset($queryParams['sort-by']);
+            }
+            else {
+                $field = Product::DEFAULT_SORT;
+            }
+            $view->with("sortField", $field);
+
+            if (!empty($queryParams['sort-order'])) {
+                $order = $queryParams['sort-order'];
+                unset($queryParams['sort-order']);
+            }
+            else {
+                $order = Product::DEFAULT_SORT_ORDER;
+            }
+            $view->with("sortOrder", $order);
+
+            $route = Route::current();
+            $routeName = Route::currentRouteName();
+            $routeParams = $route->parameters();
+            foreach ($queryParams as $key => $value) {
+                $routeParams[$key] = $value;
+            }
+            $uri = route($routeName, $routeParams);
+            $view->with("noParams", empty($queryParams));
+            $view->with("sortUrl", $uri);
+        });
+
+        Blade::include("catalog::site.categories.sort-link", "sortLink");
+    }
+
+    /**
+     * Подписаться на события.
+     */
+    private function makeEvents()
+    {
         // Подписаться на обновление полей.
         $this->app['events']->listen(CategoryFieldUpdate::class, CategoryFieldClearCache::class);
         $this->app['events']->listen(ProductFieldUpdate::class, ProductFieldClearCache::class);
@@ -83,34 +164,6 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         $this->app['events']->listen(ProductVariationUpdate::class, ProductVariationsFilterClearCache::class);
         // Изменение категории.
         $this->app['events']->listen(ProductCategoryChange::class, AddFieldsToProductCategory::class);
-
-        // Информация о текущей корзине.
-        view()->composer('catalog::site.cart.cart-state', function ($view) {
-            $cartData = (object) [
-                'total' => 0,
-                'count' => 0,
-            ];
-            $cart = Cart::getCart();
-            if ($cart) {
-                $cartData->total = $cart->total;
-                $cartData->count = $cart->getCount();
-            }
-            else {
-            }
-            $view->with('cartData', $cartData);
-        });
-    }
-
-    public function register()
-    {
-        if (env("CATALOG_CRON", false)) {
-            $this->app->singleton('portedcheese.catalog.console.kernel', function ($app) {
-                $dispatcher = $app->make(Dispatcher::class);
-                return new Kernel($app, $dispatcher);
-            });
-
-            $this->app->make('portedcheese.catalog.console.kernel');
-        }
     }
 
 }

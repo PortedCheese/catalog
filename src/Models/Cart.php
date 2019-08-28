@@ -78,7 +78,8 @@ class Cart extends Model
     /**
      * Получить корзину.
      *
-     * @return bool
+     * @return bool|Cart
+     * @throws \Exception
      */
     public static function getCart()
     {
@@ -118,7 +119,7 @@ class Cart extends Model
      * Найти по пользователю.
      *
      * @param $id
-     * @return bool
+     * @return bool|self
      */
     public static function findByUserId($id)
     {
@@ -133,8 +134,8 @@ class Cart extends Model
     /**
      * Найти корзину по uuid.
      *
-     * @param $cookie
-     * @return bool
+     * @param $uiid
+     * @return bool|self
      */
     public static function findByUuid($uiid)
     {

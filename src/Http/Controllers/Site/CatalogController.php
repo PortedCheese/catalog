@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use App\Product;
 use App\ProductVariation;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use PortedCheese\Catalog\Http\Services\ProductFilterService;
 use PortedCheese\SeoIntegration\Models\Meta;
 
@@ -41,6 +40,7 @@ class CatalogController extends Controller
     /**
      * Просмотр категории.
      *
+     * @param Request $request
      * @param Category $category
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
