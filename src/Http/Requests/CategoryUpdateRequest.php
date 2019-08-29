@@ -2,6 +2,7 @@
 
 namespace PortedCheese\Catalog\Http\Requests;
 
+use App\Category;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CategoryUpdateRequest extends FormRequest
@@ -23,20 +24,11 @@ class CategoryUpdateRequest extends FormRequest
      */
     public function rules()
     {
-        $category = $this->route()->parameter('category', NULL);
-        $id = !empty($category) ? $category->id : NULL;
-        return [
-            'title' => "required|min:2|unique:categories,title,{$id}",
-            'slug' => "min:2|unique:categories,slug,{$id}",
-            'main_image' => 'nullable|image',
-        ];
+        return Category::requestCategoryUpdateRules($this);
     }
 
     public function attributes()
     {
-        return [
-            'title' => 'Заголовок',
-            'main_image' => 'Главное изображение',
-        ];
+        return Category::requestCategoryUpdateAttributes();
     }
 }

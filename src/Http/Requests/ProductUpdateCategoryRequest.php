@@ -2,6 +2,7 @@
 
 namespace PortedCheese\Catalog\Http\Requests;
 
+use App\Product;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ProductUpdateCategoryRequest extends FormRequest
@@ -23,15 +24,11 @@ class ProductUpdateCategoryRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'category_id' => "required|numeric|exists:categories,id",
-        ];
+        return Product::requestProductUpdateCategoryRules();
     }
 
     public function attributes()
     {
-        return [
-            'category_id' => 'Категория',
-        ];
+        return Product::requestProductUpdateCategoryAttributes();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace PortedCheese\Catalog\Http\Requests;
 
+use App\ProductField;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ProductFieldUpdateRequest extends FormRequest
@@ -23,15 +24,11 @@ class ProductFieldUpdateRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'value' => 'required|min:1',
-        ];
+        return ProductField::requestProductFieldUpdateRules();
     }
 
     public function attributes()
     {
-        return [
-            'value' => 'Значение',
-        ];
+        return ProductField::requestProductFieldUpdateAttributes();
     }
 }

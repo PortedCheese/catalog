@@ -2,6 +2,7 @@
 
 namespace PortedCheese\Catalog\Http\Requests;
 
+use App\OrderState;
 use Illuminate\Foundation\Http\FormRequest;
 
 class OrderStateStoreRequest extends FormRequest
@@ -23,17 +24,11 @@ class OrderStateStoreRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'title' => 'required|min:2|unique:order_states,title',
-            'machine' => 'nullable|min:2|unique:order_states,machine',
-        ];
+        return OrderState::requestOrderStateStoreRules();
     }
 
     public function attributes()
     {
-        return [
-            'title' => 'Заголовок',
-            'machine' => 'Ключ',
-        ];
+        return OrderState::requestOrderStateStoreAttributes();
     }
 }

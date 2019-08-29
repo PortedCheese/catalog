@@ -2,6 +2,7 @@
 
 namespace PortedCheese\Catalog\Http\Requests;
 
+use App\ProductState;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ProductStateUpdateRequest extends FormRequest
@@ -23,20 +24,11 @@ class ProductStateUpdateRequest extends FormRequest
      */
     public function rules()
     {
-        $state = $this->route()->parameter('state', NULL);
-        $id = !empty($state) ? $state->id : NULL;
-        return [
-            'title' => "required|min:2|unique:product_states,title,{$id}",
-            'slug' => "nullable|min:2|unique:product_states,slug,{$id}",
-            'color' => 'required',
-        ];
+        return ProductState::requestProductStateUpdateRules($this);
     }
 
     public function attributes()
     {
-        return [
-            'title' => 'Заголовок',
-            'color' => 'Цвет',
-        ];
+        return ProductState::requestProductStateUpdateAttributes();
     }
 }

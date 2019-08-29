@@ -2,6 +2,7 @@
 
 namespace PortedCheese\Catalog\Http\Requests;
 
+use App\CategoryField;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CategoryFieldCreateRequest extends FormRequest
@@ -23,11 +24,6 @@ class CategoryFieldCreateRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'title' => 'required|min:2',
-            'exists' => 'nullable|required_without_all:machine,type|exists:category_fields,id',
-            'type' => 'nullable|required_without:exists',
-            'machine' => 'nullable|required_without:exists|min:4|unique:category_fields,machine',
-        ];
+        return CategoryField::requestCategoryFieldCreateRules();
     }
 }

@@ -18,6 +18,7 @@ class CartController extends Controller
      * Старинца корзины.
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @throws \Exception
      */
     public function index()
     {
@@ -30,6 +31,7 @@ class CartController extends Controller
      * Оформление заказа.
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\View\View
+     * @throws \Exception
      */
     public function checkout()
     {
@@ -54,6 +56,7 @@ class CartController extends Controller
      * @param AddToCartRequest $request
      * @param Product $product
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
      */
     public function addToCart(AddToCartRequest $request, Product $product)
     {
@@ -76,6 +79,7 @@ class CartController extends Controller
      * @param Product $product
      * @param ProductVariation $variation
      * @return \Illuminate\Http\RedirectResponse
+     * @throws \Exception
      */
     public function deleteFromCart(Product $product, ProductVariation $variation)
     {
@@ -95,6 +99,7 @@ class CartController extends Controller
      * @param Product $product
      * @param ProductVariation $variation
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
      */
     public function changeQuantity(ChangeQuantityRequest $request, Product $product, ProductVariation $variation)
     {

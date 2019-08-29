@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use PortedCheese\Catalog\Events\CategoryFieldUpdate;
+use PortedCheese\Catalog\Http\Requests\CategoryUpdateRequest;
 use PortedCheese\Catalog\Jobs\CategoryCache;
 use PortedCheese\SeoIntegration\Models\Meta;
 
@@ -63,6 +64,63 @@ class Category extends Model
             $model->forgetBreadcrumbCache();
             $model->forgetChildrenListCache();
         });
+    }
+
+    /**
+     * Валидация добавления категории.
+     *
+     * @return array
+     */
+    public static function requestCategoryCreateRules()
+    {
+        return [
+            'title' => 'required|min:2|unique:categories,title',
+            'slug' => 'nullable|min:2|unique:categories,slug',
+            'main_image' => 'nullable|image',
+        ];
+    }
+
+    /**
+     * Сообщения об ошибках при добавлении категории.
+     *
+     * @return array
+     */
+    public static function requestCategoryCreateAttributes()
+    {
+        return [
+            'title' => 'Заголовок',
+            'main_image' => 'Главное изображение',
+        ];
+    }
+
+    /**
+     * Валидация обновления категории.
+     *
+     * @param CategoryUpdateRequest $validator
+     * @return array
+     */
+    public static function requestCategoryUpdateRules(CategoryUpdateRequest $validator)
+    {
+        $category = $validator->route()->parameter('category', NULL);
+        $id = !empty($category) ? $category->id : NULL;
+        return [
+            'title' => "required|min:2|unique:categories,title,{$id}",
+            'slug' => "min:2|unique:categories,slug,{$id}",
+            'main_image' => 'nullable|image',
+        ];
+    }
+
+    /**
+     * Сообщения об ошибках при обновлении категори.
+     *
+     * @return array
+     */
+    public static function requestCategoryUpdateAttributes()
+    {
+        return [
+            'title' => 'Заголовок',
+            'main_image' => 'Главное изображение',
+        ];
     }
 
     /**

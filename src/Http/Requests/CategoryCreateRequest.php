@@ -2,6 +2,7 @@
 
 namespace PortedCheese\Catalog\Http\Requests;
 
+use App\Category;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CategoryCreateRequest extends FormRequest
@@ -23,18 +24,11 @@ class CategoryCreateRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'title' => 'required|min:2|unique:categories,title',
-            'slug' => 'nullable|min:2|unique:categories,slug',
-            'main_image' => 'nullable|image',
-        ];
+        return Category::requestCategoryCreateRules();
     }
 
     public function attributes()
     {
-        return [
-            'title' => 'Заголовок',
-            'main_image' => 'Главное изображение',
-        ];
+        return Category::requestCategoryCreateAttributes();
     }
 }

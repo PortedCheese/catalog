@@ -2,6 +2,7 @@
 
 namespace PortedCheese\Catalog\Http\Requests;
 
+use App\ProductField;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ProductFieldStoreRequest extends FormRequest
@@ -23,17 +24,11 @@ class ProductFieldStoreRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'value' => 'required|min:1',
-            'field_id' => 'required|exists:category_fields,id',
-        ];
+        return ProductField::requestProductFieldStoreRules();
     }
 
     public function attributes()
     {
-        return [
-            'value' => 'Значение',
-            'field_id' => 'Характеристика',
-        ];
+        return ProductField::requestProductFieldStoreAttributes();
     }
 }

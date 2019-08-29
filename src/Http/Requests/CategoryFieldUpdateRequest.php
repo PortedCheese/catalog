@@ -2,6 +2,7 @@
 
 namespace PortedCheese\Catalog\Http\Requests;
 
+use App\CategoryField;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CategoryFieldUpdateRequest extends FormRequest
@@ -23,8 +24,6 @@ class CategoryFieldUpdateRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'title' => 'required|min:2',
-        ];
+        return CategoryField::requestCategoryFieldUpdateRules();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace PortedCheese\Catalog\Http\Requests;
 
+use App\OrderState;
 use Illuminate\Foundation\Http\FormRequest;
 
 class OrderStateUpdateRequest extends FormRequest
@@ -23,17 +24,11 @@ class OrderStateUpdateRequest extends FormRequest
      */
     public function rules()
     {
-        $state = $this->route()->parameter('state', NULL);
-        $id = !empty($state) ? $state->id : NULL;
-        return [
-            'title' => "required|min:2|unique:order_states,title,{$id}",
-        ];
+        return OrderState::requestOrderStateUpdateRules($this);
     }
 
     public function attributes()
     {
-        return [
-            'title' => 'Заголовок',
-        ];
+        return OrderState::requestOrderStateUpdateAttributes();
     }
 }

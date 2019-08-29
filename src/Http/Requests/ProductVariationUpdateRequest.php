@@ -2,6 +2,7 @@
 
 namespace PortedCheese\Catalog\Http\Requests;
 
+use App\ProductVariation;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ProductVariationUpdateRequest extends FormRequest
@@ -23,23 +24,11 @@ class ProductVariationUpdateRequest extends FormRequest
      */
     public function rules()
     {
-        $variation = $this->route()->parameter('variation', NULL);
-        $id = !empty($variation) ? $variation->id : NULL;
-        return [
-            'sku' => "required|min:2|unique:product_variations,sku,{$id}",
-            'price' => 'required|numeric|min:0',
-            'sale_price' => 'nullable|numeric|min:0',
-            'description' => 'required|min:2',
-        ];
+        return ProductVariation::requestProductVariationUpdateRules($this);
     }
 
     public function attributes()
     {
-        return [
-            'sku' => 'Артикул',
-            'price' => 'Цена',
-            'sale_price' => 'Цена со скидкой',
-            'description' => 'Описание',
-        ];
+        return ProductVariation::requestProductVariationUpdateAttributes();
     }
 }

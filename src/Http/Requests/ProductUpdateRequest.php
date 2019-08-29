@@ -2,6 +2,7 @@
 
 namespace PortedCheese\Catalog\Http\Requests;
 
+use App\Product;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ProductUpdateRequest extends FormRequest
@@ -23,20 +24,11 @@ class ProductUpdateRequest extends FormRequest
      */
     public function rules()
     {
-        $product = $this->route()->parameter('product', NULL);
-        $id = !empty($product) ? $product->id : NULL;
-        return [
-            'title' => "required|min:2",
-            'slug' => "nullable|min:2|unique:products,slug,{$id}",
-            'main_image' => 'nullable|image',
-        ];
+        return Product::requestProductUpdateRules($this);
     }
 
     public function attributes()
     {
-        return [
-            'title' => 'Заголовок',
-            'main_image' => 'Главное изображение',
-        ];
+        return Product::requestProductUpdateAttributes();
     }
 }

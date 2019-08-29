@@ -2,6 +2,7 @@
 
 namespace PortedCheese\Catalog\Http\Requests;
 
+use App\Product;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ProductStoreRequest extends FormRequest
@@ -23,18 +24,11 @@ class ProductStoreRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'title' => 'required|min:2|unique:products,title',
-            'slug' => 'nullable|min:2|unique:products,slug',
-            'main_image' => 'nullable|image',
-        ];
+        return Product::requestProductStoreRules();
     }
 
     public function attributes()
     {
-        return [
-            'title' => 'Заголовок',
-            'main_image' => 'Главное изображение',
-        ];
+        return Product::requestProductStoreAttributes();
     }
 }

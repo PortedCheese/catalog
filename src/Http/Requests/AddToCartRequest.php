@@ -2,6 +2,7 @@
 
 namespace PortedCheese\Catalog\Http\Requests;
 
+use App\Cart;
 use Illuminate\Foundation\Http\FormRequest;
 
 class AddToCartRequest extends FormRequest
@@ -23,18 +24,11 @@ class AddToCartRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'quantity' => 'required|numeric|min:1',
-            'variation' => 'required|exists:product_variations,id',
-        ];
+        return Cart::requestAddToCartRules();
     }
 
     public function messages()
     {
-        return [
-            'quantity.required' => 'Количество не может быть пустым',
-            'quantity.numeric' => 'Количество должно быть числом',
-            'quantity.min' => "Количество должно быть минимум :min",
-        ];
+        return Cart::requestAddToCartMessages();
     }
 }

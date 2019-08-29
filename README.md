@@ -46,3 +46,5 @@ CATALOG_PRODUCT_STATE_ADMIN_PAGER=20 - Сколько статусов това�
 CATALOG_ORDERS_PROFILE_PAGER=10 - Сколько заказов в профиле пользователя
 
 DISABLE_CATALOG_PRICE_SORT=false - Отключить сортировку по цене, это если в каталоге нет цен
+
+CATALOG_ORDER_NOTIFY_EMAIL = "dev@gis4biz.ru"

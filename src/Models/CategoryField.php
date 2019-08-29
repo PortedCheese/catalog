@@ -37,6 +37,33 @@ class CategoryField extends Model
     }
 
     /**
+     * Валидация добавления поля в категорию.
+     *
+     * @return array
+     */
+    public static function requestCategoryFieldCreateRules()
+    {
+        return [
+            'title' => 'required|min:2',
+            'exists' => 'nullable|required_without_all:machine,type|exists:category_fields,id',
+            'type' => 'nullable|required_without:exists',
+            'machine' => 'nullable|required_without:exists|min:4|unique:category_fields,machine',
+        ];
+    }
+
+    /**
+     * Валидация обновления поля категории.
+     *
+     * @return array
+     */
+    public static function requestCategoryFieldUpdateRules()
+    {
+        return [
+            'title' => 'required|min:2',
+        ];
+    }
+
+    /**
      * Зачения у поля.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
