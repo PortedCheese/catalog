@@ -88,20 +88,11 @@ class ProductFilterService
     {
         foreach ($this->ranges as $machine => $range) {
             if ($machine == 'product_price') {
-                $ranges = DB::table('product_variations')
-                    ->select(["price", "product_id", DB::raw("COUNT(product_id) as count")])
-                    ->where('available', '=', 1)
-                    ->whereBetween("price", [$range['from'], $range['to'] + 1])
-                    ->orderBy("price")
-                    ->groupBy("product_id");
+                $ranges = Product::queryRangeVariations($range['from'], $range['to']);
             }
             else {
                 $fieldId = $this->machineId[$machine]['id'];
-                $ranges = DB::table('product_fields')
-                    ->select(["value", "field_id", "product_id", DB::raw("COUNT(product_id) as count")])
-                    ->whereBetween("value", [$range['from'], $range['to']])
-                    ->where("field_id", '=', $fieldId)
-                    ->groupBy("product_id");
+                $ranges = Product::queryRangeFields($range['from'], $range['to'], $fieldId);
             }
             $this->products->joinSub($ranges,  $machine, function ($join) use ($machine) {
                 $join->on("products.id", '=', "{$machine}.product_id");
@@ -110,11 +101,7 @@ class ProductFilterService
         if (! env("DISABLE_CATALOG_PRICE_SORT", false)) {
             // Если нет фильтра по цене, нужно добавить цены, что бы работала сортировка.
             if (empty($this->ranges['product_price'])) {
-                $prices = DB::table('product_variations')
-                    ->select(["price", "product_id", DB::raw("COUNT(product_id) as count")])
-                    ->where('available', '=', 1)
-                    ->orderBy("price")
-                    ->groupBy("product_id");
+                $prices = Product::queryRangeVariations(0,0, false);
                 $this->products->joinSub($prices, "product_price", function ($join) {
                     $join->on("products.id", '=', "product_price.product_id");
                 });
@@ -173,11 +160,7 @@ class ProductFilterService
                 return true;
             }
             $fieldId = $this->machineId[$machine]['id'];
-            $checkboxes = DB::table('product_fields')
-                ->select(["value", "field_id", "product_id", DB::raw("COUNT(product_id) as count")])
-                ->whereIn("value", $value)
-                ->where("field_id", '=', $fieldId)
-                ->groupBy("product_id");
+            $checkboxes = Product::queryCheckFields($value, $fieldId);
 
             $this->products->joinSub($checkboxes, $machine, function ($join) use ($machine) {
                 $join->on("products.id", '=', "{$machine}.product_id");
@@ -206,11 +189,7 @@ class ProductFilterService
                 return true;
             }
             $fieldId = $this->machineId[$machine]['id'];
-            $selects = DB::table('product_fields')
-                ->select(["value", "field_id", "product_id", DB::raw("COUNT(product_id) as count")])
-                ->where("value", '=', $value)
-                ->where("field_id", '=', $fieldId)
-                ->groupBy("product_id");
+            $selects = Product::querySelectFields($value, $fieldId);
 
             $this->products->joinSub($selects,  $machine, function ($join) use ($machine) {
                 $join->on("products.id", '=', "{$machine}.product_id");

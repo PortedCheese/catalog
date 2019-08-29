@@ -55,15 +55,15 @@
                         }
                     @endphp
                     @if ($render)
-                        <div class="form-group steps-slider-cover">
+                        <div class="form-group steps-slider-cover" data-step="1">
                             <label>{{ $filter->title }}</label>
                             <div class="row justify-content-between mb-2">
                                 <div class="col-6">
                                     <input type="number"
                                            name="range-from-{{ $filter->machine }}"
                                            step="1"
-                                           min="{{ min($filter->values) - 10 }}"
-                                           max="{{ max($filter->values) + 10 }}"
+                                           min="{{ (float) min($filter->values) }}"
+                                           max="{{ (float) max($filter->values) }}"
                                            data-value="{{ min($filter->values) }}"
                                            data-init="{{ $query->get("range-from-{$filter->machine}", min($filter->values)) }}"
                                            class="form-control from-input">
@@ -72,8 +72,8 @@
                                     <input type="number"
                                            name="range-to-{{ $filter->machine }}"
                                            step="1"
-                                           min="{{ min($filter->values) - 10 }}"
-                                           max="{{ max($filter->values) + 10 }}"
+                                           min="{{ min($filter->values) }}"
+                                           max="{{ max($filter->values) }}"
                                            data-value="{{ max($filter->values) }}"
                                            data-init="{{ $query->get("range-to-{$filter->machine}", max($filter->values)) }}"
                                            class="form-control to-input">
@@ -89,6 +89,9 @@
                     @break
             @endswitch
         @endforeach
+
+        <input type="hidden" name="sort-by" value="{{ $sortField }}">
+        <input type="hidden" name="sort-order" value="{{ $sortOrder }}">
 
         <div class="btn-group-vertical btn-block mt-2"
              role="group">

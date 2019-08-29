@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use PortedCheese\Catalog\Events\ProductCategoryChange;
 use PortedCheese\Catalog\Events\ProductListChange;
@@ -117,6 +118,75 @@ class Product extends Model
         if ($defaultSort) {
             $products->orderBy("products." . self::DEFAULT_SORT, self::DEFAULT_SORT_ORDER);
         }
+    }
+
+    /**
+     * Поиск вариаций.
+     *
+     * @param $from
+     * @param $to
+     * @param $needBetween
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public static function queryRangeVariations($from, $to, $needBetween = true)
+    {
+        $query = DB::table('product_variations')
+            ->select(["price", "product_id", DB::raw("COUNT(product_id) as count")])
+            ->where('available', '=', 1);
+        if ($needBetween) {
+            $query->whereBetween("price", [$from, $to + 1]);
+        }
+        return $query->orderBy("price")
+            ->groupBy("product_id");
+    }
+
+    /**
+     * Поиск характеристик по диапазону.
+     *
+     * @param $from
+     * @param $to
+     * @param $fieldId
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public static function queryRangeFields($from, $to, $fieldId)
+    {
+        return DB::table('product_fields')
+            ->select(["value", "field_id", "product_id", DB::raw("COUNT(product_id) as count")])
+            ->whereBetween("value", [$from, $to])
+            ->where("field_id", '=', $fieldId)
+            ->groupBy("product_id");
+    }
+
+    /**
+     * Поиск характеристик по чекбоксу.
+     *
+     * @param $value
+     * @param $fieldId
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public static function queryCheckFields($value, $fieldId)
+    {
+        return DB::table('product_fields')
+            ->select(["value", "field_id", "product_id", DB::raw("COUNT(product_id) as count")])
+            ->whereIn("value", $value)
+            ->where("field_id", '=', $fieldId)
+            ->groupBy("product_id");
+    }
+
+    /**
+     * Поиск характеристик по селекту.
+     *
+     * @param $value
+     * @param $fieldId
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public static function querySelectFields($value, $fieldId)
+    {
+        return DB::table('product_fields')
+            ->select(["value", "field_id", "product_id", DB::raw("COUNT(product_id) as count")])
+            ->where("value", '=', $value)
+            ->where("field_id", '=', $fieldId)
+            ->groupBy("product_id");
     }
 
     /**

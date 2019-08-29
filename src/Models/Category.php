@@ -693,11 +693,13 @@ class Category extends Model
                 ->get();
             $prices = [];
             foreach ($variations as $variation) {
-                $price = false;
-                if (!empty($variation->price)) {
-                    $price = $variation->price;
+                try {
+                    $price = (float) $variation->price;
                 }
-                if ($price && !in_array($price, $prices)) {
+                catch (\Exception $exception) {
+                    continue;
+                }
+                if (is_numeric($price) && $price >= 0 && !in_array($price, $prices)) {
                     $prices[] = $price;
                 }
             }

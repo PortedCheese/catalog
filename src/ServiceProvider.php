@@ -106,6 +106,13 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
             }
             $view->with('cartData', $cartData);
         });
+        // Фильтрация.
+        view()->composer("catalog::site.products.filters", function ($view) {
+            $request = app(Request::class);
+            $queryParams = $request->query->all();
+            $view->with("sortField", !empty($queryParams['sort-by']) ? $queryParams['sort-by'] : Product::DEFAULT_SORT);
+            $view->with("sortOrder", !empty($queryParams['sort-order']) ? $queryParams['sort-order'] : Product::DEFAULT_SORT_ORDER);
+        });
         // Сортировка.
         view()->composer("catalog::site.categories.sort", function ($view) {
             $view->with("disablePriceSort", env("DISABLE_CATALOG_PRICE_SORT", false));
