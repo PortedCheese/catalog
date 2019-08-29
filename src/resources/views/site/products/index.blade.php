@@ -1,4 +1,7 @@
 <div class="row">
+        @include("catalog::site.categories.sort")
+</div>
+<div class="row">
     @foreach ($products as $item)
         <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-3">
             {!! $item->getTeaser() !!}
