@@ -9,7 +9,6 @@ use App\ProductVariation;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use PortedCheese\Catalog\Events\CategoryFieldUpdate;
@@ -899,13 +898,22 @@ class Category extends Model
      * Добавить задачу в очередь.
      *
      * @param $method
+     * @param bool $force
+     * @return bool
      */
-    private function addCacheJob($method)
+    private function addCacheJob($method, $force = false)
     {
-        if (Schema::hasTable('jobs')) {
-            CategoryCache::dispatch($this, $method)
-                ->onQueue("catalogCache")
-                ->delay(now()->addSeconds(2));
+        if (! $force) {
+            if (env("CATALOG_HAS_EXCHANGE", false)) {
+                return false;
+            }
+            if (! Schema::hasTable('jobs')) {
+                return false;
+            }
         }
+        CategoryCache::dispatch($this, $method)
+            ->onQueue("catalogCache")
+            ->delay(now()->addSeconds(2));
+        return true;
     }
 }
