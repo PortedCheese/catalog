@@ -16,16 +16,18 @@ class ProductFilterService
     protected $category;
     protected $categoryIds;
     protected $having;
+    protected $setHaving;
     protected $products;
     protected $machineId;
     protected $ranges;
 
-    public function __construct(Request $request, Category $category)
+    public function __construct(Request $request, Category $category, $setHaving = false)
     {
         $this->request = $request;
         $this->category = $category;
         $this->categoryIds = $this->category->getChildren(true);
         $this->having = [];
+        $this->setHaving = $setHaving;
         $this->machineId = [];
         $this->ranges = [];
         // Инициализация запроса.
@@ -165,8 +167,10 @@ class ProductFilterService
             $this->products->joinSub($checkboxes, $machine, function ($join) use ($machine) {
                 $join->on("products.id", '=', "{$machine}.product_id");
             });
-            // Это для того что бы проверял все значения а не по одному.
-            $this->having[] = "max({$machine}.count) = " . count($value);
+            if ($this->setHaving) {
+                // Это для того что бы проверял все значения а не по одному.
+                $this->having[] = "max({$machine}.count) = " . count($value);
+            }
         }
         else {
             return false;
