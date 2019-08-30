@@ -726,6 +726,21 @@ class Category extends Model
     }
 
     /**
+     * Поставить в очередь кэширование категории.
+     */
+    public function forceSetAllJobsCache()
+    {
+        $this->addCacheJob("getFieldsInfo", true);
+        $this->addCacheJob("getChildrenFieldsFilterInfo", true);
+        $this->addCacheJob("getTeaser", true);
+        $this->addCacheJob("getSiteBreadcrumb", true);
+        $this->addCacheJob("getChildren", true);
+        $this->addCacheJob("getProductValues", true);
+        $this->addCacheJob("getPIds", true);
+        $this->addCacheJob("addPriceFilter", true);
+    }
+
+    /**
      * Добавить фильтр по цене.
      *
      * @param $fieldsInfo
@@ -907,13 +922,13 @@ class Category extends Model
             if (env("CATALOG_HAS_EXCHANGE", false)) {
                 return false;
             }
-            if (! Schema::hasTable('jobs')) {
-                return false;
-            }
         }
-        CategoryCache::dispatch($this, $method)
-            ->onQueue("catalogCache")
-            ->delay(now()->addSeconds(2));
-        return true;
+        if (Schema::hasTable('jobs')) {
+            CategoryCache::dispatch($this, $method)
+                ->onQueue("catalogCache")
+                ->delay(now()->addSeconds(2));
+            return true;
+        }
+        return false;
     }
 }
