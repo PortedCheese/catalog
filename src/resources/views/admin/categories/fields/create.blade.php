@@ -12,21 +12,6 @@
                 <form action="{{ route('admin.category.field.store', ['category' => $category]) }}"
                       method="post">
                     @csrf
-                    {{ debugbar()->info($errors) }}
-                    <div class="form-group">
-                        <label for="title">Заголовок</label>
-                        <input type="text"
-                               id="title"
-                               name="title"
-                               value="{{ old('title') }}"
-                               required
-                               class="form-control @error('title') is-invalid @enderror">
-                        @error ('title')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
 
                     @if($available->count())
                         <div class="form-group">
@@ -40,7 +25,7 @@
                                             @if(old('exists'))
                                             selected
                                             @endif>
-                                        {{ $field->title }} | {{ $field->type }}
+                                        {{ $field->title }} | {{ $field->type_human }}
                                     </option>
                                 @endforeach
                             </select>
@@ -51,6 +36,20 @@
                             @enderror
                         </div>
                     @endif
+
+                    <div class="form-group">
+                        <label for="title">Заголовок</label>
+                        <input type="text"
+                               id="title"
+                               name="title"
+                               value="{{ old('title') }}"
+                               class="form-control @error('title') is-invalid @enderror">
+                        @error ('title')
+                        <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                    </div>
 
                     <div class="form-group">
                         <label for="type">Виджет поля</label>

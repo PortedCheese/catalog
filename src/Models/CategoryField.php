@@ -44,7 +44,7 @@ class CategoryField extends Model
     public static function requestCategoryFieldCreateRules()
     {
         return [
-            'title' => 'required|min:2',
+            'title' => 'nullable|required_without:exists|min:2',
             'exists' => 'nullable|required_without_all:machine,type|exists:category_fields,id',
             'type' => 'nullable|required_without:exists',
             'machine' => 'nullable|required_without:exists|min:4|unique:category_fields,machine',
@@ -61,6 +61,21 @@ class CategoryField extends Model
         return [
             'title' => 'required|min:2',
         ];
+    }
+
+    /**
+     * Доступные поля для категории.
+     *
+     * @param Category $category
+     * @return mixed
+     */
+    public static function getForCategory(\App\Category $category)
+    {
+        $ids = [];
+        foreach ($category->fields as $field) {
+            $ids[] = $field->id;
+        }
+        return \App\CategoryField::whereNotIn('id', $ids)->get();
     }
 
     /**
@@ -98,17 +113,18 @@ class CategoryField extends Model
     }
 
     /**
-     * Доступные поля для категории.
+     * Аттрибут для вывода типа поля.
      *
-     * @param Category $category
      * @return mixed
      */
-    public static function getForCategory(\App\Category $category)
+    public function getTypeHumanAttribute()
     {
-        $ids = [];
-        foreach ($category->fields as $field) {
-            $ids[] = $field->id;
+        $type = $this->type;
+        if (! empty(self::TYPES[$type])) {
+            return self::TYPES[$type];
         }
-        return \App\CategoryField::whereNotIn('id', $ids)->get();
+        else {
+            return $type;
+        }
     }
 }

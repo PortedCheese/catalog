@@ -32,29 +32,14 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
 
     public function boot()
     {
-        // Подключаем метатеги.
-        $seo = app()->config['seo-integration.models'];
-        $seo['categories'] = Category::class;
-        $seo['products'] = Product::class;
-        app()->config['seo-integration.models'] = $seo;
-
-        // Подключаем изображения.
-        $imagecache = app()->config['imagecache.paths'];
-        $imagecache[] = 'storage/categories';
-        $imagecache[] = 'storage/products';
-        $imagecache[] = 'storage/gallery/products';
-        app()->config['imagecache.paths'] = $imagecache;
-
-        // Подключаем галлерею.
-        $gallery = app()->config['gallery.models'];
-        $gallery['products'] = Product::class;
-        app()->config['gallery.models'] = $gallery;
+        $this->makeConfigVariables();
 
         // Подключение миграций.
         $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
 
         // Подключение роутов.
         $this->loadRoutesFrom(__DIR__ . '/routes/web.php');
+        $this->loadRoutesFrom(__DIR__ . '/routes/admin.php');
 
         // Подгрузка шаблонов.
         $this->loadViewsFrom(__DIR__ . '/resources/views', 'catalog');
@@ -86,6 +71,30 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
 
             $this->app->make('portedcheese.catalog.console.kernel');
         }
+    }
+
+    /**
+     * Расширить текущий конфиг.
+     */
+    private function makeConfigVariables()
+    {
+        // Подключаем метатеги.
+        $seo = app()->config['seo-integration.models'];
+        $seo['categories'] = Category::class;
+        $seo['products'] = Product::class;
+        app()->config['seo-integration.models'] = $seo;
+
+        // Подключаем изображения.
+        $imagecache = app()->config['imagecache.paths'];
+        $imagecache[] = 'storage/categories';
+        $imagecache[] = 'storage/products';
+        $imagecache[] = 'storage/gallery/products';
+        app()->config['imagecache.paths'] = $imagecache;
+
+        // Подключаем галлерею.
+        $gallery = app()->config['gallery.models'];
+        $gallery['products'] = Product::class;
+        app()->config['gallery.models'] = $gallery;
     }
 
     /**

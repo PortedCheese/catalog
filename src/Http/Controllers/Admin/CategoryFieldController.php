@@ -8,12 +8,59 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use PortedCheese\Catalog\Events\CategoryFieldUpdate;
 use PortedCheese\Catalog\Http\Requests\CategoryFieldCreateRequest;
+use PortedCheese\Catalog\Http\Requests\CategoryFieldUpdateRequest;
 
 class CategoryFieldController extends Controller
 {
     /**
+     * Список всех созданных характеристик.
+     *
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function list(Request $request)
+    {
+        $fields = CategoryField::query()
+            ->orderBy('updated_at')
+            ->paginate(20)->appends($request->input());
+        return view("catalog::admin.categories.fields.list", [
+            'fields' => $fields,
+        ]);
+    }
+
+    /**
+     * Просмотр.
+     *
+     * @param CategoryField $field
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function show(CategoryField $field)
+    {
+        return view("catalog::admin.categories.fields.show", [
+            'field' => $field,
+            'categories' => $field->categories,
+        ]);
+    }
+
+    /**
+     * Обновить исходное поле.
+     *
+     * @param CategoryFieldUpdateRequest $request
+     * @param CategoryField $field
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function selfUpdate(CategoryFieldUpdateRequest $request, CategoryField $field)
+    {
+        $field->update($request->all());
+        return redirect()
+            ->back()
+            ->with("success", "Заголовок обновлен");
+    }
+
+    /**
      * Display a listing of the resource.
      *
+     * @param Category $category
      * @return \Illuminate\Http\Response
      */
     public function index(Category $category)
@@ -26,6 +73,7 @@ class CategoryFieldController extends Controller
     /**
      * Show the form for creating a new resource.
      *
+     * @param Category $category
      * @return \Illuminate\Http\Response
      */
     public function create(Category $category)
@@ -41,8 +89,9 @@ class CategoryFieldController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param CategoryFieldCreateRequest $request
+     * @param Category $category
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(CategoryFieldCreateRequest $request, Category $category)
     {
@@ -52,8 +101,9 @@ class CategoryFieldController extends Controller
         else {
             $field = CategoryField::find($request->get('exists'));
         }
+        $title = ! empty($request->get('title')) ? $request->get("title") : $field->title;
         $field->categories()->attach($category, [
-            'title' => $request->get('title'),
+            'title' => $title,
             'filter' => $request->has('filter') ? 1 : 0
         ]);
         event(new CategoryFieldUpdate($category));
@@ -65,8 +115,9 @@ class CategoryFieldController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Category $category
+     * @param CategoryField $field
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function edit(Category $category, CategoryField $field)
     {
@@ -80,11 +131,12 @@ class CategoryFieldController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param CategoryFieldUpdateRequest $request
+     * @param Category $category
+     * @param CategoryField $field
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(Request $request, Category $category, CategoryField $field)
+    public function update(CategoryFieldUpdateRequest $request, Category $category, CategoryField $field)
     {
         $category->fields()
             ->updateExistingPivot($field->id, [
@@ -100,8 +152,10 @@ class CategoryFieldController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Category $category
+     * @param CategoryField $field
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Exception
      */
     public function destroy(Category $category, CategoryField $field)
     {
