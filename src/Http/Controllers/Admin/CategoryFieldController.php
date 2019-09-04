@@ -109,6 +109,7 @@ class CategoryFieldController extends Controller
             'types' => $types,
             'available' => CategoryField::getForCategory($category),
             'groups' => CategoryFieldGroup::query()->orderBy("weight")->get(),
+            'nextField' => $category->fields()->count() + 1,
         ]);
     }
 
@@ -130,7 +131,8 @@ class CategoryFieldController extends Controller
         $title = ! empty($request->get('title')) ? $request->get("title") : $field->title;
         $field->categories()->attach($category, [
             'title' => $title,
-            'filter' => $request->has('filter') ? 1 : 0
+            'filter' => $request->has('filter') ? 1 : 0,
+            'weight' => $request->get("weight", 1)
         ]);
         event(new CategoryFieldUpdate($category));
         return redirect()
@@ -151,6 +153,7 @@ class CategoryFieldController extends Controller
             'category' => $category,
             'field' => $field,
             'pivot' => $field->categories()->find($category->id)->pivot,
+            'nextField' => $category->fields()->count() + 1,
         ]);
     }
 
@@ -167,7 +170,8 @@ class CategoryFieldController extends Controller
         $category->fields()
             ->updateExistingPivot($field->id, [
                 'title' => $request->get('title'),
-                'filter' => $request->has('filter') ? 1 : 0
+                'filter' => $request->has('filter') ? 1 : 0,
+                'weight' => $request->get("weight", 1)
             ]);
         event(new CategoryFieldUpdate($category));
         return redirect()

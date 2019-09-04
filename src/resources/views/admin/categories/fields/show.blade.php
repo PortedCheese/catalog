@@ -10,7 +10,7 @@
                 <form class="form-inline" action="{{ route("admin.category.all-fields.self-update", ['field' => $field]) }}" method="post">
                     @method('put')
                     @csrf()
-
+                    <input type="hidden" value="1" name="weight">
                     <div class="form-group mb-2 mr-sm-2">
                         <label for="title" class="sr-only">Заголовок</label>
                         <input type="text"

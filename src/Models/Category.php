@@ -459,6 +459,20 @@ class Category extends Model
     }
 
     /**
+     * Поля для селектов.
+     *
+     * @return array
+     */
+    public function getFieldsInfoAdmin()
+    {
+        $fields = [];
+        foreach ($this->fields()->orderBy('weight')->get() as $field) {
+            $fields[$field->id] = $field;
+        }
+        return $fields;
+    }
+
+    /**
      * Получить все поля для фильтра.
      *
      * @return mixed

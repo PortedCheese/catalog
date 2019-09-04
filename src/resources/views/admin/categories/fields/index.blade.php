@@ -16,6 +16,7 @@
                             <th>Тип</th>
                             <th>В фильтре</th>
                             <th>Группа</th>
+                            <th>Приоритет</th>
                             <th>Действия</th>
                         </tr>
                         </thead>
@@ -33,6 +34,9 @@
                                     @else
                                         Не задана
                                     @endif
+                                </td>
+                                <td>
+                                    {{ $field->pivot->weight }}
                                 </td>
                                 <td>
                                     <confirm-delete-model-button model-id="{{ $field->id }}">

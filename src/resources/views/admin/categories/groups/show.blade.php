@@ -63,6 +63,18 @@
                     <dt class="col-sm-3">Приоритет</dt>
                     <dd class="col-sm-9">{{ $group->weight }}</dd>
                 </dl>
+                @if ($fields->count())
+                    <h5>Поля относящается к группе</h5>
+                    <ul>
+                        @foreach ($fields as $field)
+                            <li>
+                                <a href="{{ route("admin.category.all-fields.show", ['field' => $field]) }}">
+                                    {{ $field->title }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
             </div>
         </div>
     </div>

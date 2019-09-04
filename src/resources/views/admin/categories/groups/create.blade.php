@@ -34,7 +34,12 @@
                                id="machine"
                                name="machine"
                                value="{{ old('machine') }}"
-                               class="form-control">
+                               class="form-control{{ $errors->has('machine') ? ' is-invalid' : '' }}">
+                        @if ($errors->has('machine'))
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $errors->first('machine') }}</strong>
+                            </span>
+                        @endif
                     </div>
 
                     <div class="form-group">

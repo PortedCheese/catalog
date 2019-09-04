@@ -22,13 +22,16 @@
                                 id="field_id"
                                 required
                                 class="form-control">
-                            <option value="">-- Выберите --</option>
-                            @foreach($fields as $key => $value)
-                                <option value="{{ $key }}"
-                                        @if(old('field_id'))
+                            <option value="">Выберите...</option>
+                            @foreach($fields as $value)
+                                <option value="{{ $value->id }}"
+                                        @if(old('field_id') == $value->id)
                                         selected
                                         @endif>
-                                    {{ $value->title }}
+                                    {{ $value->title }} | {{ $value->type_human }}
+                                    @if (! empty($value->group_id))
+                                        ({{ $value->group->title }})
+                                    @endif
                                 </option>
                             @endforeach
                         </select>

@@ -29,6 +29,24 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="weight">Приоритет</label>
+                        <input type="number"
+                               step="1"
+                               min="1"
+                               id="weight"
+                               name="weight"
+                               value="{{ old('weight') ? old('weight') : $pivot->weight }}"
+                               required
+                               placeholder="{{ $nextField }}"
+                               class="form-control{{ $errors->has('weight') ? ' is-invalid' : '' }}">
+                        @if ($errors->has('weight'))
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $errors->first('weight') }}</strong>
+                            </span>
+                        @endif
+                    </div>
+
+                    <div class="form-group">
                         <div class="custom-control custom-checkbox">
                             <input type="checkbox"
                                    @if (old('filter'))

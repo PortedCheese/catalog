@@ -25,7 +25,7 @@ class ProductFieldController extends Controller
         return view("catalog::admin.categories.products.fields.index", [
             'category' => $category,
             'product' => $product,
-            'fields' => $category->getFieldsInfo(),
+            'fields' => $category->getFieldsInfoAdmin(),
         ]);
     }
 
@@ -41,7 +41,7 @@ class ProductFieldController extends Controller
         return view("catalog::admin.categories.products.fields.create", [
             'category' => $category,
             'product' => $product,
-            'fields' => $category->getFieldsInfo(),
+            'fields' => $category->getFieldsInfoAdmin(),
         ]);
     }
 

@@ -30,7 +30,12 @@
                         <tbody>
                         @foreach ($product->fields as $field)
                             <tr>
-                                <td>{{ $fields[$field->field_id]->title }}</td>
+                                <td>
+                                    {{ $fields[$field->field_id]->title }} | {{ $fields[$field->field_id]->type_human }}
+                                    @if (! empty($fields[$field->field_id]->group_id))
+                                        ({{ $fields[$field->field_id]->group->title }})
+                                    @endif
+                                </td>
                                 <td>{{ $field->value }}</td>
                                 <td>
                                     <confirm-delete-model-button model-id="{{ $field->id }}">

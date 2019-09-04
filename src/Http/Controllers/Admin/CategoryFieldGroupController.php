@@ -73,7 +73,8 @@ class CategoryFieldGroupController extends Controller
     public function show(CategoryFieldGroup $group)
     {
         return view("catalog::admin.categories.groups.show", [
-            'group' => $group
+            'group' => $group,
+            'fields' => $group->fields()->orderBy('title')->get()
         ]);
     }
 
@@ -105,7 +106,7 @@ class CategoryFieldGroupController extends Controller
         if ($group->fields->count()) {
             return redirect()
                 ->back()
-                ->with("error", "Есть поля относящиется к данной группе");
+                ->with("danger", "Есть поля относящиется к данной группе");
         }
         $group->delete();
         return redirect()

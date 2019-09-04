@@ -49,6 +49,7 @@ class CategoryField extends Model
             'exists' => 'nullable|required_without_all:machine,type,title|exists:category_fields,id',
             'type' => 'nullable|required_without:exists',
             'machine' => 'nullable|required_without:exists|min:4|max:100|unique:category_fields,machine',
+            'weight' => "nullable|numeric|min:1",
         ];
     }
 
@@ -61,6 +62,7 @@ class CategoryField extends Model
     {
         return [
             'title' => 'required|min:2|max:200',
+            'weight' => "required|numeric|min:1",
         ];
     }
 

@@ -48,10 +48,28 @@
                                value="{{ old('title') }}"
                                class="form-control @error('title') is-invalid @enderror">
                         @error ('title')
-                        <span class="invalid-feedback" role="alert">
+                            <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
                             </span>
                         @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="weight">Приоритет</label>
+                        <input type="number"
+                               step="1"
+                               min="1"
+                               id="weight"
+                               name="weight"
+                               value="{{ old('weight') ? old('weight') : $nextField }}"
+                               required
+                               placeholder="{{ $nextField }}"
+                               class="form-control{{ $errors->has('weight') ? ' is-invalid' : '' }}">
+                        @if ($errors->has('weight'))
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $errors->first('weight') }}</strong>
+                            </span>
+                        @endif
                     </div>
 
                     <div class="form-group">

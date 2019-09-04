@@ -39,7 +39,7 @@ class CategoryFieldGroup extends Model
     {
         return [
             'title' => 'required|min:2|max:200',
-            'machine' => 'nullable|min:4|max:100|unique:category_field_groups,machine',
+            'machine' => 'nullable|min:2|max:100|unique:category_field_groups,machine',
             "weight" => "required|numeric|min:1",
         ];
     }
