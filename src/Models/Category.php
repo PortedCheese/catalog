@@ -218,6 +218,7 @@ class Category extends Model
         return $this->belongsToMany(\App\CategoryField::class)
             ->withPivot('title')
             ->withPivot('filter')
+            ->withPivot("weight")
             ->withTimestamps();
     }
 

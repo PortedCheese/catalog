@@ -1,0 +1,11 @@
+<?php
+
+namespace {{namespace}};
+
+use PortedCheese\Catalog\Models\CategoryFieldGroup as VendorCategoryFieldGroup;
+
+
+class CategoryFieldGroup extends VendorCategoryFieldGroup
+{
+
+}

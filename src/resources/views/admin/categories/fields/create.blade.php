@@ -14,7 +14,7 @@
                     @csrf
 
                     @if($available->count())
-                        <div class="form-group">
+                        <div class="form-group border border-primary p-2 bg-light rounded">
                             <label for="exists">Выбрать из существующих</label>
                             <select name="exists"
                                     id="exists"
@@ -26,6 +26,9 @@
                                             selected
                                             @endif>
                                         {{ $field->title }} | {{ $field->type_human }}
+                                        @if (! empty($field->group_id))
+                                            ({{ $field->group->title }})
+                                        @endif
                                     </option>
                                 @endforeach
                             </select>
@@ -55,13 +58,11 @@
                         <label for="type">Виджет поля</label>
                         <select name="type"
                                 id="type"
-                                class="form-control @error('type') is-invalid @enderror">
-                            <option value="">--Выберите--</option>
+                                class="custom-select @error('type') is-invalid @enderror">
+                            <option value="">Выберите...</option>
                             @foreach($types as $key => $value)
                                 <option value="{{ $key }}"
-                                        @if(old('type'))
-                                        selected
-                                        @endif>
+                                        {{ old("type") == $key ? "selected" : "" }}>
                                     {{ $value }}
                                 </option>
                             @endforeach
@@ -72,6 +73,20 @@
                             </span>
                         @enderror
                     </div>
+
+                    @if ($groups->count())
+                        <div class="form-group">
+                            <label for="group">Группа</label>
+                            <select class="custom-select" name="group_id" id="group">
+                                <option>Выберите...</option>
+                                @foreach($groups as $group)
+                                    <option value="{{ $group->id }}" {{ old("group_id") == $group->id ? "selected" : "" }}>
+                                        {{ $group->title }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
 
                     <div class="form-group">
                         <label for="machine">Машинное имя</label>

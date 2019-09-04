@@ -49,6 +49,14 @@ if (! siteconf()->get('catalog.useOwnAdminRoutes')) {
             Route::put("/{field}", "CategoryFieldController@selfUpdate")
                 ->name("self-update");
         });
+        // Группы характеристик.
+        Route::group([
+            'as' => "category.",
+        ], function () {
+            Route::resource("groups", "CategoryFieldGroupController")->except([
+                'edit',
+            ]);
+        });
         // Категории.
         Route::group([
             'prefix' => 'category/{category}',

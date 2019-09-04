@@ -4,6 +4,7 @@ namespace PortedCheese\Catalog\Http\Controllers\Admin;
 
 use App\Category;
 use App\CategoryField;
+use App\CategoryFieldGroup;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use PortedCheese\Catalog\Events\CategoryFieldUpdate;
@@ -21,10 +22,17 @@ class CategoryFieldController extends Controller
     public function list(Request $request)
     {
         $fields = CategoryField::query()
-            ->orderBy('updated_at')
+            ->orderBy('category_fields.updated_at')
             ->paginate(20)->appends($request->input());
+        $groups = [];
+        foreach ($fields as $field) {
+            if (! empty($field->group_id) && empty($groups[$field->group_id])) {
+                $groups[$field->group_id] = $field->group;
+            }
+        }
         return view("catalog::admin.categories.fields.list", [
             'fields' => $fields,
+            'groups' => $groups,
         ]);
     }
 
@@ -36,9 +44,15 @@ class CategoryFieldController extends Controller
      */
     public function show(CategoryField $field)
     {
+        $groups = CategoryFieldGroup::query()
+            ->select(['id', 'title'])
+            ->orderBy("weight")
+            ->get();
         return view("catalog::admin.categories.fields.show", [
             'field' => $field,
             'categories' => $field->categories,
+            'group' => $field->group,
+            'groups' => $groups,
         ]);
     }
 
@@ -65,8 +79,19 @@ class CategoryFieldController extends Controller
      */
     public function index(Category $category)
     {
+        $fields = $category->fields()
+            ->orderBy('weight')
+            ->get();
+        $groups = [];
+        foreach ($fields as $field) {
+            if (! empty($field->group_id) && empty($groups[$field->group_id])) {
+                $groups[$field->group_id] = $field->group;
+            }
+        }
         return view("catalog::admin.categories.fields.index", [
             'category' => $category,
+            'fields' => $fields,
+            'groups' => $groups,
         ]);
     }
 
@@ -83,6 +108,7 @@ class CategoryFieldController extends Controller
             'category' => $category,
             'types' => $types,
             'available' => CategoryField::getForCategory($category),
+            'groups' => CategoryFieldGroup::query()->orderBy("weight")->get(),
         ]);
     }
 

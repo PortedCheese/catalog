@@ -32,6 +32,7 @@ class CatalogMakeCommand extends BaseConfigModelCommand
     protected $models = [
         'Category.stub' => 'Category.php',
         'CategoryField.stub' => 'CategoryField.php',
+        'CategoryFieldGroup.stub' => 'CategoryFieldGroup.php',
         'Product.stub' => 'Product.php',
         'ProductState.stub' => 'ProductState.php',
         'ProductVariation.stub' => 'ProductVariation.php',
@@ -47,6 +48,7 @@ class CatalogMakeCommand extends BaseConfigModelCommand
             "CartController",
             "CategoryController",
             "CategoryFieldController",
+            "CategoryFieldGroupController",
             "OrderController",
             "OrderStateController",
             "ProductController",
@@ -191,7 +193,7 @@ class CatalogMakeCommand extends BaseConfigModelCommand
         $title = "Категории";
         $itemData = [
             'title' => $title,
-            'route' => '@admin.category.*|admin.category.field.*|admin.category.product.*|admin.product.*|admin.category.product.field.*|admin.category.product.variation.*|admin.product-state.*|admin.category.all-fields.*',
+            'route' => '@admin.category.*|admin.category.field.*|admin.category.product.*|admin.product.*|admin.category.product.field.*|admin.category.product.variation.*|admin.product-state.*|admin.category.all-fields.*|admin.category.groups.*',
             'class' =>'@fas fa-stream',
             'menu_id' => $menu->id,
             'url' => '#',
@@ -237,6 +239,14 @@ class CatalogMakeCommand extends BaseConfigModelCommand
             'parent_id' => $menuItem->id,
             'route' => 'admin.category.all-fields.list',
         ]);
+
+        $title = "Группы";
+        $this->updateOrCreateItem([
+            'title' => $title,
+            'menu_id' => $menu->id,
+            'parent_id' => $menuItem->id,
+            'route' => "admin.category.groups.index",
+        ]);
     }
 
     /**
@@ -249,7 +259,7 @@ class CatalogMakeCommand extends BaseConfigModelCommand
     {
         $title = $itemData['title'];
         try {
-            $menuItem = MenuItem::where('route', $itemData['route'])->firstOrFail();
+            $menuItem = MenuItem::where('title', $itemData['title'])->firstOrFail();
             $menuItem->update($itemData);
             $this->info("Элемент меню '$title' обновлен");
         }

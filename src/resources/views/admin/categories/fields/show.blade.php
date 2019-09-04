@@ -12,7 +12,7 @@
                     @csrf()
 
                     <div class="form-group mb-2 mr-sm-2">
-                        <label for="title" class="sr-only">Название</label>
+                        <label for="title" class="sr-only">Заголовок</label>
                         <input type="text"
                                id="title"
                                name="title"
@@ -26,9 +26,21 @@
                         @endif
                     </div>
 
+                    @if ($groups->count())
+                        <div class="form-group mb-2 mr-sm-2">
+                            <label for="group" class="sr-only">Группа</label>
+                            <select class="custom-select" id="group" name="group_id">
+                                <option {{ empty($group) ? "selected" : "" }}>Выбрать группу...</option>
+                                @foreach($groups as $item)
+                                    <option value="{{ $item->id }}" {{ ! empty($group) && $group->id == $item->id ? "selected" : "" }}>{{ $item->title }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
+
                     <div class="btn-group mb-2 mr-sm-2"
                          role="group">
-                        <button type="submit" class="btn btn-success">Обновить заголовок</button>
+                        <button type="submit" class="btn btn-success">Обновить</button>
                     </div>
                 </form>
             </div>
@@ -42,6 +54,9 @@
 
                     <dt class="col-sm-3">Машинное имя</dt>
                     <dd class="col-sm-9">{{ $field->machine }}</dd>
+
+                    <dt class="col-sm-3">Группа</dt>
+                    <dd class="col-sm-9">{{ empty($group) ? "Не задана" : $group->title }}</dd>
                 </dl>
                 <h3>Категори, в которых используется характеристика</h3>
                 <ul>

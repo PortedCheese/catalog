@@ -15,19 +15,23 @@
                             <th>Заголовок</th>
                             <th>Тип</th>
                             <th>В фильтре</th>
+                            <th>Группа</th>
                             <th>Действия</th>
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach ($category->fields as $field)
+                        @foreach ($fields as $field)
                             <tr>
                                 <td>{{ $field->pivot->title }}</td>
                                 <td>{{ $field->type }}</td>
                                 <td>
-                                    @if ($field->pivot->filter)
-                                        Да
+                                    {{ $field->pivot->filter ? "Да" : "Нет" }}
+                                </td>
+                                <td>
+                                    @if (! empty($field->group_id))
+                                        {{ $groups[$field->group_id]->title }}
                                     @else
-                                        Нет
+                                        Не задана
                                     @endif
                                 </td>
                                 <td>

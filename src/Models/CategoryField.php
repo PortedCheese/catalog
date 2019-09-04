@@ -11,6 +11,7 @@ class CategoryField extends Model
         'title',
         'machine',
         'type',
+        'group_id',
     ];
 
     const TYPES = [
@@ -44,10 +45,10 @@ class CategoryField extends Model
     public static function requestCategoryFieldCreateRules()
     {
         return [
-            'title' => 'nullable|required_without:exists|min:2',
-            'exists' => 'nullable|required_without_all:machine,type|exists:category_fields,id',
+            'title' => 'nullable|required_without:exists|min:2|max:200',
+            'exists' => 'nullable|required_without_all:machine,type,title|exists:category_fields,id',
             'type' => 'nullable|required_without:exists',
-            'machine' => 'nullable|required_without:exists|min:4|unique:category_fields,machine',
+            'machine' => 'nullable|required_without:exists|min:4|max:100|unique:category_fields,machine',
         ];
     }
 
@@ -59,7 +60,7 @@ class CategoryField extends Model
     public static function requestCategoryFieldUpdateRules()
     {
         return [
-            'title' => 'required|min:2',
+            'title' => 'required|min:2|max:200',
         ];
     }
 
@@ -98,11 +99,23 @@ class CategoryField extends Model
         return $this->belongsToMany(\App\Category::class)
             ->withPivot('title')
             ->withPivot('filter')
+            ->withPivot("weight")
             ->withTimestamps();
     }
 
     /**
+     * Может принадлежать к группе.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function group()
+    {
+        return $this->belongsTo(\App\CategoryFieldGroup::class, 'group_id');
+    }
+
+    /**
      * Если поле больше нигде не используется, удаляем.
+     *
      * @throws \Exception
      */
     public function checkCategoryOnDetach()

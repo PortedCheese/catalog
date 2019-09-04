@@ -15,12 +15,17 @@ class CreateCategoryFieldsTable extends Migration
     {
         Schema::create('category_fields', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('title')->comment("Заголовок поля");
+
+            $table->string('title')
+                ->comment("Заголовок поля");
+
             $table->string('machine')
                 ->unique()
                 ->comment("Машинное имя поля");
+
             $table->char('type', 20)
                 ->comment('Тип поля в фильтре');
+
             $table->timestamps();
         });
     }
