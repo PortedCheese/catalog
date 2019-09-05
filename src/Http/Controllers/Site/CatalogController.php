@@ -94,6 +94,7 @@ class CatalogController extends Controller
             'siteBreadcrumb' => $category->getSiteBreadcrumb(true),
             'image' => $product->image,
             'fields' => $product->getFieldsInfo($category),
+            'groups' => $product->getGroupedFieldsInfo($category),
             'variations' => $variations,
             'gallery' => $product->images,
             'useCart' => siteconf()->get('catalog.useCart'),

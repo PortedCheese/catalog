@@ -3,6 +3,7 @@
 namespace PortedCheese\Catalog\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class CategoryFieldGroup extends Model
@@ -27,6 +28,14 @@ class CategoryFieldGroup extends Model
                 $machine = $buf . "_" . $i++;
             }
             $model->machine = $machine;
+        });
+
+        self::updated(function (\App\CategoryFieldGroup $model) {
+            $model->forgetGroupCache();
+        });
+
+        self::deleted(function (\App\CategoryFieldGroup $model) {
+            $model->forgetGroupCache();
         });
     }
 
@@ -53,6 +62,25 @@ class CategoryFieldGroup extends Model
     }
 
     /**
+     * Найти данные по id.
+     *
+     * @param $id
+     * @return mixed
+     */
+    public static function getById($id)
+    {
+        $key = "category-field-group-getById:{$id}";
+        return Cache::rememberForever($key, function () use ($id) {
+            try {
+                return self::findOrFail($id);
+            }
+            catch (\Exception $e) {
+                return false;
+            }
+        });
+    }
+
+    /**
      * Может относится ко многим полям.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
@@ -60,5 +88,13 @@ class CategoryFieldGroup extends Model
     public function fields()
     {
         return $this->hasMany(\App\CategoryField::class, "group_id");
+    }
+
+    /**
+     * Очистить кэш информации о группе.
+     */
+    public function forgetGroupCache()
+    {
+        Cache::forget("category-field-group-getById:{$this->id}");
     }
 }

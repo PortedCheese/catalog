@@ -66,9 +66,15 @@ class CategoryFieldController extends Controller
     public function selfUpdate(CategoryFieldUpdateRequest $request, CategoryField $field)
     {
         $field->update($request->all());
+        $categories = $field->categories;
+        if ($categories->count()) {
+            foreach ($categories as $category) {
+                event(new CategoryFieldUpdate($category));
+            }
+        }
         return redirect()
             ->back()
-            ->with("success", "Заголовок обновлен");
+            ->with("success", "Обновлено");
     }
 
     /**

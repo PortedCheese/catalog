@@ -1,9 +1,9 @@
 @extends("admin.layout")
 
-@section("page-title", "Просмотр - ")
+@section("page-title", "Просмотр группы - ")
 
 @section('header-title')
-    {{ $group->title }}
+    Группа {{ $group->title }}
 @endsection
 
 @section('admin')

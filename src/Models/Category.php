@@ -361,6 +361,7 @@ class Category extends Model
             $data = [
                 'title' => $pivot->title,
                 'filter' => $pivot->filter,
+                'weight' => $pivot->weight,
             ];
             if (in_array($parentFiled->id, $ids)) {
                 $parentFiled->categories()
@@ -430,16 +431,11 @@ class Category extends Model
     public function getFieldsInfo($filter = false)
     {
         $key = "category-getFieldsInfo:{$this->id}";
-        $cached = Cache::get($key);
-        if (!empty($cached)) {
-            if ($filter) {
-                return $this->getOnlyFilter($cached);
-            }
-            return $cached;
-        }
+
         $fields = Cache::rememberForever($key, function () {
             $fields = [];
-            foreach ($this->fields as $field) {
+            $collection = $this->fields()->orderBy('weight')->get();
+            foreach ($collection as $field) {
                 $pivot = $field->pivot;
                 $fields[$field->id] = (object) [
                     'id' => $field->id,
@@ -447,6 +443,7 @@ class Category extends Model
                     'filter' => $pivot->filter,
                     'type' => $field->type,
                     'machine' => $field->machine,
+                    'group_id' => $field->group_id,
                 ];
             }
             return $fields;

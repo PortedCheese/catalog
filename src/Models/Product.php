@@ -490,46 +490,110 @@ class Product extends Model
     }
 
     /**
-     * Информация по заполненным полям.
+     * Получить характеристики разбитые по группам.
      *
      * @param null $category
+     * @return array
+     */
+    public function getGroupedFieldsInfo($category = null)
+    {
+        $fieldsInfo = $this->getFieldsInfo($category);
+        $groups = [];
+        $noGroup = [];
+        foreach ($fieldsInfo as $key => $field) {
+            // Это нужно на тот случай если группу с таким id не нашли.
+            $added = false;
+            // Если у характеристики есть группа.
+            if (! empty($field->group_id)) {
+                $groupId = $field->group_id;
+                // Если еще не искали такую группу.
+                if (empty($groups[$groupId])) {
+                    $group = \App\CategoryFieldGroup::getById($field->group_id);
+                    // Если такая группа есть.
+                    if (! empty($group)) {
+                        $groups[$group->id] = [
+                            'model' => $group,
+                            'title' => $group->title,
+                            'fields' => [$field],
+                        ];
+                        $added = true;
+                    }
+                }
+                // Если уже нашли, то добавляем в нее характеристику.
+                else {
+                    $groups[$groupId]['fields'][] = $field;
+                    $added = true;
+                }
+            }
+            if (! $added) {
+                $noGroup[] = $field;
+            }
+        }
+        $groupsInfo = [];
+        // Если есть поля без группы, добавляем их в начало.
+        if (! empty($noGroup)) {
+            $groupsInfo[] = (object) [
+                'model' => false,
+                'title' => "No group",
+                'fields' => $noGroup,
+            ];
+        }
+        // Нужно определить порядок групп.
+        if (! empty($groups)) {
+            $gIds = array_keys($groups);
+            $collection = \App\CategoryFieldGroup::query()
+                ->select('id')
+                ->whereIn('id', $gIds)
+                ->orderBy("weight")
+                ->get();
+            foreach ($collection as $item) {
+                $id = $item->id;
+                $groupsInfo[] = (object) $groups[$id];
+            }
+        }
+        return $groupsInfo;
+    }
+
+    /**
+     * Информация по заполненным полям.
+     *
+     * @param null|\App\Category $category
      * @return array
      */
     public function getFieldsInfo($category = null)
     {
         $key = "product-getFieldsInfo:{$this->id}";
-        $productFieldsInfo = Cache::get($key);
-        if (empty($productFieldsInfo)) {
-            $productFieldsInfo =  Cache::rememberForever($key, function () {
-
-                $fieldsInfo = [];
-                foreach ($this->fields as $field) {
-                    $fieldId = $field->field_id;
-                    if (empty($fieldsInfo[$fieldId])) {
-                        $fieldsInfo[$fieldId] = (object) [
-                            'values' => [],
-                            'id' => $field->id,
-                            'title' => '',
-                        ];
-                    }
-                    $fieldsInfo[$fieldId]->values[] = $field->value;
+        // Характеристики которые есть в товаре.
+        $productFields =  Cache::rememberForever($key, function () {
+            $fieldsInfo = [];
+            foreach ($this->fields as $field) {
+                $fieldId = $field->field_id;
+                if (empty($fieldsInfo[$fieldId])) {
+                    $fieldsInfo[$fieldId] = (object) [
+                        'values' => [],
+                        'id' => $field->id,
+                        'title' => '',
+                    ];
                 }
-
-                return $fieldsInfo;
-            });
-        }
-
+                $fieldsInfo[$fieldId]->values[] = $field->value;
+            }
+            return $fieldsInfo;
+        });
+        // Нужна категория для получения полной информации о характеристиках.
         if (empty($category)) {
             $category = $this->category;
         }
-
+        // Информация о характеристиках категории, отсортированная по приоритету.
         $categoryFieldsInfo = $category->getFieldsInfo();
-
-        foreach ($productFieldsInfo as $id => &$item) {
-            if (empty($categoryFieldsInfo[$id])) {
-                unset($productFieldsInfo[$id]);
+        // Добавить к информации о характеристиках в полученные характеристики товара.
+        $productFieldsInfo = [];
+        foreach ($categoryFieldsInfo as $id => $categoryField) {
+            if (empty($productFields[$id])) {
+                continue;
             }
-            $item->title = $categoryFieldsInfo[$id]->title;
+            $productFields[$id]->title = $categoryField->title;
+            $productFields[$id]->group_id = $categoryField->group_id;
+            $productFieldsInfo[] = $productFields[$id];
         }
 
         return $productFieldsInfo;

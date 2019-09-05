@@ -45,17 +45,19 @@
                     Описание
                 </a>
             </li>
-            <li class="nav-item">
-                <a href="#fields"
-                   class="nav-link"
-                   id="fields-tab"
-                   data-toggle="tab"
-                   role="tab"
-                   aria-controls="fields"
-                   aria-selected="false">
-                    Характеристики
-                </a>
-            </li>
+            @if (count($groups))
+                <li class="nav-item">
+                    <a href="#fields"
+                       class="nav-link"
+                       id="fields-tab"
+                       data-toggle="tab"
+                       role="tab"
+                       aria-controls="fields"
+                       aria-selected="false">
+                        Характеристики
+                    </a>
+                </li>
+            @endif
             @if($gallery->count())
                 <li class="nav-item">
                     <a href="#gallery"
@@ -77,17 +79,34 @@
                  aria-labelledby="description-tab">
                 {!! $product->description !!}
             </div>
-            <div class="tab-pane fade"
-                 id="fields"
-                 role="tabpanel"
-                 aria-labelledby="fields-tab">
-                <dl class="row">
-                    @foreach ($fields as $field)
-                        <dt class="col-sm-3">{{ $field->title }}</dt>
-                        <dd class="col-sm-9">{{ implode(', ', $field->values) }}</dd>
+            @if (count($groups))
+                <div class="tab-pane fade"
+                     id="fields"
+                     role="tabpanel"
+                     aria-labelledby="fields-tab">
+                    @foreach($groups as $group)
+                        <table class="table table-striped table-hover table-sm">
+                            @if ($group->model)
+                                <thead>
+                                <tr>
+                                    <th colspan="2" class="border-0">
+                                        <h5>{{ $group->title }}</h5>
+                                    </th>
+                                </tr>
+                                </thead>
+                            @endif
+                            <tbody>
+                            @foreach ($group->fields as $field)
+                                <tr>
+                                    <td class="col-4 col-sm-6 col-md-5 border-0">{{ $field->title }}</td>
+                                    <td class="col-8 col-sm-6 col-md-5 border-0">{{ implode(', ', $field->values) }}</td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
                     @endforeach
-                </dl>
-            </div>
+                </div>
+            @endif
             @if($gallery->count())
                 <div class="tab-pane fade"
                      id="gallery"
