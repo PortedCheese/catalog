@@ -98,8 +98,8 @@
                             <tbody>
                             @foreach ($group->fields as $field)
                                 <tr>
-                                    <td class="col-4 col-sm-6 col-md-5 border-0">{{ $field->title }}</td>
-                                    <td class="col-8 col-sm-6 col-md-5 border-0">{{ implode(', ', $field->values) }}</td>
+                                    <td class="w-25 border-0">{{ $field->title }}</td>
+                                    <td class="w-75 border-0">{{ implode(', ', $field->values) }}</td>
                                 </tr>
                             @endforeach
                             </tbody>
