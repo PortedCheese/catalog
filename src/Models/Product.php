@@ -571,7 +571,8 @@ class Product extends Model
                 if (empty($fieldsInfo[$fieldId])) {
                     $fieldsInfo[$fieldId] = (object) [
                         'values' => [],
-                        'id' => $fieldId,
+                        'id' => $field->id,
+                        'originalId' => $fieldId,
                         'title' => '',
                     ];
                 }
