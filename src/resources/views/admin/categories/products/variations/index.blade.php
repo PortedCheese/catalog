@@ -11,7 +11,7 @@
             <div class="card-header">
                 <div class="btn-group"
                      role="group">
-                    <a href="{{ route('admin.category.product.variation.create', ['categroy' => $category, 'product' => $product]) }}"
+                    <a href="{{ route('admin.category.product.variation.create', ['category' => $category, 'product' => $product]) }}"
                        class="btn btn-success">
                         Добавить
                     </a>

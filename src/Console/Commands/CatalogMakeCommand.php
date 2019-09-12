@@ -82,6 +82,21 @@ class CatalogMakeCommand extends BaseConfigModelCommand
         'useCart' => false,
     ];
 
+    protected $vueFolder = "catalog";
+
+    protected $vueIncludes = [
+        'admin' => [
+            'cart-state' => "CartStateComponent",
+            'change-item-quantity' => "ChangeItemQuantityComponent",
+        ],
+        'app' => [
+            "catalog-single-order" => "SingleProductComponent",
+            "add-to-cart" => "AddToCardComponent",
+            "cart-state" => "CartStateComponent",
+            "change-item-quantity" => "ChangeItemQuantityComponent",
+        ],
+    ];
+
     /**
      * Директория пакета.
      *
@@ -108,8 +123,12 @@ class CatalogMakeCommand extends BaseConfigModelCommand
     {
         if (! $this->option('menu')) {
             $this->exportModels();
+
             $this->exportControllers("Admin");
             $this->exportControllers("Site");
+
+            $this->makeVueIncludes("admin");
+            $this->makeVueIncludes("app");
         }
         $this->makeMenu();
         $this->makeConfig();
