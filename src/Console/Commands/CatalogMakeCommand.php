@@ -159,8 +159,12 @@ class CatalogMakeCommand extends BaseConfigModelCommand
         $title = "Заказы";
         $itemData = [
             'title' => $title,
-            'route' => '@admin.order-state.*|admin.order.*|admin.cart.*',
-            'class' =>'@fab fa-jedi-order',
+            'active' => [
+                "admin.order-state.*",
+                "admin.order.*",
+                "admin.cart.*",
+            ],
+            'ico' =>'fab fa-jedi-order',
             'menu_id' => $menu->id,
             'url' => '#',
         ];
@@ -212,8 +216,18 @@ class CatalogMakeCommand extends BaseConfigModelCommand
         $title = "Категории";
         $itemData = [
             'title' => $title,
-            'route' => '@admin.category.*|admin.category.field.*|admin.category.product.*|admin.product.*|admin.category.product.field.*|admin.category.product.variation.*|admin.product-state.*|admin.category.all-fields.*|admin.category.groups.*',
-            'class' =>'@fas fa-stream',
+            'active' => [
+                "admin.category.*",
+                "admin.category.field.*",
+                "admin.category.product.*",
+                "admin.product.*",
+                "admin.category.product.field.*",
+                "admin.category.product.variation.*",
+                "admin.product-state.*",
+                "admin.category.all-fields.*",
+                "admin.category.groups.*",
+            ],
+            'ico' =>'fas fa-stream',
             'menu_id' => $menu->id,
             'url' => '#',
         ];
@@ -278,7 +292,13 @@ class CatalogMakeCommand extends BaseConfigModelCommand
     {
         $title = $itemData['title'];
         try {
-            $menuItem = MenuItem::where('title', $itemData['title'])->firstOrFail();
+            $query = MenuItem::query()
+                ->where('title', $itemData['title'])
+                ->where("menu_id", $itemData['menu_id']);
+            if (! empty($itemData['parent_id'])) {
+                $query->where("parent_id", $itemData['parent_id']);
+            }
+            $menuItem = $query->firstOrFail();
             $menuItem->update($itemData);
             $this->info("Элемент меню '$title' обновлен");
         }

@@ -24,7 +24,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('admin.category.product.index', ['categroy' => $category]) }}"
+                    <a href="{{ route('admin.category.product.index', ['category' => $category]) }}"
                        class="nav-link{{ strstr($currentRoute, 'admin.category.product') !== FALSE ? ' active' : '' }}">
                         Товары
                     </a>
