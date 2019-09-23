@@ -3,9 +3,9 @@
     "description": "Catalog with categories for site",
     "type": "library",
     "require": {
-        "portedcheese/base-settings": "^1.2",
+        "portedcheese/base-settings": "^1.3",
         "portedcheese/seo-integration": "^1.0",
-        "portedcheese/admin-site-menu": "^1.1"
+        "portedcheese/admin-site-menu": "^1.2"
     },
     "license": "MIT",
     "authors": [

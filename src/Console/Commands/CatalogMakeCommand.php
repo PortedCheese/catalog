@@ -4,7 +4,6 @@ namespace PortedCheese\Catalog\Console\Commands;
 
 use App\Menu;
 use App\MenuItem;
-use Illuminate\Console\DetectsApplicationNamespace;
 use PortedCheese\BaseSettings\Console\Commands\BaseConfigModelCommand;
 
 class CatalogMakeCommand extends BaseConfigModelCommand
@@ -16,7 +15,12 @@ class CatalogMakeCommand extends BaseConfigModelCommand
      * @var string
      */
     protected $signature = 'make:catalog
-                    {--menu : Only config menu}';
+                    {--all : Run all}
+                    {--menu : Config menu}
+                    {--models : Export models}
+                    {--controllers : Export controllers}
+                    {--vue : Export vue}
+                    {--config : Make config}';
 
     /**
      * The console command description.
@@ -26,64 +30,80 @@ class CatalogMakeCommand extends BaseConfigModelCommand
     protected $description = 'Settings for catalog';
 
     /**
+     * Имя пакета.
+     *
+     * @var string
+     */
+    protected $packageName = "Catalog";
+
+    /**
      * The models that need to be exported.
      * @var array
      */
     protected $models = [
-        'Category.stub' => 'Category.php',
-        'CategoryField.stub' => 'CategoryField.php',
-        'CategoryFieldGroup.stub' => 'CategoryFieldGroup.php',
-        'Product.stub' => 'Product.php',
-        'ProductState.stub' => 'ProductState.php',
-        'ProductVariation.stub' => 'ProductVariation.php',
-        'ProductField.stub' => 'ProductField.php',
-        'Order.stub' => 'Order.php',
-        'OrderState.stub' => 'OrderState.php',
-        'OrderItem.stub' => 'OrderItem.php',
-        'Cart.stub' => 'Cart.php',
+        'Category', 'CategoryField', 'CategoryFieldGroup',
+        'Product', 'ProductState', 'ProductVariation', 'ProductField',
+        'Order', 'OrderState', 'OrderItem', 'Cart',
     ];
 
+    /**
+     * Создание контроллеров.
+     *
+     * @var array
+     */
     protected $controllers = [
         "Admin" => [
-            "CartController",
-            "CategoryController",
-            "CategoryFieldController",
-            "CategoryFieldGroupController",
-            "OrderController",
-            "OrderStateController",
-            "ProductController",
-            "ProductFieldController",
-            "ProductStateController",
-            "ProductVariationController",
+            "CartController", "CategoryController", "CategoryFieldController", "CategoryFieldGroupController",
+            "OrderController", "OrderStateController",
+            "ProductController", "ProductFieldController", "ProductStateController", "ProductVariationController",
         ],
         "Site" => [
-            "CartController",
-            "CatalogController",
-            "OrderController",
+            "CartController", "CatalogController", "OrderController",
         ],
     ];
-    protected $packageName = "Catalog";
 
     /**
      * Имя конфига.
      *
      * @var string
      */
-    protected $configName = 'catalog';
+    protected $configName = "catalog";
 
     /**
-     * Значения конфигов.
+     * Заголовок конфига.
+     *
+     * @var string
+     */
+    protected $configTitle = "Каталог";
+
+    /**
+     * Шаблон настроек.
+     *
+     * @var string
+     */
+    protected $configTemplate = "catalog::admin.settings";
+
+    /**
+     * Значения конфига.
      *
      * @var array
      */
     protected $configValues = [
-        'useOwnSiteRoutes' => false,
-        'useOwnAdminRoutes' => false,
         'useCart' => false,
     ];
 
+    /**
+     * Папка для vue файлов.
+     *
+     * @var string
+     */
     protected $vueFolder = "catalog";
 
+    /**
+     * Список vue файлов.
+     *
+     * @var array
+     */
     protected $vueIncludes = [
         'admin' => [
             'cart-state' => "CartStateComponent",
@@ -98,13 +118,6 @@ class CatalogMakeCommand extends BaseConfigModelCommand
     ];
 
     /**
-     * Директория пакета.
-     *
-     * @var string
-     */
-    protected $dir = __DIR__;
-
-    /**
      * Create a new command instance.
      *
      * @return void
@@ -116,22 +129,32 @@ class CatalogMakeCommand extends BaseConfigModelCommand
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
     public function handle()
     {
-        if (! $this->option('menu')) {
+        $all = $this->option("all");
+        
+        if ($this->option('menu') || $all) {
+            $this->makeMenu();
+        }
+        
+        if ($this->option("models") || $all) {
             $this->exportModels();
-
+        }
+        
+        if ($this->option("controllers") || $all) {
             $this->exportControllers("Admin");
             $this->exportControllers("Site");
-
+        }
+        
+        if ($this->option("vue") || $all) {
             $this->makeVueIncludes("admin");
             $this->makeVueIncludes("app");
         }
-        $this->makeMenu();
-        $this->makeConfig();
+        
+        if ($this->option("config") || $all) {
+            $this->makeConfig();
+        }
     }
 
     /**
@@ -139,7 +162,7 @@ class CatalogMakeCommand extends BaseConfigModelCommand
      */
     protected function makeMenu() {
         try {
-            $menu = Menu::where('key', 'admin')->firstOrFail();
+            $menu = Menu::query()->where('key', 'admin')->firstOrFail();
         }
         catch (\Exception $e) {
             return;
@@ -187,7 +210,7 @@ class CatalogMakeCommand extends BaseConfigModelCommand
         ]);
 
         $title = "Корзины";
-        if (siteconf()->get('catalog.useCart')) {
+        if (siteconf()->get("catalog", "useCart")) {
             $this->updateOrCreateItem([
                 'title' => $title,
                 'menu_id' => $menu->id,
