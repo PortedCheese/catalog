@@ -33,22 +33,27 @@
                                 <td>{{ $group->machine }}</td>
                                 <td>{{ $group->weight }}</td>
                                 <td>
-                                    <confirm-delete-model-button model-id="{{ $group->id }}">
-                                        <template slot="show">
+                                    <div role="toolbar" class="btn-toolbar">
+                                        <div class="btn-group mr-1">
                                             <a href="{{ route('admin.category.groups.show', ['group' => $group]) }}" class="btn btn-dark">
                                                 <i class="far fa-eye"></i>
                                             </a>
-                                        </template>
-                                        <template slot="delete">
+                                            <button type="button" class="btn btn-danger" data-confirm="{{ "delete-form-{$group->id}" }}">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <confirm-form :id="'{{ "delete-form-{$group->id}" }}'">
+                                        <template>
                                             <form action="{{ route('admin.category.groups.destroy', ['group' => $group]) }}"
-                                                  id="delete-{{ $group->id }}"
+                                                  id="delete-form-{{ $group->id }}"
                                                   class="btn-group"
                                                   method="post">
                                                 @csrf
                                                 <input type="hidden" name="_method" value="DELETE">
                                             </form>
                                         </template>
-                                    </confirm-delete-model-button>
+                                    </confirm-form>
                                 </td>
                             </tr>
                         @endforeach

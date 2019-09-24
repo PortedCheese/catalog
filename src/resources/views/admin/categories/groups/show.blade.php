@@ -84,20 +84,25 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body">
-                <confirm-delete-model-button model-id="{{ $group->id }}">
-                    <template slot="delete">
+                <div role="toolbar" class="btn-toolbar">
+                    <div class="btn-group mr-1">
+                        <a href="{{ route('admin.category.groups.index') }}" class="btn btn-dark">К списку</a>
+                        <button type="button" class="btn btn-danger" data-confirm="{{ "delete-form-{$group->id}" }}">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                <confirm-form :id="'{{ "delete-form-{$group->id}" }}'">
+                    <template>
                         <form action="{{ route('admin.category.groups.destroy', ['group' => $group]) }}"
-                              id="delete-{{ $group->id }}"
+                              id="delete-form-{{ $group->id }}"
                               class="btn-group"
                               method="post">
                             @csrf
                             <input type="hidden" name="_method" value="DELETE">
                         </form>
                     </template>
-                    <template slot="other">
-                        <a href="{{ route('admin.category.groups.index') }}" class="btn btn-dark">К списку</a>
-                    </template>
-                </confirm-delete-model-button>
+                </confirm-form>
             </div>
         </div>
     </div>

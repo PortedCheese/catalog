@@ -38,30 +38,36 @@
                                 </td>
                                 <td>{{ $field->value }}</td>
                                 <td>
-                                    <confirm-delete-model-button model-id="{{ $field->id }}">
-                                        <template slot="edit">
+                                    <div role="toolbar" class="btn-toolbar">
+                                        <div class="btn-group mr-1">
                                             <a href="{{ route('admin.category.product.field.edit', [
                                                                     'category' => $category,
                                                                     'product' => $product,
                                                                     'field' => $field
-                                                                ]) }}" class="btn btn-primary">
+                                                                ]) }}"
+                                               class="btn btn-primary">
                                                 <i class="far fa-edit"></i>
                                             </a>
-                                        </template>
-                                        <template slot="delete">
+                                            <button type="button" class="btn btn-danger" data-confirm="{{ "delete-field-form-{$field->id}" }}">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <confirm-form :id="'{{ "delete-field-form-{$field->id}" }}'">
+                                        <template>
                                             <form action="{{ route('admin.category.product.field.destroy', [
                                                                     'category' => $category,
                                                                     'product' => $product,
                                                                     'field' => $field
                                                                 ]) }}"
-                                                  id="delete-{{ $field->id }}"
+                                                  id="delete-field-form-{{ $field->id }}"
                                                   class="btn-group"
                                                   method="post">
                                                 @csrf
                                                 <input type="hidden" name="_method" value="DELETE">
                                             </form>
                                         </template>
-                                    </confirm-delete-model-button>
+                                    </confirm-form>
                                 </td>
                             </tr>
                         @endforeach

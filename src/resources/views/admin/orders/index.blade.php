@@ -129,30 +129,33 @@
                                 <td>{{ $order->total }}</td>
                                 <td>{{ date('d.m.Y H:i:s', strtotime($order->created_at)) }}</td>
                                 <td>
-                                    <confirm-delete-model-button model-id="{{ $order->id }}">
-                                        <template slot="other">
+                                    <div role="toolbar" class="btn-toolbar">
+                                        <div class="btn-group mr-1">
                                             <button type="button"
                                                     class="btn btn-info"
                                                     data-toggle="modal"
                                                     data-target="#orderInfo{{ $order->id }}">
                                                 <i class="fas fa-info"></i>
                                             </button>
-                                        </template>
-                                        <template slot="show">
                                             <a href="{{ route('admin.order.show', ['order' => $order]) }}" class="btn btn-dark">
                                                 <i class="far fa-eye"></i>
                                             </a>
-                                        </template>
-                                        <template slot="delete">
+                                            <button type="button" class="btn btn-danger" data-confirm="{{ "delete-order-form-{$order->id}" }}">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <confirm-form :id="'{{ "delete-order-form-{$order->id}" }}'">
+                                        <template>
                                             <form action="{{ route('admin.order.destroy', ['order' => $order]) }}"
-                                                  id="delete-{{ $order->id }}"
+                                                  id="delete-order-form-{{ $order->id }}"
                                                   class="btn-group"
                                                   method="post">
                                                 @csrf
                                                 <input type="hidden" name="_method" value="DELETE">
                                             </form>
                                         </template>
-                                    </confirm-delete-model-button>
+                                    </confirm-form>
 
                                     @include("catalog::admin.orders.user-info-modal", ['order' => $order, 'userData' => $userData])
                                 </td>

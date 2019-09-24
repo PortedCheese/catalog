@@ -97,7 +97,7 @@ class CatalogController extends Controller
             'groups' => $product->getGroupedFieldsInfo($category),
             'variations' => $variations,
             'gallery' => $product->images,
-            'useCart' => siteconf()->get('catalog.useCart'),
+            'useCart' => siteconf()->get('catalog', "useCart"),
             'hasStates' => $states->count(),
             'states' => $states,
             'pageMetas' => Meta::getByModelKey($product),

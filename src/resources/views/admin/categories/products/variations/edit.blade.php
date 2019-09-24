@@ -72,36 +72,26 @@
                                class="form-control">
                     </div>
 
-                    <div class="form-check">
-                        <input type="checkbox"
-                               @if(old('sale'))
-                               checked
-                               @elseif ($variation->sale)
-                               checked
-                               @endif
-                               class="form-check-input"
-                               value=""
-                               name="sale"
-                               id="sale">
-                        <label for="sale">
-                            Действует скидка
-                        </label>
+                    <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox"
+                                   class="custom-control-input"
+                                   id="sale"
+                                   {{ (! count($errors->all()) && $variation->sale) || old("sale") ? "checked" : "" }}
+                                   name="sale">
+                            <label class="custom-control-label" for="sale">Действует скидка</label>
+                        </div>
                     </div>
 
-                    <div class="form-check">
-                        <input type="checkbox"
-                               @if(old('available'))
-                               checked
-                               @elseif ($variation->available)
-                               checked
-                               @endif
-                               class="form-check-input"
-                               value=""
-                               name="available"
-                               id="available">
-                        <label for="available">
-                            В наличии
-                        </label>
+                    <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox"
+                                   class="custom-control-input"
+                                   id="available"
+                                   {{ (! count($errors->all()) && $variation->available) || old("available") ? "checked" : "" }}
+                                   name="available">
+                            <label class="custom-control-label" for="available">В наличии</label>
+                        </div>
                     </div>
 
                     <div class="btn-group"

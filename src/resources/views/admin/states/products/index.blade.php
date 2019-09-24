@@ -34,27 +34,30 @@
                                 </td>
                                 <td>{{ $state->slug }}</td>
                                 <td>
-                                    <confirm-delete-model-button model-id="{{ $state->id }}">
-                                        <template slot="edit">
-                                            <a href="{{ route('admin.product-state.edit', ['state' => $state]) }}" class="btn btn-primary">
+                                    <div role="toolbar" class="btn-toolbar">
+                                        <div class="btn-group mr-1">
+                                            <a href="{{ route("admin.product-state.edit", ["state" => $state]) }}" class="btn btn-primary">
                                                 <i class="far fa-edit"></i>
                                             </a>
-                                        </template>
-                                        <template slot="show">
                                             <a href="{{ route('admin.product-state.show', ['state' => $state]) }}" class="btn btn-dark">
                                                 <i class="far fa-eye"></i>
                                             </a>
-                                        </template>
-                                        <template slot="delete">
+                                            <button type="button" class="btn btn-danger" data-confirm="{{ "delete-form-{$state->id}" }}">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <confirm-form :id="'{{ "delete-form-{$state->id}" }}'">
+                                        <template>
                                             <form action="{{ route('admin.product-state.destroy', ['state' => $state]) }}"
-                                                  id="delete-{{ $state->id }}"
+                                                  id="delete-form-{{ $state->id }}"
                                                   class="btn-group"
                                                   method="post">
                                                 @csrf
                                                 <input type="hidden" name="_method" value="DELETE">
                                             </form>
                                         </template>
-                                    </confirm-delete-model-button>
+                                    </confirm-form>
                                 </td>
                             </tr>
                         @endforeach

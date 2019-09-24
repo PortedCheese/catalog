@@ -72,29 +72,30 @@
                     </form>
                 </td>
                 <td>
-                    <confirm-delete-model-button model-id="{{ $category->id }}">
-                        <template slot="edit">
-                            <a href="{{ route('admin.category.edit', ['category' => $category]) }}"
-                               class="btn btn-primary">
+                    <div role="toolbar" class="btn-toolbar">
+                        <div class="btn-group mr-1">
+                            <a href="{{ route("admin.category.edit", ["category" => $category]) }}" class="btn btn-primary">
                                 <i class="far fa-edit"></i>
                             </a>
-                        </template>
-                        <template slot="show">
-                            <a href="{{ route('admin.category.show', ['category' => $category]) }}"
-                               class="btn btn-dark">
+                            <a href="{{ route('admin.category.show', ['category' => $category]) }}" class="btn btn-dark">
                                 <i class="far fa-eye"></i>
                             </a>
-                        </template>
-                        <template slot="delete">
+                            <button type="button" class="btn btn-danger" data-confirm="{{ "delete-form-{$category->id}" }}">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <confirm-form :id="'{{ "delete-form-{$category->id}" }}'">
+                        <template>
                             <form action="{{ route('admin.category.destroy', ['category' => $category]) }}"
-                                  id="delete-{{ $category->id }}"
+                                  id="delete-form-{{ $category->id }}"
                                   class="btn-group"
                                   method="post">
                                 @csrf
                                 <input type="hidden" name="_method" value="DELETE">
                             </form>
                         </template>
-                    </confirm-delete-model-button>
+                    </confirm-form>
                 </td>
             </tr>
         @endforeach

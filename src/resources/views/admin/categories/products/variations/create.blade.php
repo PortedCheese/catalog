@@ -73,18 +73,15 @@
                                class="form-control">
                     </div>
 
-                    <div class="form-check">
-                        <input type="checkbox"
-                               @if(old('sale'))
-                               checked
-                               @endif
-                               class="form-check-input"
-                               value=""
-                               name="sale"
-                               id="sale">
-                        <label for="sale">
-                            Действует скидка
-                        </label>
+                    <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox"
+                                   class="custom-control-input"
+                                   id="sale"
+                                   {{ old("sale") ? "checked" : "" }}
+                                   name="sale">
+                            <label class="custom-control-label" for="sale">Действует скидка</label>
+                        </div>
                     </div>
 
                     <div class="btn-group"

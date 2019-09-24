@@ -41,8 +41,8 @@
                                 <td>{{ $variation->description }}</td>
                                 <td>{{ $variation->available ? "Да" : "Нет" }}</td>
                                 <td>
-                                    <confirm-delete-model-button model-id="{{ $variation->id }}">
-                                        <template slot="edit">
+                                    <div role="toolbar" class="btn-toolbar">
+                                        <div class="btn-group mr-1">
                                             <a href="{{ route('admin.category.product.variation.edit', [
                                                             'variation' => $variation,
                                                             'product' => $product,
@@ -51,21 +51,26 @@
                                                class="btn btn-primary">
                                                 <i class="far fa-edit"></i>
                                             </a>
-                                        </template>
-                                        <template slot="delete">
+                                            <button type="button" class="btn btn-danger" data-confirm="{{ "delete-variation-form-{$variation->id}" }}">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <confirm-form :id="'{{ "delete-variation-form-{$variation->id}" }}'">
+                                        <template>
                                             <form action="{{ route('admin.category.product.variation.destroy', [
                                                             'variation' => $variation,
                                                             'product' => $product,
                                                             'category' => $category,
                                                         ]) }}"
-                                                  id="delete-{{ $variation->id }}"
+                                                  id="delete-variation-form-{{ $variation->id }}"
                                                   class="btn-group"
                                                   method="post">
                                                 @csrf
                                                 <input type="hidden" name="_method" value="DELETE">
                                             </form>
                                         </template>
-                                    </confirm-delete-model-button>
+                                    </confirm-form>
                                 </td>
                             </tr>
                         @endforeach

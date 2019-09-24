@@ -48,12 +48,6 @@
                         <a href="{{ $formRoute }}" class="btn btn-warning">
                             Сбросить
                         </a>
-                        @isset($category)
-                            <a href="{{ route('admin.category.product.create', ['category' => $category]) }}"
-                               class="btn btn-success">
-                                Добавить
-                            </a>
-                        @endisset
                     </div>
                 </form>
             </div>
@@ -62,6 +56,14 @@
 
     <div class="col-12">
         <div class="card">
+            @isset($category)
+                <div class="card-header">
+                    <a href="{{ route('admin.category.product.create', ['category' => $category]) }}"
+                       class="btn btn-success">
+                        Добавить
+                    </a>
+                </div>
+            @endisset
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table">
@@ -95,44 +97,52 @@
                                     </td>
                                 @endif
                                 <td>
-                                    <confirm-delete-model-button model-id="{{ $product->id }}">
-                                        <template slot="forms">
-                                            <form id="change-publushed-{{ $product->id }}"
+                                    <div role="toolbar" class="btn-toolbar">
+                                        <div class="btn-group mr-1">
+                                            <a href="{{ route('admin.category.product.edit', ['category' => $category, 'product' => $product]) }}"
+                                               class="btn btn-primary">
+                                                <i class="far fa-edit"></i>
+                                            </a>
+                                            <a href="{{ route('admin.category.product.show', ['category' => $category, 'product' => $product]) }}"
+                                               class="btn btn-dark">
+                                                <i class="far fa-eye"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-danger" data-confirm="{{ "delete-product-form-{$product->id}" }}">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                        <div class="btn-group">
+                                            <button type="button"
+                                                    class="btn btn-{{ $product->published ? "success" : "secondary" }}"
+                                                    data-confirm="{{ "change-published-form-{$product->id}" }}">
+                                                <i class="fas fa-toggle-{{ $product->published ? "on" : "off" }}"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <confirm-form :id="'{{ "change-published-form-{$product->id}" }}'"
+                                                  confirm-text="Да, изменить!"
+                                                  text="Это изменит статус показа товара на сайте">
+                                        <template>
+                                            <form id="change-published-form-{{ $product->id }}"
                                                   action="{{ route("admin.category.product.published", ['category' => $category, 'product' => $product]) }}"
                                                   method="post">
                                                 @method('put')
                                                 @csrf
                                             </form>
                                         </template>
-                                        <template slot="other">
-                                            <a href="#"
-                                               class="btn btn-{{ $product->published ? "success" : "secondary" }}"
-                                               onclick="event.preventDefault();document.getElementById('change-publushed-{{ $product->id }}').submit();">
-                                                <i class="fas fa-toggle-{{ $product->published ? "on" : "off" }}"></i>
-                                            </a>
-                                        </template>
-                                        <template slot="edit">
-                                            <a href="{{ route('admin.category.product.edit', ['category' => $category, 'product' => $product]) }}"
-                                               class="btn btn-primary">
-                                                <i class="far fa-edit"></i>
-                                            </a>
-                                        </template>
-                                        <template slot="show">
-                                            <a href="{{ route('admin.category.product.show', ['category' => $category, 'product' => $product]) }}"
-                                               class="btn btn-dark">
-                                                <i class="far fa-eye"></i>
-                                            </a>
-                                        </template>
-                                        <template slot="delete">
+                                    </confirm-form>
+                                    <confirm-form :id="'{{ "delete-product-form-{$product->id}" }}'">
+                                        <template>
                                             <form action="{{ route('admin.category.product.destroy', ['category' => $category, 'product' => $product]) }}"
-                                                  id="delete-{{ $product->id }}"
+                                                  id="delete-product-form-{{ $product->id }}"
                                                   class="btn-group"
                                                   method="post">
                                                 @csrf
                                                 <input type="hidden" name="_method" value="DELETE">
                                             </form>
                                         </template>
-                                    </confirm-delete-model-button>
+                                    </confirm-form>
+
                                 </td>
                             </tr>
                         @endforeach

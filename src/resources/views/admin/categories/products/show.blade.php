@@ -7,35 +7,40 @@
     @include("catalog::admin.categories.products.pills", ['category' => $category, 'product' => $product])
     <div class="col-12 mt-2">
         <div class="row">
-            @php
-                $class = $image ? "col-12 col-md-9" : "col-12";
-            @endphp
             @if ($image)
                 <div class="col-12 col-md-3">
                     <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title">Изображение:</h5>
+                        </div>
                         <div class="card-body">
-                            <img src="{{ route('imagecache', ['template' => 'medium', 'filename' => $image->file_name]) }}"
-                                 class="img-thumbnail mb-2"
-                                 alt="{{ $image->name }}">
-                            <confirm-delete-model-button model-id="{{ $product->id }}">
-                                <template slot="delete">
+                            <div class="d-inline-block">
+                                <img src="{{ route('imagecache', ['template' => 'medium', 'filename' => $image->file_name]) }}"
+                                     class="rounded mb-2"
+                                     alt="{{ $image->name }}">
+                                <button type="button" class="close ml-1" data-confirm="{{ "delete-image-form-{$category->id}" }}">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <confirm-form :id="'{{ "delete-image-form-{$category->id}" }}'">
+                                <template>
                                     <form action="{{ route('admin.category.product.destroy-image', [
                                                 'category' => $category,
                                                 'product' => $product
                                             ]) }}"
-                                          id="delete-{{ $product->id }}"
+                                          id="delete-image-form-{{ $category->id }}"
                                           class="btn-group"
                                           method="post">
                                         @csrf
                                         <input type="hidden" name="_method" value="DELETE">
                                     </form>
                                 </template>
-                            </confirm-delete-model-button>
+                            </confirm-form>
                         </div>
                     </div>
                 </div>
             @endif
-            <div class="product-description {{ $class }}">
+            <div class="product-description {{ $image ? "col-12 col-md-9" : "col-12" }}">
                 <div class="card">
                     <div class="card-header">
                         <button type="button" class="btn btn-primary collapse show collapseChangeCategory" data-toggle="modal" data-target="#changeCategory">
@@ -71,11 +76,11 @@
                     </div>
                     <div class="card-body">
                         <div class="short mb-3">
-                            <h4 class="mt-0">Краткое описание:</h4>
+                            <h5 class="mt-0">Краткое описание:</h5>
                             {{ $product->short }}
                         </div>
                         <div class="full">
-                            <h4 class="mt-0">Полное описание:</h4>
+                            <h5 class="mt-0">Полное описание:</h5>
                             {!! $product->description !!}
                         </div>
                     </div>

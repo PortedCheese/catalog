@@ -17,7 +17,7 @@
                     <input type="hidden" value="{{ $category->id }}" name="category_id">
 
                     <div class="form-group">
-                        <label for="title">Заголовок</label>
+                        <label for="title">Заголовок <span class="text-danger">*</span></label>
                         <input type="text"
                                id="title"
                                name="title"
@@ -50,14 +50,12 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="description">Описание</label>
+                        <label for="description">Описание <span class="text-danger">*</span></label>
                         <textarea class="form-control"
                                   name="description"
                                   id="ckDescription"
                                   rows="3"
-                                  required>
-                    {{ old('description') }}
-                </textarea>
+                                  required>{{ old('description') }}</textarea>
                         @if ($errors->has('description'))
                             <div class="invalid-feedback">
                                 <strong>{{ $errors->first('description') }}</strong>
