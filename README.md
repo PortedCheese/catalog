@@ -8,29 +8,14 @@
 ##Install
 `php artisan migrate` - Создаст необходимые таблицы.
 
-`php artisan make:catalog {--menu : Only config menu}` - Настройки каталога. Создает необходимые модели и контроллеры, методы которых можно переопределить, создает элементы меню и создает конфигурацию.
+`php artisan make:catalog {--all : Run all}
+                          {--menu : Config menu}
+                          {--models : Export models}
+                          {--controllers : Export controllers}
+                          {--vue : Export vue}
+                          {--config : Make config}` - Настройки каталога. Создает необходимые модели и контроллеры, методы которых можно переопределить, создает элементы меню и создает конфигурацию.
 
 `php artisan vendor:publish --provider="PortedCheese\Catalog\ServiceProvider" --tag=public` - Копирует компоненты.
-
-`Vue.component(
-    'catalog-single-order',
-    require('./components/vendor/catalog/SingleProductComponent')
-);`
-
-`Vue.component(
-    'add-to-cart',
-    require('./components/vendor/catalog/AddToCardComponent')
-);`
-
-`Vue.component(
-    'cart-state',
-    require('./components/vendor/catalog/CartStateComponent')
-);`
-
-`Vue.component(
-    'change-item-quantity',
-    require('./components/vendor/catalog/ChangeItemQuantityComponent')
-);`
 
 `@include("catalog::site.cart.cart-state")` - Добавить элемент li в меню для корзины
 
