@@ -12,6 +12,8 @@ use Illuminate\Support\Str;
 
 class Cart extends Model
 {
+    const CRON_ENABLED = false;
+
     protected $fillable = [
         'user_id',
         'items',

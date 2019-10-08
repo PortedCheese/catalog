@@ -90,6 +90,16 @@ class CatalogMakeCommand extends BaseConfigModelCommand
      */
     protected $configValues = [
         'useCart' => false,
+        "disablePriceSort" => true,
+        "oldCardLive" => 7,
+        "cartsAdminPager" => 10,
+        "ordersAdminPager" => 20,
+        "productsAdminPager" => 20,
+        "productStatesAdminPager" => 20,
+        "ordersProfilePager" => 10,
+        "productsSitePager" => 18,
+        "hasExchange" => false,
+        "orderNotificationEmail" => "dev@gis4biz.ru",
     ];
 
     /**

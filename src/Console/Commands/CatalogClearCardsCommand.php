@@ -39,7 +39,7 @@ class CatalogClearCardsCommand extends Command
      */
     public function handle()
     {
-        $days = env("CATALOG_OLD_CARD_LIVE", 7);
+        $days = siteconf()->get("catalog", "oldCardLive");
         $ts = strtotime("- $days days", time());
         $date = date("Y-m-d H:i:s", $ts);
         $carts = Cart::query()

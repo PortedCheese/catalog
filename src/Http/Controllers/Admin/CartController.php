@@ -8,8 +8,6 @@ use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
-    const PAGER = 10;
-
     /**
      * Список корзин.
      *
@@ -19,7 +17,7 @@ class CartController extends Controller
     public function index(Request $request)
     {
         $query = $request->query;
-        $perPage = env("CATALOG_CARTS_ADMIN_PAGER", self::PAGER);
+        $perPage = siteconf()->get("catalog", "cartsAdminPager");
         $carts = Cart::query()
             ->orderByDesc('updated_at')
             ->paginate($perPage)

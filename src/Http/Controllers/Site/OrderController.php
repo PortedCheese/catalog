@@ -100,7 +100,7 @@ class OrderController extends Controller
         $orders = Order::query()
             ->where("user_id", Auth::user()->id)
             ->orderBy('created_at', 'desc');
-        $perPage = env("CATALOG_ORDERS_PROFILE_PAGER", self::PAGER);
+        $perPage = siteconf()->get("catalog", "ordersProfilePager");
         return view("catalog::site.profile.index", [
             'orders' => $orders->paginate($perPage)->appends($request->input()),
             'states' => OrderState::getList(),

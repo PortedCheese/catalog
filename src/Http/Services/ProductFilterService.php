@@ -78,7 +78,7 @@ class ProductFilterService
         }
 
         Product::addSortFromFilter($this->request, $this->products);
-        $perPage = env("CATALOG_PRODUCT_SITE_PAGER", self::PAGER);
+        $perPage = siteconf()->get("catalog", "productsSitePager");
 
         return $this->products->paginate($perPage)->appends($this->request->input());
     }
@@ -100,7 +100,7 @@ class ProductFilterService
                 $join->on("products.id", '=', "{$machine}.product_id");
             });
         }
-        if (! env("DISABLE_CATALOG_PRICE_SORT", false)) {
+        if (! siteconf()->get("catalog", "disablePriceSort")) {
             // Если нет фильтра по цене, нужно добавить цены, что бы работала сортировка.
             if (empty($this->ranges['product_price'])) {
                 $prices = Product::queryRangeVariations(0,0, false);

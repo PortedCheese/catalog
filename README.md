@@ -20,18 +20,4 @@
 `@include("catalog::site.cart.cart-state")` - Добавить элемент li в меню для корзины
 
 ##Settings
-###env
-CATALOG_CRON=true - Включить удаление устаревших корзин анонимов
-CATALOG_OLD_CARD_LIVE=7 - Сколько дней живут корзины анонимов
-
-CATALOG_ORDERS_ADMIN_PAGER=20 - Сколько заказов на страницу в админке
-CATALOG_PRODUCT_ADMIN_PAGER=20 - Сколько товаров на страницу в админке
-CATALOG_PRODUCT_STATE_ADMIN_PAGER=20 - Сколько статусов товара на странице в админке
-
-CATALOG_ORDERS_PROFILE_PAGER=10 - Сколько заказов в профиле пользователя
-
-DISABLE_CATALOG_PRICE_SORT=false - Отключить сортировку по цене, это если в каталоге нет цен
-
-CATALOG_ORDER_NOTIFY_EMAIL = "dev@gis4biz.ru" - куда отправлять уведомление о новом заказе.
-
-CATALOG_HAS_EXCHANGE = false - если есть выгрузка выключить очередь на кэширование.
+В модели Card есть константа CRON_ENABLED - Включить удаление устаревших корзин анонимов

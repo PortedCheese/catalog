@@ -190,8 +190,7 @@ class Order extends Model
      */
     public function routeNotificationForMail($notification)
     {
-        // TODO: change.
-        return env("CATALOG_ORDER_NOTIFY_EMAIL", "dev@gis4biz.ru");
+        return siteconf()->get("catalog", "orderNotificationEmail");
     }
 
     /**

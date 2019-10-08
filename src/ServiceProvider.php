@@ -63,7 +63,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
 
     public function register()
     {
-        if (env("CATALOG_CRON", false)) {
+        if (Cart::CRON_ENABLED) {
             $this->app->singleton('portedcheese.catalog.console.kernel', function ($app) {
                 $dispatcher = $app->make(Dispatcher::class);
                 return new Kernel($app, $dispatcher);
@@ -124,7 +124,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         });
         // Сортировка.
         view()->composer("catalog::site.categories.sort", function ($view) {
-            $view->with("disablePriceSort", env("DISABLE_CATALOG_PRICE_SORT", false));
+            $view->with("disablePriceSort", siteconf()->get("catalog", "disablePriceSort"));
         });
         view()->composer("catalog::site.categories.sort-link", function ($view) {
             $request = app(Request::class);

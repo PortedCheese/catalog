@@ -11,8 +11,6 @@ use PortedCheese\Catalog\Http\Requests\ProductStateUpdateRequest;
 
 class ProductStateController extends Controller
 {
-    const PAGER = 20;
-
     /**
      * Display a listing of the resource.
      *
@@ -46,7 +44,7 @@ class ProductStateController extends Controller
             $products->where('title', 'LIKE', "%$title%");
         }
         $products->orderBy('created_at', 'desc');
-        $perPage = env("CATALOG_PRODUCT_STATE_ADMIN_PAGER", self::PAGER);
+        $perPage = siteconf()->get("catalog", "productStatesAdminPager");
         return view("catalog::admin.states.products.show", [
             'state' => $state,
             'products' => $products->paginate($perPage)->appends($request->input()),

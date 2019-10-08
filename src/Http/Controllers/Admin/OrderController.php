@@ -9,8 +9,6 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-    const PAGER = 20;
-
     /**
      * Display a listing of the resource.
      *
@@ -40,12 +38,12 @@ class OrderController extends Controller
             $orders->where('created_at', '<=', $to);
         }
         $orders->orderBy('created_at', 'desc');
-        $perPage = env("CATALOG_ORDERS_ADMIN_PAGER", self::PAGER);
+        $perPage = siteconf()->get("catalog", "ordersAdminPager");
         return view("catalog::admin.orders.index", [
             'orders' => $orders->paginate($perPage)->appends($request->input()),
             'states' => OrderState::getList(),
             'query' => $query,
-            'per' => self::PAGER,
+            'per' => $perPage,
             'page' => $query->get('page', 1) - 1,
         ]);
     }

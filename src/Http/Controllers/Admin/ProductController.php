@@ -14,8 +14,6 @@ use PortedCheese\Catalog\Http\Requests\ProductUpdateRequest;
 
 class ProductController extends Controller
 {
-    const PAGER = 20;
-
     /**
      * Display a listing of the resource.
      *
@@ -45,7 +43,7 @@ class ProductController extends Controller
             }
         }
         $products->orderBy('created_at', 'desc');
-        $perPage = env("CATALOG_PRODUCT_ADMIN_PAGER", self::PAGER);
+        $perPage = siteconf()->get("catalog", "productsAdminPager");
         return view('catalog::admin.categories.products.index', [
             'category' => $category,
             'products' => $products->paginate($perPage)->appends($request->input()),

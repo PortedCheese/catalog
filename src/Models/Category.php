@@ -931,7 +931,7 @@ class Category extends Model
     private function addCacheJob($method, $force = false)
     {
         if (! $force) {
-            if (env("CATALOG_HAS_EXCHANGE", false)) {
+            if (siteconf()->get("catalog", "hasExchange")) {
                 return false;
             }
         }
