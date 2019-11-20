@@ -63,7 +63,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
 
     public function register()
     {
-        if (Cart::CRON_ENABLED) {
+        if (class_exists(Cart::class) && Cart::CRON_ENABLED) {
             $this->app->singleton('portedcheese.catalog.console.kernel', function ($app) {
                 $dispatcher = $app->make(Dispatcher::class);
                 return new Kernel($app, $dispatcher);
