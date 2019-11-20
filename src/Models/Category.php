@@ -625,7 +625,8 @@ class Category extends Model
         $this->setProductValuesToFilter($fieldsInfo, $fieldValues);
 
         $this->addPriceFilter($fieldsInfo, $includeSubs);
-
+        $this->setAdditionalRangeFilter($fieldsInfo);
+        debugbar()->info($fieldsInfo);
         return $fieldsInfo;
     }
 
@@ -750,6 +751,44 @@ class Category extends Model
         $this->addCacheJob("getProductValues", true);
         $this->addCacheJob("getPIds", true);
         $this->addCacheJob("addPriceFilter", true);
+    }
+
+    /**
+     * Добавить переменные в фильтры по диапазону.
+     *
+     * @param $fieldsInfo
+     */
+    private function setAdditionalRangeFilter(&$fieldsInfo)
+    {
+        foreach ($fieldsInfo as $key => &$filter) {
+            if ($filter->type !== 'range') {
+                continue;
+            }
+            if (! empty($filter->values)) {
+                $render = true;
+                foreach ($filter->values as $value) {
+                    if (! is_numeric($value)) {
+                        $render = false;
+                        break;
+                    }
+                }
+            }
+            else {
+                $render = false;
+            }
+            $filter->render = $render;
+            if ($render) {
+                $filter->min = min($filter->values);
+                $filter->max = max($filter->values);
+                if ($filter->min == $filter->max) {
+                    $filter->render = false;
+                }
+            }
+            if (! $filter->render) {
+                unset($fieldsInfo[$key]);
+            }
+        }
+
     }
 
     /**

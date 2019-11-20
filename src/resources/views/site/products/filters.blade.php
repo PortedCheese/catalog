@@ -44,17 +44,7 @@
                     @break
 
                 @case('range')
-                    @php
-                        $render = true;
-                        if (! empty($filter->values)) {
-                            foreach ($filter->values as $value) {
-                                if (! is_numeric($value)) {
-                                    $render = false;
-                                }
-                            }
-                        }
-                    @endphp
-                    @if ($render)
+                    @if ($filter->render)
                         <div class="form-group steps-slider-cover" data-step="1">
                             <label>{{ $filter->title }}</label>
                             <div class="row justify-content-between mb-2">
@@ -93,13 +83,17 @@
         <input type="hidden" name="sort-by" value="{{ $sortField }}">
         <input type="hidden" name="sort-order" value="{{ $sortOrder }}">
 
-        <div class="btn-group-vertical btn-block mt-2"
-             role="group">
-            <button type="submit" class="btn btn-primary">Применить</button>
-            <a href="{{ route("site.catalog.category.show", ['category' => $category]) }}"
-               class="btn btn-outline-secondary">
-                Сбросить
-            </a>
-        </div>
+        @if (count($filters))
+            <div class="btn-group-vertical btn-block mt-2"
+                 role="group">
+                <button type="submit" class="btn btn-primary">Применить</button>
+                <a href="{{ route("site.catalog.category.show", ['category' => $category]) }}"
+                   class="btn btn-outline-secondary">
+                    Сбросить
+                </a>
+            </div>
+        @else
+            <p class="text-muted">Нет параметров для фильтрации</p>
+        @endif
     </form>
 </div>
