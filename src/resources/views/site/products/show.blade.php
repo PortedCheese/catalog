@@ -9,7 +9,7 @@
         <div class="row mb-3">
             <div class="col-12 col-md-4{{ $image ? '' : " text-center" }}">
                 @if ($hasStates)
-                    <div class="states pl-3">
+                    <div class="states text-left pl-3">
                         @foreach($states as $state)
                             <span class="badge badge-{{ $state->color }} px-3 py-2 mt-2">
                                 {{ $state->title }}

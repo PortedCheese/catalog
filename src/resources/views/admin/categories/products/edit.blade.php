@@ -69,15 +69,16 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="description">Описание</label>
+                        <label for="ckDescription">Описание</label>
                         <textarea class="form-control"
                                   name="description"
                                   id="ckDescription"
                                   rows="3"
                                   required>
-                    {{ old('description') ? old('description') : $product->description }}
-                </textarea>
+                            {{ old('description') ? old('description') : $product->description }}
+                        </textarea>
                         @if ($errors->has('description'))
+                            <input type="hidden" class="form-control is-invalid">
                             <div class="invalid-feedback">
                                 <strong>{{ $errors->first('description') }}</strong>
                             </div>

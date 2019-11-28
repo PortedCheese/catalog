@@ -201,6 +201,7 @@ class Product extends Model
             'title' => 'required|min:2|unique:products,title',
             'slug' => 'nullable|min:2|unique:products,slug',
             'main_image' => 'nullable|image',
+            'description' => "required",
         ];
     }
 
@@ -213,7 +214,9 @@ class Product extends Model
     {
         return [
             'title' => 'Заголовок',
+            'slug' => "Slug",
             'main_image' => 'Главное изображение',
+            'description' => "Описание",
         ];
     }
 
@@ -255,6 +258,7 @@ class Product extends Model
             'title' => "required|min:2",
             'slug' => "nullable|min:2|unique:products,slug,{$id}",
             'main_image' => 'nullable|image',
+            'description' => "required",
         ];
     }
 
@@ -267,7 +271,9 @@ class Product extends Model
     {
         return [
             'title' => 'Заголовок',
+            'slug' => "Slug",
             'main_image' => 'Главное изображение',
+            'description' => "Описание",
         ];
     }
 

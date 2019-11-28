@@ -57,6 +57,7 @@
                                   rows="3"
                                   required>{{ old('description') }}</textarea>
                         @if ($errors->has('description'))
+                            <input type="hidden" class="form-control is-invalid">
                             <div class="invalid-feedback">
                                 <strong>{{ $errors->first('description') }}</strong>
                             </div>
