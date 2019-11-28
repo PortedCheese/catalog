@@ -24,11 +24,11 @@ class ProductStateStoreRequest extends FormRequest
      */
     public function rules()
     {
-        ProductState::requestProductStateStoreRules();
+        return ProductState::requestProductStateStoreRules();
     }
 
     public function attributes()
     {
-        ProductState::requestProductStateStoreAttributes();
+        return ProductState::requestProductStateStoreAttributes();
     }
 }
