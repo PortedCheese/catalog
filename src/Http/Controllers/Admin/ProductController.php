@@ -166,6 +166,7 @@ class ProductController extends Controller
             }
         }
         $product->states()->sync($stateIds);
+        $product->forgetTeaserCache();
         return redirect()
             ->route("admin.category.product.show", ['category' => $product->category, 'product' => $product])
             ->with('success', 'Товар успешно обновлен');
