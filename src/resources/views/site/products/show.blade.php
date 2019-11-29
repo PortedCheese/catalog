@@ -66,7 +66,7 @@
                        role="tab"
                        aria-controls="gallery"
                        aria-selected="false">
-                        Галлерея
+                        Галерея
                     </a>
                 </li>
             @endif
