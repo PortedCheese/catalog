@@ -6,9 +6,9 @@
 Есть возможность автоматически удалять старые корзины, для этого нужно включить крон.
 
 ## Install
-`php artisan migrate` - Создаст необходимые таблицы.
+    php artisan migrate
 
-`php artisan vendor:publish --provider="PortedCheese\Catalog\ServiceProvider" --tag=public` - Копирует компоненты.
+    php artisan vendor:publish --provider="PortedCheese\Catalog\ServiceProvider" --tag=public
 
     php artisan make:catalog {--all : Run all}
                              {--menu : Config menu}
@@ -18,7 +18,7 @@
                              {--config : Make config}
 Настройки каталога. Создает необходимые модели и контроллеры, методы которых можно переопределить, создает элементы меню и создает конфигурацию.
 
-`@include("catalog::site.cart.cart-state")` - Добавить элемент li в меню для корзины
+`@includeIf("catalog::site.cart.cart-state")` - Добавить элемент li в меню для корзины
 
 ## Settings
 В модели Card есть константа CRON_ENABLED - Включить удаление устаревших корзин анонимов
