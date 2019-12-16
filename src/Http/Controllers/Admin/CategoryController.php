@@ -84,7 +84,7 @@ class CategoryController extends Controller
      *
      * @param array $data
      */
-    private function storeValidator(array $data)
+    protected function storeValidator(array $data)
     {
         Validator::make($data, [
             "title" => ["required", "min:2", "unique:categories,title"],
@@ -145,7 +145,7 @@ class CategoryController extends Controller
             ->with('success', 'Категория успешно обновлена');
     }
 
-    private function updateValidator(array $data, Category $category)
+    protected function updateValidator(array $data, Category $category)
     {
         $id = $category->id;
         Validator::make($data, [

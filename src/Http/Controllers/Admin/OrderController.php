@@ -98,7 +98,7 @@ class OrderController extends Controller
             ->with('success', 'Успешно обновлено');
     }
 
-    private function updateValidator(array $data)
+    protected function updateValidator(array $data)
     {
         Validator::make($data, [
             "state" => ["required", "exists:order_states,id"],

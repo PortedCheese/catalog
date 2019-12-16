@@ -129,7 +129,7 @@ class CategoryFieldController extends Controller
             ->with('success', 'Характеристика добавлена');
     }
 
-    private function storeValidation(array $data)
+    protected function storeValidation(array $data)
     {
         Validator::make($data, [
             "title" => ["nullable", "required_without:exists", "min:2", "max:200"],
@@ -210,7 +210,7 @@ class CategoryFieldController extends Controller
             ->with("success", "Обновлено");
     }
 
-    private function updateValidator(array $data)
+    protected function updateValidator(array $data)
     {
         Validator::make($data, [
             "title" => ["required", "min:2", "max:200"],

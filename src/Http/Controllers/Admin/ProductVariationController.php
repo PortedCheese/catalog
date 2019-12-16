@@ -70,7 +70,7 @@ class ProductVariationController extends Controller
             ->with('success', 'Вариация добавлена');
     }
 
-    private function storeValidator(array $data)
+    protected function storeValidator(array $data)
     {
         Validator::make($data, [
             'sku' => ['required', 'min:2', 'unique:product_variations,sku'],
@@ -140,7 +140,7 @@ class ProductVariationController extends Controller
             ->with('success', 'Вариация обновлена');
     }
 
-    private function updateValidator(array $data, ProductVariation $variation)
+    protected function updateValidator(array $data, ProductVariation $variation)
     {
         $id = $variation->id;
         Validator::make($data, [

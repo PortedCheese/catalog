@@ -50,7 +50,7 @@ class OrderStateController extends Controller
             ->with('success', 'Статус заказа добавлен');
     }
 
-    private function storeValidator(array $data)
+    protected function storeValidator(array $data)
     {
         Validator::make($data, [
             "title" => ["required", "min:2", "unique:order_states,title"],
@@ -102,7 +102,7 @@ class OrderStateController extends Controller
             ->with('success', 'Статус успешно обновлен');
     }
 
-    private function updateValidator(array $data, OrderState $state)
+    protected function updateValidator(array $data, OrderState $state)
     {
         $id = $state->id;
         Validator::make($data, [

@@ -93,7 +93,7 @@ class ProductController extends Controller
             ->with('success', 'Товар успешно добавлен');
     }
 
-    private function storeValidator(array $data)
+    protected function storeValidator(array $data)
     {
         Validator::make($data, [
             "title" => ["required", "min:2", "unique:products,title"],
@@ -190,7 +190,7 @@ class ProductController extends Controller
             ->with('success', 'Товар успешно обновлен');
     }
 
-    private function updateValidator(array $data, Product $product)
+    protected function updateValidator(array $data, Product $product)
     {
         $id = $product->id;
         Validator::make($data, [
@@ -278,7 +278,7 @@ class ProductController extends Controller
             ->with('success', 'Категория изменена');
     }
 
-    private function changeCategoryValidator(array $data)
+    protected function changeCategoryValidator(array $data)
     {
         Validator::make($data, [
             'category_id' => "required|numeric|exists:categories,id",

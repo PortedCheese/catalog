@@ -61,7 +61,7 @@ class ProductFieldController extends Controller
             ->with('success', 'Значение добавлено');
     }
 
-    private function storeValidator(array $data)
+    protected function storeValidator(array $data)
     {
         Validator::make($data, [
             "value" => ["required", "min:1"],
@@ -111,7 +111,7 @@ class ProductFieldController extends Controller
             ->with('success', 'Значение обновлено');
     }
 
-    private function updateValidator(array $data)
+    protected function updateValidator(array $data)
     {
         Validator::make($data, [
             'value' => ['required', 'min:1'],

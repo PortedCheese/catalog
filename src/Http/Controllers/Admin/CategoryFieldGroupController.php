@@ -65,7 +65,7 @@ class CategoryFieldGroupController extends Controller
             ->with("success", "Группа добавлена");
     }
 
-    private function storeValidator(array $data)
+    protected function storeValidator(array $data)
     {
         Validator::make($data, [
             "title" => ["required", "min:2", "max:200"],
@@ -110,7 +110,7 @@ class CategoryFieldGroupController extends Controller
             ->with("success", "Обновлено");
     }
 
-    private function updateValidatior(array $data)
+    protected function updateValidatior(array $data)
     {
         Validator::make($data, [
             "title" => ["required", "min:2", "max:200"],

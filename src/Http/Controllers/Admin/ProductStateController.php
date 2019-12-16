@@ -77,7 +77,7 @@ class ProductStateController extends Controller
             ->with('success', 'Метка успешно создана');
     }
 
-    private function storeValidator(array $data)
+    protected function storeValidator(array $data)
     {
         Validator::make($data, [
             'title' => ['required', 'min:2', 'unique:product_states,title'],
@@ -132,7 +132,7 @@ class ProductStateController extends Controller
             ->with('success', 'Метка успешно обновлена');
     }
 
-    private function updateValidator(array $data, ProductState $state)
+    protected function updateValidator(array $data, ProductState $state)
     {
         $id = $state->id;
         Validator::make($data, [
