@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Order;
 use App\OrderState;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
 {
@@ -87,9 +88,7 @@ class OrderController extends Controller
      */
     public function update(Request $request, Order $order)
     {
-        $request->validate([
-            'state' => 'required|exists:order_states,id',
-        ]);
+        $this->updateValidator($request->all());
 
         $order->state_id = $request->get('state');
         $order->save();
@@ -97,6 +96,15 @@ class OrderController extends Controller
         return redirect()
             ->back()
             ->with('success', 'Успешно обновлено');
+    }
+
+    private function updateValidator(array $data)
+    {
+        Validator::make($data, [
+            "state" => ["required", "exists:order_states,id"],
+        ], [], [
+            "state" => "Статус",
+        ])->validate();
     }
 
     /**

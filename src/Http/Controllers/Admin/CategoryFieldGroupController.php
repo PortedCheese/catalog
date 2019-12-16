@@ -5,9 +5,8 @@ namespace PortedCheese\Catalog\Http\Controllers\Admin;
 use App\CategoryFieldGroup;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use PortedCheese\Catalog\Http\Requests\CategoryFieldGroupCreateRequest;
-use PortedCheese\Catalog\Http\Requests\CategoryFieldGroupUpdateRequest;
 
 class CategoryFieldGroupController extends Controller
 {
@@ -42,11 +41,13 @@ class CategoryFieldGroupController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  CategoryFieldGroupCreateRequest  $request
+     * @param  Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(CategoryFieldGroupCreateRequest $request)
+    public function store(Request $request)
     {
+        $this->storeValidator($request->all());
+
         $userInput = $request->all();
         if (empty($userInput['machine'])) {
             $slug = Str::slug($userInput['title'], '-');
@@ -62,6 +63,19 @@ class CategoryFieldGroupController extends Controller
         return redirect()
             ->route("admin.category.groups.show", ['group' => $group])
             ->with("success", "Группа добавлена");
+    }
+
+    private function storeValidator(array $data)
+    {
+        Validator::make($data, [
+            "title" => ["required", "min:2", "max:200"],
+            "machine" => ["nullable", "min:2", "max:100", "unique:category_field_groups,machine"],
+            "weight" => ["required", "numeric", "min:1"],
+        ], [], [
+            "title" => "Заголовок",
+            "machine" => "Машинное имя",
+            "weight" => "Вес",
+        ])->validate();
     }
 
     /**
@@ -81,17 +95,30 @@ class CategoryFieldGroupController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  CategoryFieldGroupUpdateRequest  $request
+     * @param  Request  $request
      * @param  \App\CategoryFieldGroup  $group
      * @return \Illuminate\Http\Response
      */
-    public function update(CategoryFieldGroupUpdateRequest $request, CategoryFieldGroup $group)
+    public function update(Request $request, CategoryFieldGroup $group)
     {
+        $this->updateValidatior($request->all());
+
         $group->update($request->all());
 
         return redirect()
             ->back()
             ->with("success", "Обновлено");
+    }
+
+    private function updateValidatior(array $data)
+    {
+        Validator::make($data, [
+            "title" => ["required", "min:2", "max:200"],
+            "weight" => ["required", "numeric", "min:1"],
+        ], [], [
+            "title" => "Заголовок",
+            "weight" => "Вес",
+        ])->validate();
     }
 
     /**

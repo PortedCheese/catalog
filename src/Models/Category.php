@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use PortedCheese\Catalog\Events\CategoryFieldUpdate;
-use PortedCheese\Catalog\Http\Requests\CategoryUpdateRequest;
 use PortedCheese\Catalog\Jobs\CategoryCache;
 use PortedCheese\SeoIntegration\Models\Meta;
 
@@ -63,63 +62,6 @@ class Category extends Model
             $model->forgetBreadcrumbCache();
             $model->forgetChildrenListCache();
         });
-    }
-
-    /**
-     * Валидация добавления категории.
-     *
-     * @return array
-     */
-    public static function requestCategoryCreateRules()
-    {
-        return [
-            'title' => 'required|min:2|unique:categories,title',
-            'slug' => 'nullable|min:2|unique:categories,slug',
-            'main_image' => 'nullable|image',
-        ];
-    }
-
-    /**
-     * Сообщения об ошибках при добавлении категории.
-     *
-     * @return array
-     */
-    public static function requestCategoryCreateAttributes()
-    {
-        return [
-            'title' => 'Заголовок',
-            'main_image' => 'Главное изображение',
-        ];
-    }
-
-    /**
-     * Валидация обновления категории.
-     *
-     * @param CategoryUpdateRequest $validator
-     * @return array
-     */
-    public static function requestCategoryUpdateRules(CategoryUpdateRequest $validator)
-    {
-        $category = $validator->route()->parameter('category', NULL);
-        $id = !empty($category) ? $category->id : NULL;
-        return [
-            'title' => "required|min:2|unique:categories,title,{$id}",
-            'slug' => "min:2|unique:categories,slug,{$id}",
-            'main_image' => 'nullable|image',
-        ];
-    }
-
-    /**
-     * Сообщения об ошибках при обновлении категори.
-     *
-     * @return array
-     */
-    public static function requestCategoryUpdateAttributes()
-    {
-        return [
-            'title' => 'Заголовок',
-            'main_image' => 'Главное изображение',
-        ];
     }
 
     /**
@@ -345,15 +287,15 @@ class Category extends Model
         else {
             $parent = $customParent;
         }
-        $parentFileds = $parent->fields;
-        if (! $parentFileds->count()) {
+        $parentFields = $parent->fields;
+        if (! $parentFields->count()) {
             return;
         }
         $ids = [];
         foreach ($this->fields as $field) {
             $ids[] = $field->id;
         }
-        foreach ($parentFileds as $parentFiled) {
+        foreach ($parentFields as $parentFiled) {
             $pivot = $parentFiled->pivot;
             if (empty($pivot)) {
                 continue;
@@ -503,7 +445,6 @@ class Category extends Model
     public function getAdminBreadcrumb($productPage = false)
     {
         $breadcrumb = [];
-        // TODO: add cache.
         if (!empty($this->parent)) {
             $breadcrumb = $this->parent->getAdminBreadcrumb();
         }
@@ -969,16 +910,19 @@ class Category extends Model
      */
     private function addCacheJob($method, $force = false)
     {
-        if (! $force) {
-            if (siteconf()->get("catalog", "hasExchange")) {
-                return false;
+        // disabled.
+        if (false) {
+            if (! $force) {
+                if (siteconf()->get("catalog", "hasExchange")) {
+                    return false;
+                }
             }
-        }
-        if (Schema::hasTable('jobs')) {
-            CategoryCache::dispatch($this, $method)
-                ->onQueue("catalogCache")
-                ->delay(now()->addSeconds(2));
-            return true;
+            if (Schema::hasTable('jobs')) {
+                CategoryCache::dispatch($this, $method)
+                    ->onQueue("catalogCache")
+                    ->delay(now()->addSeconds(2));
+                return true;
+            }
         }
         return false;
     }

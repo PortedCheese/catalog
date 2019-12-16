@@ -7,10 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Product;
 use App\ProductState;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use PortedCheese\Catalog\Http\Requests\ProductStoreRequest;
-use PortedCheese\Catalog\Http\Requests\ProductUpdateCategoryRequest;
-use PortedCheese\Catalog\Http\Requests\ProductUpdateRequest;
 
 class ProductController extends Controller
 {
@@ -70,12 +68,14 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param ProductStoreRequest $request
+     * @param Request $request
      * @param Category $category
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(ProductStoreRequest $request, Category $category)
+    public function store(Request $request, Category $category)
     {
+        $this->storeValidator($request->all());
+
         $userInput = $request->all();
         if (empty($userInput['slug'])) {
             $slug = Str::slug($userInput['title'], '-');
@@ -91,6 +91,21 @@ class ProductController extends Controller
         return redirect()
             ->route("admin.category.product.show", ['category' => $category, 'product' => $product])
             ->with('success', 'Товар успешно добавлен');
+    }
+
+    private function storeValidator(array $data)
+    {
+        Validator::make($data, [
+            "title" => ["required", "min:2", "unique:products,title"],
+            "slug" => ["nullable", "min:2", "unique:products,slug"],
+            "main_image" => ["nullable", "image"],
+            "description" => ["required"],
+        ], [], [
+            "title" => "Заголовок",
+            "slug" => "Slug",
+            "main_image" => "Главное изображение",
+            "description" => "Описание",
+        ])->validate();
     }
 
     /**
@@ -139,14 +154,17 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param ProductUpdateRequest $request
+     * @param Request $request
      * @param Category $category
      * @param Product $product
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(ProductUpdateRequest $request, Category $category, Product $product)
+    public function update(Request $request, Category $category, Product $product)
     {
         $userInput = $request->all();
+
+        $this->updateValidator($userInput, $product);
+
         if (empty($userInput['slug'])) {
             $slug = Str::slug($userInput['title'], '-');
             $buf = $slug;
@@ -170,6 +188,22 @@ class ProductController extends Controller
         return redirect()
             ->route("admin.category.product.show", ['category' => $product->category, 'product' => $product])
             ->with('success', 'Товар успешно обновлен');
+    }
+
+    private function updateValidator(array $data, Product $product)
+    {
+        $id = $product->id;
+        Validator::make($data, [
+            'title' => ["required", "min:2"],
+            'slug' => ["nullable", "min:2", "unique:products,slug,{$id}"],
+            'main_image' => ['nullable', 'image'],
+            'description' => ["required"],
+        ], [], [
+            'title' => 'Заголовок',
+            'slug' => "Slug",
+            'main_image' => 'Главное изображение',
+            'description' => "Описание",
+        ])->validate();
     }
 
     /**
@@ -228,18 +262,29 @@ class ProductController extends Controller
     /**
      * Изменить категорию товара.
      *
-     * @param ProductUpdateCategoryRequest $request
+     * @param Request $request
      * @param Category $category
      * @param Product $product
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function changeCategory(ProductUpdateCategoryRequest $request, Category $category, Product $product)
+    public function changeCategory(Request $request, Category $category, Product $product)
     {
+        $this->changeCategoryValidator($request->all());
+
         $product->category_id = $request->get('category_id');
         $product->save();
         return redirect()
             ->route("admin.category.product.show", ['category' => $product->category, 'product' => $product])
             ->with('success', 'Категория изменена');
+    }
+
+    private function changeCategoryValidator(array $data)
+    {
+        Validator::make($data, [
+            'category_id' => "required|numeric|exists:categories,id",
+        ], [], [
+            'category_id' => 'Категория',
+        ])->validate();
     }
 
     /**

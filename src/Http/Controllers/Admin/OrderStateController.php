@@ -5,8 +5,7 @@ namespace PortedCheese\Catalog\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\OrderState;
 use Illuminate\Http\Request;
-use PortedCheese\Catalog\Http\Requests\OrderStateStoreRequest;
-use PortedCheese\Catalog\Http\Requests\OrderStateUpdateRequest;
+use Illuminate\Support\Facades\Validator;
 
 class OrderStateController extends Controller
 {
@@ -38,15 +37,28 @@ class OrderStateController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(OrderStateStoreRequest $request)
+    public function store(Request $request)
     {
+        $this->storeValidator($request->all());
+
         OrderState::create($request->all());
         return redirect()
             ->route("admin.order-state.index")
             ->with('success', 'Статус заказа добавлен');
+    }
+
+    private function storeValidator(array $data)
+    {
+        Validator::make($data, [
+            "title" => ["required", "min:2", "unique:order_states,title"],
+            "machine" => ["nullable", "min:2", "unique:order_states,machine"],
+        ], [], [
+            "title" => "Заголовок",
+            "machine" => "Ключ",
+        ])->validate();
     }
 
     /**
@@ -76,23 +88,36 @@ class OrderStateController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param OrderState $state
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(OrderStateUpdateRequest $request, OrderState $state)
+    public function update(Request $request, OrderState $state)
     {
+        $this->updateValidator($request->all(), $state);
+
         $state->update($request->all());
         return redirect()
             ->route('admin.order-state.index')
             ->with('success', 'Статус успешно обновлен');
     }
 
+    private function updateValidator(array $data, OrderState $state)
+    {
+        $id = $state->id;
+        Validator::make($data, [
+            "title" => ["required", "min:2", "unique:order_states,title,{$id}"],
+        ], [], [
+            "title" => "Заголовок",
+        ])->validate();
+    }
+
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param OrderState $state
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Exception
      */
     public function destroy(OrderState $state)
     {

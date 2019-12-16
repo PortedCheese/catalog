@@ -5,9 +5,8 @@ namespace PortedCheese\Catalog\Http\Controllers\Admin;
 use App\Category;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use PortedCheese\Catalog\Http\Requests\CategoryUpdateRequest;
-use PortedCheese\Catalog\Http\Requests\CategoryCreateRequest;
 
 class CategoryController extends Controller
 {
@@ -42,7 +41,8 @@ class CategoryController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param Category|null $category
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function create(Category $category = null)
     {
@@ -54,12 +54,15 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param CategoryCreateRequest $request
+     * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(CategoryCreateRequest $request)
+    public function store(Request $request)
     {
         $userInput = $request->all();
+
+        $this->storeValidator($userInput);
+
         if (empty($userInput['slug'])) {
             $slug = Str::slug($userInput['title'], '-');
             $buf = $slug;
@@ -74,6 +77,23 @@ class CategoryController extends Controller
         return redirect()
             ->route("admin.category.show", ['category' => $category])
             ->with('success', 'Категория успешно создана');
+    }
+
+    /**
+     * Валидация сохранения.
+     *
+     * @param array $data
+     */
+    private function storeValidator(array $data)
+    {
+        Validator::make($data, [
+            "title" => ["required", "min:2", "unique:categories,title"],
+            "slug" => ["nullable", "min:2", "unique:categories,slug"],
+            "main_image" => ["nullable", "image"],
+        ], [], [
+            "title" => "Заголовок",
+            "main_image" => "Главное изображение",
+        ])->validate();
     }
 
     /**
@@ -95,8 +115,8 @@ class CategoryController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Category $category
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function edit(Category $category)
     {
@@ -109,18 +129,33 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param CategoryUpdateRequest $request
+     * @param Request $request
      * @param Category $category
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(CategoryUpdateRequest $request, Category $category)
+    public function update(Request $request, Category $category)
     {
+        $this->updateValidator($request->all(), $category);
+
         $userInput = $request->all();
         $category->update($userInput);
         $category->uploadMainImage($request);
         return redirect()
             ->route("admin.category.show", ['category' => $category])
             ->with('success', 'Категория успешно обновлена');
+    }
+
+    private function updateValidator(array $data, Category $category)
+    {
+        $id = $category->id;
+        Validator::make($data, [
+            "title" => ["required", "min:2", "unique:categories,title,{$id}"],
+            "slug" => ["min:2", "unique:categories,slug,{$id}"],
+            "main_image" => ["nullable", "image"],
+        ], [], [
+            "title" => "Заголовок",
+            "main_image" => "Главное изображение",
+        ]);
     }
 
     /**

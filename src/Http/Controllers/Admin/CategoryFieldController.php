@@ -7,9 +7,8 @@ use App\CategoryField;
 use App\CategoryFieldGroup;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use PortedCheese\Catalog\Events\CategoryFieldUpdate;
-use PortedCheese\Catalog\Http\Requests\CategoryFieldCreateRequest;
-use PortedCheese\Catalog\Http\Requests\CategoryFieldUpdateRequest;
 
 class CategoryFieldController extends Controller
 {
@@ -57,27 +56,6 @@ class CategoryFieldController extends Controller
     }
 
     /**
-     * Обновить исходное поле.
-     *
-     * @param CategoryFieldUpdateRequest $request
-     * @param CategoryField $field
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function selfUpdate(CategoryFieldUpdateRequest $request, CategoryField $field)
-    {
-        $field->update($request->all());
-        $categories = $field->categories;
-        if ($categories->count()) {
-            foreach ($categories as $category) {
-                event(new CategoryFieldUpdate($category));
-            }
-        }
-        return redirect()
-            ->back()
-            ->with("success", "Обновлено");
-    }
-
-    /**
      * Display a listing of the resource.
      *
      * @param Category $category
@@ -122,28 +100,50 @@ class CategoryFieldController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param CategoryFieldCreateRequest $request
+     * @param Request $request
      * @param Category $category
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(CategoryFieldCreateRequest $request, Category $category)
+    public function store(Request $request, Category $category)
     {
+        $this->storeValidation($request->all());
+
         if (empty($request->get('exists'))) {
             $field = CategoryField::create($request->all());
         }
         else {
             $field = CategoryField::find($request->get('exists'));
         }
+
         $title = ! empty($request->get('title')) ? $request->get("title") : $field->title;
         $field->categories()->attach($category, [
             'title' => $title,
             'filter' => $request->has('filter') ? 1 : 0,
             'weight' => $request->get("weight", 1)
         ]);
+
         event(new CategoryFieldUpdate($category));
+
         return redirect()
             ->route('admin.category.field.index', ['category' => $category])
             ->with('success', 'Характеристика добавлена');
+    }
+
+    private function storeValidation(array $data)
+    {
+        Validator::make($data, [
+            "title" => ["nullable", "required_without:exists", "min:2", "max:200"],
+            "exists" => ["nullable", "required_without_all:machine,type,title", "exists:category_fields,id"],
+            "type" => ["nullable", "required_without:exists"],
+            "machine" => ["nullable", "required_without:exists", "min:4", "max:100", "unique:category_fields,machine"],
+            "weight" => ["nullable", "numeric", "min:1"],
+        ], [], [
+            "title" => "Заголовок",
+            "exists" => "Существующие",
+            "type" => "Тип",
+            "machine" => "Машинное имя",
+            "weight" => "Вес",
+        ])->validate();
     }
 
     /**
@@ -166,13 +166,15 @@ class CategoryFieldController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param CategoryFieldUpdateRequest $request
+     * @param Request $request
      * @param Category $category
      * @param CategoryField $field
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(CategoryFieldUpdateRequest $request, Category $category, CategoryField $field)
+    public function update(Request $request, Category $category, CategoryField $field)
     {
+        $this->updateValidator($request->all());
+
         $category->fields()
             ->updateExistingPivot($field->id, [
                 'title' => $request->get('title'),
@@ -183,6 +185,40 @@ class CategoryFieldController extends Controller
         return redirect()
             ->route('admin.category.field.index', ['category' => $category])
             ->with('success', 'Успешно обновлено');
+    }
+
+    /**
+     * Обновить исходное поле.
+     *
+     * @param Request $request
+     * @param CategoryField $field
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function selfUpdate(Request $request, CategoryField $field)
+    {
+        $this->updateValidator($request->all());
+
+        $field->update($request->all());
+        $categories = $field->categories;
+        if ($categories->count()) {
+            foreach ($categories as $category) {
+                event(new CategoryFieldUpdate($category));
+            }
+        }
+        return redirect()
+            ->back()
+            ->with("success", "Обновлено");
+    }
+
+    private function updateValidator(array $data)
+    {
+        Validator::make($data, [
+            "title" => ["required", "min:2", "max:200"],
+            "weight" => ["required", "numeric", "min:1"],
+        ], [], [
+            "title" => "Заголовок",
+            "weight" => "Вес",
+        ])->validate();
     }
 
     /**

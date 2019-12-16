@@ -7,9 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Product;
 use App\ProductField;
 use Illuminate\Http\Request;
-use PortedCheese\Catalog\Events\ProductFieldUpdate;
-use PortedCheese\Catalog\Http\Requests\ProductFieldStoreRequest;
-use PortedCheese\Catalog\Http\Requests\ProductFieldUpdateRequest;
+use Illuminate\Support\Facades\Validator;
 
 class ProductFieldController extends Controller
 {
@@ -48,17 +46,30 @@ class ProductFieldController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param ProductFieldStoreRequest $request
+     * @param Request $request
      * @param Category $category
      * @param Product $product
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(ProductFieldStoreRequest $request, Category $category, Product $product)
+    public function store(Request $request, Category $category, Product $product)
     {
+        $this->storeValidator($request->all());
+
         ProductField::create($request->all());
         return redirect()
             ->route('admin.category.product.field.index', ['category' => $category, 'product' => $product])
             ->with('success', 'Значение добавлено');
+    }
+
+    private function storeValidator(array $data)
+    {
+        Validator::make($data, [
+            "value" => ["required", "min:1"],
+            "field_id" => ["required", "exists:category_fields,id"],
+        ], [], [
+            "value" => "Значение",
+            "field_id" => "Характеристика",
+        ])->validate();
     }
 
     /**
@@ -81,14 +92,16 @@ class ProductFieldController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param ProductFieldUpdateRequest $request
+     * @param Request $request
      * @param Category $category
      * @param Product $product
      * @param ProductField $field
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(ProductFieldUpdateRequest $request, Category $category, Product $product, ProductField $field)
+    public function update(Request $request, Category $category, Product $product, ProductField $field)
     {
+        $this->updateValidator($request->all());
+
         $field->update($request->all());
         return redirect()
             ->route('admin.category.product.field.index', [
@@ -96,6 +109,15 @@ class ProductFieldController extends Controller
                 'product' => $product,
             ])
             ->with('success', 'Значение обновлено');
+    }
+
+    private function updateValidator(array $data)
+    {
+        Validator::make($data, [
+            'value' => ['required', 'min:1'],
+        ], [], [
+            'value' => 'Значение',
+        ])->validate();
     }
 
     /**

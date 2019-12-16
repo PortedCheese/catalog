@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use PortedCheese\Catalog\Events\ProductCategoryChange;
 use PortedCheese\Catalog\Events\ProductListChange;
-use PortedCheese\Catalog\Http\Requests\ProductUpdateRequest;
 use PortedCheese\SeoIntegration\Models\Meta;
 
 class Product extends Model
@@ -188,93 +187,6 @@ class Product extends Model
             ->where("value", '=', $value)
             ->where("field_id", '=', $fieldId)
             ->groupBy("product_id");
-    }
-
-    /**
-     * Валидация добавления товара.
-     *
-     * @return array
-     */
-    public static function requestProductStoreRules()
-    {
-        return [
-            'title' => 'required|min:2|unique:products,title',
-            'slug' => 'nullable|min:2|unique:products,slug',
-            'main_image' => 'nullable|image',
-            'description' => "required",
-        ];
-    }
-
-    /**
-     * Названия полей для валидации добавления товара.
-     *
-     * @return array
-     */
-    public static function requestProductStoreAttributes()
-    {
-        return [
-            'title' => 'Заголовок',
-            'slug' => "Slug",
-            'main_image' => 'Главное изображение',
-            'description' => "Описание",
-        ];
-    }
-
-    /**
-     * Валидация обновления категории у товара.
-     *
-     * @return array
-     */
-    public static function requestProductUpdateCategoryRules()
-    {
-        return [
-            'category_id' => "required|numeric|exists:categories,id",
-        ];
-    }
-
-    /**
-     * Названия полей для валидации обновления категории у товара.
-     *
-     * @return array
-     */
-    public static function requestProductUpdateCategoryAttributes()
-    {
-        return [
-            'category_id' => 'Категория',
-        ];
-    }
-
-    /**
-     * Валидация обновления товара.
-     *
-     * @param ProductUpdateRequest $validator
-     * @return array
-     */
-    public static function requestProductUpdateRules(ProductUpdateRequest $validator)
-    {
-        $product = $validator->route()->parameter('product', NULL);
-        $id = !empty($product) ? $product->id : NULL;
-        return [
-            'title' => "required|min:2",
-            'slug' => "nullable|min:2|unique:products,slug,{$id}",
-            'main_image' => 'nullable|image',
-            'description' => "required",
-        ];
-    }
-
-    /**
-     * Названия полей для валидации обновления тарова.
-     *
-     * @return array
-     */
-    public static function requestProductUpdateAttributes()
-    {
-        return [
-            'title' => 'Заголовок',
-            'slug' => "Slug",
-            'main_image' => 'Главное изображение',
-            'description' => "Описание",
-        ];
     }
 
     /**

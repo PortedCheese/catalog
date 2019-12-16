@@ -32,56 +32,6 @@ class ProductField extends Model
     }
 
     /**
-     * Валидация добавления характеристики.
-     *
-     * @return array
-     */
-    public static function requestProductFieldStoreRules()
-    {
-        return [
-            'value' => 'required|min:1',
-            'field_id' => 'required|exists:category_fields,id',
-        ];
-    }
-
-    /**
-     * Названия полей в валидации добавления характеристики.
-     *
-     * @return array
-     */
-    public static function requestProductFieldStoreAttributes()
-    {
-        return [
-            'value' => 'Значение',
-            'field_id' => 'Характеристика',
-        ];
-    }
-
-    /**
-     * Валидация обновления характеристики.
-     *
-     * @return array
-     */
-    public static function requestProductFieldUpdateRules()
-    {
-        return [
-            'value' => 'required|min:1',
-        ];
-    }
-
-    /**
-     * Названия полей в валидации обновления характеристики.
-     *
-     * @return array
-     */
-    public static function requestProductFieldUpdateAttributes()
-    {
-        return [
-            'value' => 'Значение',
-        ];
-    }
-
-    /**
      * К какому полю относится значение.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

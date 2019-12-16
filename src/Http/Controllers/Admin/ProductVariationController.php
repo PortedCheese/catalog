@@ -7,15 +7,16 @@ use App\Http\Controllers\Controller;
 use App\Product;
 use App\ProductVariation;
 use Illuminate\Http\Request;
-use PortedCheese\Catalog\Http\Requests\ProductVariationStoreRequest;
-use PortedCheese\Catalog\Http\Requests\ProductVariationUpdateRequest;
+use Illuminate\Support\Facades\Validator;
 
 class ProductVariationController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param Category $category
+     * @param Product $product
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function index(Category $category, Product $product)
     {
@@ -29,7 +30,9 @@ class ProductVariationController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param Category $category
+     * @param Product $product
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function create(Category $category, Product $product)
     {
@@ -42,11 +45,15 @@ class ProductVariationController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param Category $category
+     * @param Product $product
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(ProductVariationStoreRequest $request, Category $category, Product $product)
+    public function store(Request $request, Category $category, Product $product)
     {
+        $this->storeValidator($request->all());
+
         $userInput = $request->all();
         if ($request->has('sale')) {
             $userInput['sale'] = 1;
@@ -63,11 +70,30 @@ class ProductVariationController extends Controller
             ->with('success', 'Вариация добавлена');
     }
 
+    private function storeValidator(array $data)
+    {
+        Validator::make($data, [
+            'sku' => ['required', 'min:2', 'unique:product_variations,sku'],
+            'product_id' => ['required', 'exists:products,id'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'sale_price' => ['nullable', 'numeric', 'min:0'],
+            'description' => ['required', 'min:2'],
+        ], [], [
+            'sku' => 'Артикул',
+            'product_id' => "Товар",
+            'price' => 'Цена',
+            'sale_price' => 'Цена со скидкой',
+            'description' => 'Описание',
+        ])->validate();
+    }
+
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Category $category
+     * @param Product $product
+     * @param ProductVariation $variation
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function edit(Category $category, Product $product, ProductVariation $variation)
     {
@@ -81,13 +107,18 @@ class ProductVariationController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param Category $category
+     * @param Product $product
+     * @param ProductVariation $variation
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(ProductVariationUpdateRequest $request, Category $category, Product $product, ProductVariation $variation)
+    public function update(Request $request, Category $category, Product $product, ProductVariation $variation)
     {
         $userInput = $request->all();
+
+        $this->updateValidator($request->all(), $variation);
+
         if ($request->has('sale')) {
             $userInput['sale'] = 1;
         }
@@ -107,6 +138,22 @@ class ProductVariationController extends Controller
                 'product' => $product,
             ])
             ->with('success', 'Вариация обновлена');
+    }
+
+    private function updateValidator(array $data, ProductVariation $variation)
+    {
+        $id = $variation->id;
+        Validator::make($data, [
+            'sku' => ["required", "min:2", "unique:product_variations,sku,{$id}"],
+            'price' => ['required', 'numeric', 'min:0'],
+            'sale_price' => ['nullable', 'numeric', 'min:0'],
+            'description' => ['required', 'min:2'],
+        ], [], [
+            'sku' => 'Артикул',
+            'price' => 'Цена',
+            'sale_price' => 'Цена со скидкой',
+            'description' => 'Описание',
+        ])->validate();
     }
 
     /**

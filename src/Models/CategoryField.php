@@ -38,35 +38,6 @@ class CategoryField extends Model
     }
 
     /**
-     * Валидация добавления поля в категорию.
-     *
-     * @return array
-     */
-    public static function requestCategoryFieldCreateRules()
-    {
-        return [
-            'title' => 'nullable|required_without:exists|min:2|max:200',
-            'exists' => 'nullable|required_without_all:machine,type,title|exists:category_fields,id',
-            'type' => 'nullable|required_without:exists',
-            'machine' => 'nullable|required_without:exists|min:4|max:100|unique:category_fields,machine',
-            'weight' => "nullable|numeric|min:1",
-        ];
-    }
-
-    /**
-     * Валидация обновления поля категории.
-     *
-     * @return array
-     */
-    public static function requestCategoryFieldUpdateRules()
-    {
-        return [
-            'title' => 'required|min:2|max:200',
-            'weight' => "required|numeric|min:1",
-        ];
-    }
-
-    /**
      * Доступные поля для категории.
      *
      * @param Category $category

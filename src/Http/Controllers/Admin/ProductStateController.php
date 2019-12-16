@@ -5,9 +5,8 @@ namespace PortedCheese\Catalog\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\ProductState;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use PortedCheese\Catalog\Http\Requests\ProductStateStoreRequest;
-use PortedCheese\Catalog\Http\Requests\ProductStateUpdateRequest;
 
 class ProductStateController extends Controller
 {
@@ -56,11 +55,12 @@ class ProductStateController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param ProductStateStoreRequest $request
+     * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(ProductStateStoreRequest $request)
+    public function store(Request $request)
     {
+        $this->storeValidator($request->all());
         $userInput = $request->all();
         if (empty($userInput['slug'])) {
             $slug = Str::slug($userInput['title'], '-');
@@ -75,6 +75,19 @@ class ProductStateController extends Controller
         return redirect()
             ->route("admin.product-state.index")
             ->with('success', 'Метка успешно создана');
+    }
+
+    private function storeValidator(array $data)
+    {
+        Validator::make($data, [
+            'title' => ['required', 'min:2', 'unique:product_states,title'],
+            'slug' => ['nullable', 'min:2', 'unique:product_states,slug'],
+            'color' => ['required'],
+        ], [], [
+            'title' => 'Заголовок',
+            "slug" => "Slug",
+            'color' => 'Цвет',
+        ])->validate();
     }
 
     /**
@@ -94,12 +107,14 @@ class ProductStateController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param ProductStateUpdateRequest $request
+     * @param Request $request
      * @param ProductState $state
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(ProductStateUpdateRequest $request, ProductState $state)
+    public function update(Request $request, ProductState $state)
     {
+        $this->updateValidator($request->all(), $state);
+
         $userInput = $request->all();
         if (empty($userInput['slug'])) {
             $slug = Str::slug($userInput['title'], '-');
@@ -115,6 +130,19 @@ class ProductStateController extends Controller
         return redirect()
             ->route('admin.product-state.index')
             ->with('success', 'Метка успешно обновлена');
+    }
+
+    private function updateValidator(array $data, ProductState $state)
+    {
+        $id = $state->id;
+        Validator::make($data, [
+            "title" => ["required", "min:2", "unique:product_states,title,{$id}"],
+            "slug" => ["nullable", "min:2", "unique:product_states,slug,{$id}"],
+            "color" => "required",
+        ], [], [
+            'title' => 'Заголовок',
+            'color' => 'Цвет',
+        ])->validate();
     }
 
     /**

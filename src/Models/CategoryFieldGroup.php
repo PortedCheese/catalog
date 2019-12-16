@@ -40,28 +40,6 @@ class CategoryFieldGroup extends Model
     }
 
     /**
-     * Валидация добавления группы характеристик.
-     *
-     * @return array
-     */
-    public static function requestCategoryFieldGroupCreateRules()
-    {
-        return [
-            'title' => 'required|min:2|max:200',
-            'machine' => 'nullable|min:2|max:100|unique:category_field_groups,machine',
-            "weight" => "required|numeric|min:1",
-        ];
-    }
-
-    public static function requestCategoryFieldGroupUpdateRules()
-    {
-        return [
-            "title" => "required|min:2|max:200",
-            "weight" => "required|numeric|min:1",
-        ];
-    }
-
-    /**
      * Найти данные по id.
      *
      * @param $id

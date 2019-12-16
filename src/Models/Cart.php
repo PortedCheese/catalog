@@ -41,59 +41,6 @@ class Cart extends Model
     }
 
     /**
-     * Валидация добавления в корзину.
-     *
-     * @return array
-     */
-    public static function requestAddToCartRules()
-    {
-        return [
-            'quantity' => 'required|numeric|min:1',
-            'variation' => 'required|exists:product_variations,id',
-        ];
-    }
-
-    /**
-     * Сообщения об ошибках добавления в корзину.
-     *
-     * @return array
-     */
-    public static function requestAddToCartMessages()
-    {
-        return [
-            'quantity.required' => 'Количество не может быть пустым',
-            'quantity.numeric' => 'Количество должно быть числом',
-            'quantity.min' => "Количество должно быть минимум :min",
-        ];
-    }
-
-    /**
-     * Валидация обновления количества.
-     *
-     * @return array
-     */
-    public static function requestChangeQuantityRules()
-    {
-        return [
-            'quantity' => 'required|numeric|min:1',
-        ];
-    }
-
-    /**
-     * Сообщения об ошибках при обновлении количества.
-     *
-     * @return array
-     */
-    public static function requestChangeQuantityMessages()
-    {
-        return [
-            'quantity.required' => 'Количество не может быть пустым',
-            'quantity.numeric' => 'Количество должно быть числом',
-            'quantity.min' => "Количество должно быть минимум :min",
-        ];
-    }
-
-    /**
      * Добавить в корзину.
      *
      * @param Product $product

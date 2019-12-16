@@ -8,9 +8,8 @@ use App\Order;
 use App\OrderState;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use PortedCheese\Catalog\Events\CreateNewOrder;
-use PortedCheese\Catalog\Http\Requests\OrderFullCartRequest;
-use PortedCheese\Catalog\Http\Requests\OrderSingleProductRequest;
 
 class OrderController extends Controller
 {
@@ -19,11 +18,13 @@ class OrderController extends Controller
     /**
      * Заказать товар.
      *
-     * @param OrderSingleProductRequest $request
+     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function makeProductOrder(OrderSingleProductRequest $request)
+    public function makeProductOrder(Request $request)
     {
+        $this->makeProductOrderValidator($request->all());
+
         $userInput = $request->all();
         $variationId = $userInput['variation'];
         unset($userInput['variation']);
@@ -47,14 +48,37 @@ class OrderController extends Controller
             ]);
     }
 
+    private function makeProductOrderValidator(array $data)
+    {
+        Validator::make($data, [
+            'name' => ['required', 'min:2'],
+            'email' => ['nullable', 'required_without:phone', 'email'],
+            'phone' => ['required_without:email'],
+            'variation' => ['required', 'exists:product_variations,id'],
+        ], [
+            'name.required' => 'Поле :attribute обязательно для заполнения',
+            'name.min' => "Поле :attribute должно быть минимум :min символа",
+            'email.required_without' => "Поле :attribute обязательно когда :values не заполнено.",
+            'email.email' => "Поле :attribute должно быть валидным e-mail адресом",
+            'phone.required_without' => "Поле :attribute обязательно когда :values не заполнено.",
+        ], [
+            'name' => 'Имя',
+            'email' => "E-mail",
+            'phone' => 'Телефон',
+        ])->validate();
+    }
+
     /**
      * Оформление корзины.
      *
-     * @param OrderFullCartRequest $request
+     * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
+     * @throws \Exception
      */
-    public function makeCartOrder(OrderFullCartRequest $request)
+    public function makeCartOrder(Request $request)
     {
+        $this->makeCartOrderValidator($request->all());
+
         $userInput = $request->all();
         if (!empty($userInput["_token"])) {
             unset($userInput["_token"]);
@@ -86,6 +110,25 @@ class OrderController extends Controller
         return redirect()
             ->route('site.cart.index')
             ->with("success", "Заказ успешно оформлен");
+    }
+
+    private function makeCartOrderValidator(array $data)
+    {
+        Validator::make($data, [
+            'name' => ['required', 'min:2'],
+            'email' => ['nullable', 'required_without:phone', 'email'],
+            'phone' => ['required_without:email'],
+        ], [
+            'name.required' => 'Поле :attribute обязательно для заполнения',
+            'name.min' => "Поле :attribute должно быть минимум :min символа",
+            'email.required_without' => "Поле :attribute обязательно когда :values не заполнено.",
+            'email.email' => "Поле :attribute должно быть валидным e-mail адресом",
+            'phone.required_without' => "Поле :attribute обязательно когда :values не заполнено.",
+        ], [
+            'name' => 'Имя',
+            'email' => "E-mail",
+            'phone' => 'Телефон',
+        ])->validate();
     }
 
     /**

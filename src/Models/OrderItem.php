@@ -96,6 +96,7 @@ class OrderItem extends Model
      * Увеличить количество.
      *
      * @param $quantity
+     * @return bool
      */
     public function increaseQuantity($quantity)
     {
