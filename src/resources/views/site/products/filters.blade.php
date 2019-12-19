@@ -5,9 +5,9 @@
             @switch($filter->type)
                 @case('select')
                     <div class="form-group">
-                        <label for="{{ $filter->machine }}">{{ $filter->title }}</label>
+                        <label for="{{ $filter->machine }}{{ isset($modal) ?: "-main" }}">{{ $filter->title }}</label>
                         <select name="select-{{ $filter->machine }}"
-                                id="{{ $filter->machine }}"
+                                id="{{ $filter->machine }}{{ isset($modal) ?: "-main" }}"
                                 class="form-control custom-select">
                             <option value="">-- Выберите --</option>
                             @foreach($filter->values as $value)
@@ -33,9 +33,9 @@
                                        checked
                                        @endif
                                        value="{{ $value }}"
-                                       id="check-{{ "{$loop->iteration}-{$filter->machine}" }}"
+                                       id="check-{{ "{$loop->iteration}-{$filter->machine}" }}{{ isset($modal) ?: "-main" }}"
                                        name="check-{{ "{$filter->machine}" }}[]">
-                                <label class="custom-control-label" for="check-{{ "{$loop->iteration}-{$filter->machine}" }}">
+                                <label class="custom-control-label" for="check-{{ "{$loop->iteration}-{$filter->machine}" }}{{ isset($modal) ?: "-main" }}">
                                     {{ $value }}
                                 </label>
                             </div>

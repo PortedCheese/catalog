@@ -76,6 +76,7 @@
                             'category' => $category,
                             'filters' => $filters,
                             'query' => $query,
+                            'modal' => true,
                         ])
     @endsection
 @endif
