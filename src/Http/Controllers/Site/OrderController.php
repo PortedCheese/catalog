@@ -48,7 +48,7 @@ class OrderController extends Controller
             ]);
     }
 
-    private function makeProductOrderValidator(array $data)
+    protected function makeProductOrderValidator(array $data)
     {
         Validator::make($data, [
             'name' => ['required', 'min:2'],
@@ -112,7 +112,7 @@ class OrderController extends Controller
             ->with("success", "Заказ успешно оформлен");
     }
 
-    private function makeCartOrderValidator(array $data)
+    protected function makeCartOrderValidator(array $data)
     {
         Validator::make($data, [
             'name' => ['required', 'min:2'],

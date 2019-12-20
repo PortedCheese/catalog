@@ -78,7 +78,7 @@ class CartController extends Controller
      *
      * @param array $data
      */
-    private function addToCardValidator(array $data)
+    protected function addToCardValidator(array $data)
     {
         Validator::make($data, [
             'quantity' => ['required', 'numeric', 'min:1'],
@@ -143,7 +143,7 @@ class CartController extends Controller
             ]);
     }
 
-    private function changeQuantityValidator(array $data)
+    protected function changeQuantityValidator(array $data)
     {
         Validator::make($data, [
             'quantity' => ["required", "numeric", "min:1"],
