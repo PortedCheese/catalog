@@ -61,17 +61,7 @@ class ProductStateController extends Controller
     public function store(Request $request)
     {
         $this->storeValidator($request->all());
-        $userInput = $request->all();
-        if (empty($userInput['slug'])) {
-            $slug = Str::slug($userInput['title'], '-');
-            $buf = $slug;
-            $i = 1;
-            while (ProductState::where('slug', $slug)->count()) {
-                $slug = $buf . '-' . $i++;
-            }
-            $userInput['slug'] = $slug;
-        }
-        ProductState::create($userInput);
+        ProductState::create($request->all());
         return redirect()
             ->route("admin.product-state.index")
             ->with('success', 'Метка успешно создана');
@@ -80,8 +70,8 @@ class ProductStateController extends Controller
     protected function storeValidator(array $data)
     {
         Validator::make($data, [
-            'title' => ['required', 'min:2', 'unique:product_states,title'],
-            'slug' => ['nullable', 'min:2', 'unique:product_states,slug'],
+            'title' => ['required', 'min:2', "max:20", 'unique:product_states,title'],
+            'slug' => ['nullable', 'min:2', "max:20", 'unique:product_states,slug'],
             'color' => ['required'],
         ], [], [
             'title' => 'Заголовок',
@@ -114,18 +104,7 @@ class ProductStateController extends Controller
     public function update(Request $request, ProductState $state)
     {
         $this->updateValidator($request->all(), $state);
-
-        $userInput = $request->all();
-        if (empty($userInput['slug'])) {
-            $slug = Str::slug($userInput['title'], '-');
-            $buf = $slug;
-            $i = 1;
-            while (ProductState::where('slug', $slug)->count()) {
-                $slug = $buf . '-' . $i++;
-            }
-            $userInput['slug'] = $slug;
-        }
-        $state->update($userInput);
+        $state->update($request->all());
 
         return redirect()
             ->route('admin.product-state.index')
@@ -136,8 +115,8 @@ class ProductStateController extends Controller
     {
         $id = $state->id;
         Validator::make($data, [
-            "title" => ["required", "min:2", "unique:product_states,title,{$id}"],
-            "slug" => ["nullable", "min:2", "unique:product_states,slug,{$id}"],
+            "title" => ["required", "min:2", "max:20", "unique:product_states,title,{$id}"],
+            "slug" => ["nullable", "min:2", "max:20", "unique:product_states,slug,{$id}"],
             "color" => "required",
         ], [], [
             'title' => 'Заголовок',
