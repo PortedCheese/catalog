@@ -36,26 +36,6 @@ class CategoryFieldController extends Controller
     }
 
     /**
-     * Просмотр.
-     *
-     * @param CategoryField $field
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function show(CategoryField $field)
-    {
-        $groups = CategoryFieldGroup::query()
-            ->select(['id', 'title'])
-            ->orderBy("weight")
-            ->get();
-        return view("catalog::admin.categories.fields.show", [
-            'field' => $field,
-            'categories' => $field->categories,
-            'group' => $field->group,
-            'groups' => $groups,
-        ]);
-    }
-
-    /**
      * Display a listing of the resource.
      *
      * @param Category $category
@@ -144,6 +124,26 @@ class CategoryFieldController extends Controller
             "machine" => "Машинное имя",
             "weight" => "Вес",
         ])->validate();
+    }
+
+    /**
+     * Просмотр.
+     *
+     * @param CategoryField $field
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function show(CategoryField $field)
+    {
+        $groups = CategoryFieldGroup::query()
+            ->select(['id', 'title'])
+            ->orderBy("weight")
+            ->get();
+        return view("catalog::admin.categories.fields.show", [
+            'field' => $field,
+            'categories' => $field->categories,
+            'group' => $field->group,
+            'groups' => $groups,
+        ]);
     }
 
     /**

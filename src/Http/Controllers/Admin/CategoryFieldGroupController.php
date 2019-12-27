@@ -47,18 +47,7 @@ class CategoryFieldGroupController extends Controller
     public function store(Request $request)
     {
         $this->storeValidator($request->all());
-
-        $userInput = $request->all();
-        if (empty($userInput['machine'])) {
-            $slug = Str::slug($userInput['title'], '-');
-            $buf = $slug;
-            $i = 1;
-            while (CategoryFieldGroup::where('machine', $slug)->count()) {
-                $slug = $buf . '-' . $i++;
-            }
-            $userInput['machine'] = $slug;
-        }
-        $group = CategoryFieldGroup::create($userInput);
+        $group = CategoryFieldGroup::create($request->all());
 
         return redirect()
             ->route("admin.category.groups.show", ['group' => $group])
