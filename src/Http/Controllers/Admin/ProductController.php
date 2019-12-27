@@ -75,18 +75,7 @@ class ProductController extends Controller
     public function store(Request $request, Category $category)
     {
         $this->storeValidator($request->all());
-
-        $userInput = $request->all();
-        if (empty($userInput['slug'])) {
-            $slug = Str::slug($userInput['title'], '-');
-            $buf = $slug;
-            $i = 1;
-            while (Product::where('slug', $slug)->count()) {
-                $slug = $buf . '-' . $i++;
-            }
-            $userInput['slug'] = $slug;
-        }
-        $product = Product::create($userInput);
+        $product = Product::create($request->all());
         $product->uploadMainImage($request);
         return redirect()
             ->route("admin.category.product.show", ['category' => $category, 'product' => $product])
@@ -96,8 +85,8 @@ class ProductController extends Controller
     protected function storeValidator(array $data)
     {
         Validator::make($data, [
-            "title" => ["required", "min:2", "unique:products,title"],
-            "slug" => ["nullable", "min:2", "unique:products,slug"],
+            "title" => ["required", "min:2", "max:100", "unique:products,title"],
+            "slug" => ["nullable", "min:2", "max:100", "unique:products,slug"],
             "main_image" => ["nullable", "image"],
             "description" => ["required"],
         ], [], [
@@ -163,18 +152,8 @@ class ProductController extends Controller
     {
         $userInput = $request->all();
 
-        $this->updateValidator($userInput, $product);
-
-        if (empty($userInput['slug'])) {
-            $slug = Str::slug($userInput['title'], '-');
-            $buf = $slug;
-            $i = 1;
-            while (Product::where('slug', $slug)->count()) {
-                $slug = $buf . '-' . $i++;
-            }
-            $userInput['slug'] = $slug;
-        }
-        $product->update($userInput);
+        $this->updateValidator($request->all(), $product);
+        $product->update($request->all());
         $product->uploadMainImage($request);
         // Обновляем метки.
         $stateIds = [];
@@ -194,8 +173,8 @@ class ProductController extends Controller
     {
         $id = $product->id;
         Validator::make($data, [
-            'title' => ["required", "min:2"],
-            'slug' => ["nullable", "min:2", "unique:products,slug,{$id}"],
+            'title' => ["required", "min:2", "max:100"],
+            'slug' => ["nullable", "min:2", "max:100", "unique:products,slug,{$id}"],
             'main_image' => ['nullable', 'image'],
             'description' => ["required"],
         ], [], [

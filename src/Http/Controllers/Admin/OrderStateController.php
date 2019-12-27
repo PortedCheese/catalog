@@ -53,8 +53,8 @@ class OrderStateController extends Controller
     protected function storeValidator(array $data)
     {
         Validator::make($data, [
-            "title" => ["required", "min:2", "unique:order_states,title"],
-            "machine" => ["nullable", "min:2", "unique:order_states,machine"],
+            "title" => ["required", "min:2", "max:20", "unique:order_states,title"],
+            "machine" => ["required", "min:2", "max:20", "unique:order_states,machine"],
         ], [], [
             "title" => "Заголовок",
             "machine" => "Ключ",
@@ -106,7 +106,7 @@ class OrderStateController extends Controller
     {
         $id = $state->id;
         Validator::make($data, [
-            "title" => ["required", "min:2", "unique:order_states,title,{$id}"],
+            "title" => ["required", "min:2", "max:20", "unique:order_states,title,{$id}"],
         ], [], [
             "title" => "Заголовок",
         ])->validate();

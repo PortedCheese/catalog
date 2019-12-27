@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use PortedCheese\Catalog\Events\ProductCategoryChange;
 use PortedCheese\Catalog\Events\ProductListChange;
 use PortedCheese\SeoIntegration\Models\Meta;
@@ -31,6 +32,40 @@ class Product extends Model
     protected static function boot()
     {
         parent::boot();
+
+        static::creating(function (\App\Product $model) {
+            $model->fixSlug();
+        });
+
+        static::created(function (\App\Product $model) {
+            // Создать метатеги по умолчанию.
+            $model->createDefaultMetas();
+
+            event(new ProductListChange($model));
+        });
+
+        static::updating(function (\App\Product $model) {
+            $model->fixSlug(true);
+        });
+
+        static::updated(function (\App\Product $model) {
+            // Очистить кэш.
+            $model->forgetTeaserCache();
+
+            $changes = $model->getChanges();
+            if (! empty($changes['category_id'])) {
+                $original = $model->getOriginal();
+                if (! empty($original['category_id'])) {
+                    $categoryId = $original['category_id'];
+                }
+                else {
+                    $categoryId = false;
+                }
+                event(new ProductCategoryChange($model, $categoryId));
+                // Если меняем категорию, то меняется список продуктов у двух категорий.
+                event(new ProductListChange($model, $categoryId));
+            }
+        });
 
         static::deleting(function (\App\Product $model) {
             // Удаляем главное изображение.
@@ -59,32 +94,85 @@ class Product extends Model
         static::deleted(function (\App\Product $model) {
             event(new ProductListChange($model));
         });
+    }
 
-        static::updated(function (\App\Product $model) {
-            // Очистить кэш.
-            $model->forgetTeaserCache();
+    /**
+     * Может находится во многих позициях заказа.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function orderItems()
+    {
+        return $this->hasMany(\App\OrderItem::class);
+    }
 
-            $changes = $model->getChanges();
-            if (! empty($changes['category_id'])) {
-                $original = $model->getOriginal();
-                if (! empty($original['category_id'])) {
-                    $categoryId = $original['category_id'];
-                }
-                else {
-                    $categoryId = false;
-                }
-                event(new ProductCategoryChange($model, $categoryId));
-                // Если меняем категорию, то меняется список продуктов у двух категорий.
-                event(new ProductListChange($model, $categoryId));
-            }
-        });
+    /**
+     * У товара может быть несколько меток.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function states()
+    {
+        return $this->belongsToMany(\App\ProductState::class)
+            ->withTimestamps();
+    }
 
-        static::created(function (\App\Product $model) {
-            // Создать метатеги по умолчанию.
-            $model->createDefaultMetas();
+    /**
+     * Значения полей.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function fields()
+    {
+        return $this->hasMany(\App\ProductField::class);
+    }
 
-            event(new ProductListChange($model));
-        });
+    /**
+     * Может быть несколько вариаций.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function variations()
+    {
+        return $this->hasMany(\App\ProductVariation::class);
+    }
+
+    /**
+     * Товар относится к категории.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function category()
+    {
+        return $this->belongsTo(\App\Category::class);
+    }
+
+    /**
+     * Может быть изображение.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function image()
+    {
+        return $this->belongsTo(Image::class, 'main_image');
+    }
+
+    /**
+     * Галлерея.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
+    public function images() {
+        return $this->morphMany(Image::class, 'imageable');
+    }
+
+    /**
+     * Метатеги.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
+    public function metas() {
+        return $this->morphMany(Meta::class, 'metable');
     }
 
     /**
@@ -190,85 +278,6 @@ class Product extends Model
     }
 
     /**
-     * Может находится во многих позициях заказа.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function orderItems()
-    {
-        return $this->hasMany(\App\OrderItem::class);
-    }
-
-    /**
-     * У товара может быть несколько меток.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function states()
-    {
-        return $this->belongsToMany(\App\ProductState::class)
-            ->withTimestamps();
-    }
-
-    /**
-     * Значения полей.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function fields()
-    {
-        return $this->hasMany(\App\ProductField::class);
-    }
-
-    /**
-     * Может быть несколько вариаций.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function variations()
-    {
-        return $this->hasMany(\App\ProductVariation::class);
-    }
-
-    /**
-     * Товар относится к категории.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function category()
-    {
-        return $this->belongsTo(\App\Category::class);
-    }
-
-    /**
-     * Может быть изображение.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function image()
-    {
-        return $this->belongsTo(Image::class, 'main_image');
-    }
-
-    /**
-     * Галлерея.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
-     */
-    public function images() {
-        return $this->morphMany(Image::class, 'imageable');
-    }
-
-    /**
-     * Метатеги.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
-     */
-    public function metas() {
-        return $this->morphMany(Meta::class, 'metable');
-    }
-
-    /**
      * Подгружать по slug.
      *
      * @return string
@@ -276,6 +285,42 @@ class Product extends Model
     public function getRouteKeyName()
     {
         return 'slug';
+    }
+
+    /**
+     * Поправить slug.
+     *
+     * @param bool $updating
+     */
+    public function fixSlug($updating = false)
+    {
+        if ($updating && ($this->original["slug"] == $this->slug)) {
+            return;
+        }
+        if (empty($this->slug)) {
+            $slug = $this->title;
+        }
+        else {
+            $slug = $this->slug;
+        }
+        $slug = Str::slug($slug);
+        $buf = $slug;
+        $i = 1;
+        if ($updating) {
+            $id = $this->id;
+        }
+        else {
+            $id = 0;
+        }
+        while (self::query()
+            ->select("id")
+            ->where("slug", $buf)
+            ->where("id", "!=", $id)
+            ->count())
+        {
+            $buf = $slug . "-" . $i++;
+        }
+        $this->slug = $buf;
     }
 
     /**

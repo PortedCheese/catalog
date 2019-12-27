@@ -75,8 +75,8 @@ class CategoryController extends Controller
     protected function storeValidator(array $data)
     {
         Validator::make($data, [
-            "title" => ["required", "min:2", "unique:categories,title"],
-            "slug" => ["nullable", "min:2", "unique:categories,slug"],
+            "title" => ["required", "min:2", "max:100", "unique:categories,title"],
+            "slug" => ["nullable", "min:2", "max:100", "unique:categories,slug"],
             "main_image" => ["nullable", "image"],
         ], [], [
             "title" => "Заголовок",
@@ -135,8 +135,8 @@ class CategoryController extends Controller
     {
         $id = $category->id;
         Validator::make($data, [
-            "title" => ["required", "min:2", "unique:categories,title,{$id}"],
-            "slug" => ["nullable", "min:2", "unique:categories,slug,{$id}"],
+            "title" => ["required", "min:2", "max:100", "unique:categories,title,{$id}"],
+            "slug" => ["nullable", "min:2", "max:100", "unique:categories,slug,{$id}"],
             "main_image" => ["nullable", "image"],
         ], [], [
             "title" => "Заголовок",
