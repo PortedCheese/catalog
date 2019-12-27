@@ -3,6 +3,7 @@
 namespace PortedCheese\Catalog\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use PortedCheese\Catalog\Events\ProductVariationUpdate;
 
 class ProductVariation extends Model
@@ -21,8 +22,16 @@ class ProductVariation extends Model
     {
         parent::boot();
 
+        static::creating(function (\App\ProductVariation $model) {
+            $model->fixSku();
+        });
+
         static::created(function ($model) {
             event(new ProductVariationUpdate($model));
+        });
+
+        static::updating(function (\App\ProductVariation $model) {
+            $model->fixSku(true);
         });
 
         static::updated(function ($model) {
@@ -62,5 +71,43 @@ class ProductVariation extends Model
     public function getHumanSalePriceAttribute()
     {
         return number_format($this->sale_price, 0, ",", " ");
+    }
+
+    /**
+     * Поправить sku.
+     *
+     * @param bool $updating
+     */
+    public function fixSku($updating = false)
+    {
+        if ($updating && ($this->original["sku"] == $this->sku)) {
+            return;
+        }
+        if (empty($this->sku)) {
+            $product = $this->product;
+            $category = $product->category;
+            $sku = "{$category->slug}#{$product->slug}";
+        }
+        else {
+            $sku = $this->sku;
+        }
+        $sku = str_replace(" ", "#", $sku);
+        $buf = $sku;
+        $i = 1;
+        if ($updating) {
+            $id = $this->id;
+        }
+        else {
+            $id = 0;
+        }
+        while (self::query()
+            ->select("id")
+            ->where("sku", $buf)
+            ->where("id", "!=", $id)
+            ->count())
+        {
+            $buf = $sku . "-" . $i++;
+        }
+        $this->sku = $buf;
     }
 }

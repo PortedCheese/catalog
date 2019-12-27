@@ -21,17 +21,16 @@
                                id="sku"
                                name="sku"
                                value="{{ old('sku') }}"
-                               required
                                class="form-control{{ $errors->has('sku') ? ' is-invalid' : '' }}">
                         @if ($errors->has('sku'))
                             <span class="invalid-feedback" role="alert">
-                        <strong>{{ $errors->first('sku') }}</strong>
-                    </span>
+                                <strong>{{ $errors->first('sku') }}</strong>
+                            </span>
                         @endif
                     </div>
 
                     <div class="form-group">
-                        <label for="description">Описание</label>
+                        <label for="description">Описание <span class="text-danger">*</span></label>
                         <input type="text"
                                id="description"
                                name="description"
@@ -40,13 +39,13 @@
                                class="form-control{{ $errors->has('description') ? ' is-invalid' : '' }}">
                         @if ($errors->has('description'))
                             <span class="invalid-feedback" role="alert">
-                        <strong>{{ $errors->first('description') }}</strong>
-                    </span>
+                                <strong>{{ $errors->first('description') }}</strong>
+                            </span>
                         @endif
                     </div>
 
                     <div class="form-group">
-                        <label for="price">Цена</label>
+                        <label for="price">Цена <span class="text-danger">*</span></label>
                         <input type="number"
                                step="0.01"
                                min="0"

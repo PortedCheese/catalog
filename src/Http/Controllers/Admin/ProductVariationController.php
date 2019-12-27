@@ -73,7 +73,7 @@ class ProductVariationController extends Controller
     protected function storeValidator(array $data)
     {
         Validator::make($data, [
-            'sku' => ['required', 'min:2', 'unique:product_variations,sku'],
+            'sku' => ['nullable', 'min:2', "max:250", 'unique:product_variations,sku'],
             'product_id' => ['required', 'exists:products,id'],
             'price' => ['required', 'numeric', 'min:0'],
             'sale_price' => ['nullable', 'numeric', 'min:0'],
@@ -144,7 +144,7 @@ class ProductVariationController extends Controller
     {
         $id = $variation->id;
         Validator::make($data, [
-            'sku' => ["required", "min:2", "unique:product_variations,sku,{$id}"],
+            'sku' => ["nullable", "min:2", "max:250", "unique:product_variations,sku,{$id}"],
             'price' => ['required', 'numeric', 'min:0'],
             'sale_price' => ['nullable', 'numeric', 'min:0'],
             'description' => ['required', 'min:2'],

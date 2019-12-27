@@ -20,7 +20,6 @@
                                id="sku"
                                name="sku"
                                value="{{ old('sku') ? old('sku') : $variation->sku }}"
-                               required
                                class="form-control{{ $errors->has('sku') ? ' is-invalid' : '' }}">
                         @if ($errors->has('sku'))
                             <span class="invalid-feedback" role="alert">
@@ -30,7 +29,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="description">Описание</label>
+                        <label for="description">Описание <span class="text-danger">*</span></label>
                         <input type="text"
                                id="description"
                                name="description"
@@ -45,7 +44,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="price">Цена</label>
+                        <label for="price">Цена <span class="text-danger">*</span></label>
                         <input type="number"
                                step="0.01"
                                min="0"
