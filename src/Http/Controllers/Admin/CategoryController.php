@@ -59,20 +59,8 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $userInput = $request->all();
-
-        $this->storeValidator($userInput);
-
-        if (empty($userInput['slug'])) {
-            $slug = Str::slug($userInput['title'], '-');
-            $buf = $slug;
-            $i = 1;
-            while (Category::where('slug', $slug)->count()) {
-                $slug = $buf . '-' . $i++;
-            }
-            $userInput['slug'] = $slug;
-        }
-        $category = Category::create($userInput);
+        $this->storeValidator($request->all());
+        $category = Category::create($request->all());
         $category->uploadMainImage($request);
         return redirect()
             ->route("admin.category.show", ['category' => $category])
@@ -136,9 +124,7 @@ class CategoryController extends Controller
     public function update(Request $request, Category $category)
     {
         $this->updateValidator($request->all(), $category);
-
-        $userInput = $request->all();
-        $category->update($userInput);
+        $category->update($request->all());
         $category->uploadMainImage($request);
         return redirect()
             ->route("admin.category.show", ['category' => $category])
@@ -150,7 +136,7 @@ class CategoryController extends Controller
         $id = $category->id;
         Validator::make($data, [
             "title" => ["required", "min:2", "unique:categories,title,{$id}"],
-            "slug" => ["min:2", "unique:categories,slug,{$id}"],
+            "slug" => ["nullable", "min:2", "unique:categories,slug,{$id}"],
             "main_image" => ["nullable", "image"],
         ], [], [
             "title" => "Заголовок",

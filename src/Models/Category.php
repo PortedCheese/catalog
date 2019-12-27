@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use PortedCheese\Catalog\Events\CategoryFieldUpdate;
 use PortedCheese\Catalog\Jobs\CategoryCache;
 use PortedCheese\SeoIntegration\Models\Meta;
@@ -31,7 +32,33 @@ class Category extends Model
     {
         parent::boot();
 
-        static::deleting(function (self $model) {
+        static::creating(function (\App\Category $model) {
+            // Проверить slug.
+            $model->fixSlug();
+        });
+
+        static::created(function (\App\Category $model) {
+            // Создать метатеги по умолчанию.
+            $model->createDefaultMetas();
+            // Поля родителя.
+            $model->setParentFields();
+            // Очистка кэша.
+            $model->forgetChildrenListCache();
+        });
+
+        static::updating(function (\App\Category $model) {
+            // Проверить slug.
+            $model->fixSlug(true);
+        });
+
+        static::updated(function (\App\Category $model) {
+            // Очистка кэша.
+            $model->forgetTeaserCache();
+            $model->forgetBreadcrumbCache();
+            $model->forgetChildrenListCache();
+        });
+
+        static::deleting(function (\App\Category $model) {
             // Удаляем главное изображение.
             $model->clearMainImage();
             // Удаляем метатеги.
@@ -46,78 +73,6 @@ class Category extends Model
             $model->forgetTeaserCache();
             $model->forgetChildrenListCache();
         });
-
-        static::created(function (self $model) {
-            // Создать метатеги по умолчанию.
-            $model->createDefaultMetas();
-            // Поля родителя.
-            $model->setParentFields();
-            // Очистка кэша.
-            $model->forgetChildrenListCache();
-        });
-
-        static::updated(function (self $model) {
-            // Очистка кэша.
-            $model->forgetTeaserCache();
-            $model->forgetBreadcrumbCache();
-            $model->forgetChildrenListCache();
-        });
-    }
-
-    /**
-     * Категории в виде дерева.
-     *
-     * @return array
-     */
-    public static function getTree()
-    {
-        $tree = [];
-        $categories = DB::table('categories')
-            ->select(['id', 'title', 'slug', 'parent_id'])
-            ->orderBy('parent_id')
-            ->get();
-        $noParent = [];
-        foreach ($categories as $category) {
-            $tree[$category->id] = (object) [
-                'title' => $category->title,
-                'slug' => $category->slug,
-                'parent' => $category->parent_id,
-                'children' => [],
-            ];
-            if (empty($category->parent_id)) {
-                $noParent[] = $category->id;
-            }
-        }
-        foreach ($tree as $id => $item) {
-            if (empty($item->parent)) {
-                continue;
-            }
-            $tree[$item->parent]->children[$id] = $item;
-        }
-        foreach ($noParent as $id) {
-            self::removeChildren($tree, $id);
-        }
-        return $tree;
-    }
-
-    /**
-     * Убираем подкатегории.
-     *
-     * @param $tree
-     * @param $id
-     */
-    private static function removeChildren(&$tree, $id)
-    {
-        if (empty($tree[$id])) {
-            return;
-        }
-        $item = $tree[$id];
-        foreach ($item->children as $key => $child) {
-            self::removeChildren($tree, $key);
-            if (!empty($tree[$key])) {
-                unset($tree[$key]);
-            }
-        }
     }
 
     /**
@@ -191,6 +146,97 @@ class Category extends Model
     public function getRouteKeyName()
     {
         return 'slug';
+    }
+
+    /**
+     * Категории в виде дерева.
+     *
+     * @return array
+     */
+    public static function getTree()
+    {
+        $tree = [];
+        $categories = DB::table('categories')
+            ->select(['id', 'title', 'slug', 'parent_id'])
+            ->orderBy('parent_id')
+            ->get();
+        $noParent = [];
+        foreach ($categories as $category) {
+            $tree[$category->id] = (object) [
+                'title' => $category->title,
+                'slug' => $category->slug,
+                'parent' => $category->parent_id,
+                'children' => [],
+            ];
+            if (empty($category->parent_id)) {
+                $noParent[] = $category->id;
+            }
+        }
+        foreach ($tree as $id => $item) {
+            if (empty($item->parent)) {
+                continue;
+            }
+            $tree[$item->parent]->children[$id] = $item;
+        }
+        foreach ($noParent as $id) {
+            self::removeChildren($tree, $id);
+        }
+        return $tree;
+    }
+
+    /**
+     * Убираем подкатегории.
+     *
+     * @param $tree
+     * @param $id
+     */
+    private static function removeChildren(&$tree, $id)
+    {
+        if (empty($tree[$id])) {
+            return;
+        }
+        $item = $tree[$id];
+        foreach ($item->children as $key => $child) {
+            self::removeChildren($tree, $key);
+            if (!empty($tree[$key])) {
+                unset($tree[$key]);
+            }
+        }
+    }
+
+    /**
+     * Поправить slug.
+     * @param bool $updating
+     */
+    public function fixSlug($updating = false)
+    {
+        if ($updating && ($this->original["slug"] == $this->slug)) {
+            return;
+        }
+        if (empty($this->slug)) {
+            $slug = $this->title;
+        }
+        else {
+            $slug = $this->slug;
+        }
+        $slug = Str::slug($slug);
+        $buf = $slug;
+        $i = 1;
+        if ($updating) {
+            $id = $this->id;
+        }
+        else {
+            $id = 0;
+        }
+        while (self::query()
+            ->select("id")
+            ->where("slug", $buf)
+            ->where("id", "!=", $id)
+            ->count())
+        {
+            $buf = $slug . "-" . $i++;
+        }
+        $this->slug = $buf;
     }
 
     /**
