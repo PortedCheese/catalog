@@ -61,7 +61,7 @@ class CategoryController extends Controller
     {
         $this->storeValidator($request->all());
         $category = Category::create($request->all());
-        $category->uploadMainImage($request);
+        $category->uploadImage($request, "categories", "main_image");
         return redirect()
             ->route("admin.category.show", ['category' => $category])
             ->with('success', 'Категория успешно создана');
@@ -125,12 +125,18 @@ class CategoryController extends Controller
     {
         $this->updateValidator($request->all(), $category);
         $category->update($request->all());
-        $category->uploadMainImage($request);
+        $category->uploadImage($request, "categories", "main_image");
         return redirect()
             ->route("admin.category.show", ['category' => $category])
             ->with('success', 'Категория успешно обновлена');
     }
 
+    /**
+     * Валидация обновления.
+     *
+     * @param array $data
+     * @param Category $category
+     */
     protected function updateValidator(array $data, Category $category)
     {
         $id = $category->id;
@@ -141,7 +147,7 @@ class CategoryController extends Controller
         ], [], [
             "title" => "Заголовок",
             "main_image" => "Главное изображение",
-        ]);
+        ])->validate();
     }
 
     /**
@@ -185,7 +191,7 @@ class CategoryController extends Controller
      */
     public function destroyImage(Category $category)
     {
-        $category->clearMainImage();
+        $category->clearImage();
         return redirect()
             ->back()
             ->with('success', 'Изображение удалено');

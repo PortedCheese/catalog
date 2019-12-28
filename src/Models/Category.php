@@ -12,12 +12,17 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use PortedCheese\BaseSettings\Traits\HasImage;
+use PortedCheese\BaseSettings\Traits\HasSlug;
 use PortedCheese\Catalog\Events\CategoryFieldUpdate;
 use PortedCheese\Catalog\Jobs\CategoryCache;
 use PortedCheese\SeoIntegration\Models\Meta;
+use PortedCheese\SeoIntegration\Traits\HasMetas;
 
 class Category extends Model
 {
+    use HasSlug, HasImage, HasMetas;
+
     const PAGE_NAME = "Каталог";
     const PAGE_ROUTE = 'site.catalog.index';
 
@@ -27,28 +32,21 @@ class Category extends Model
         'slug',
         'parent_id',
     ];
+    protected $imageKey = "main_image";
+    protected $metaKey = "categories";
 
     protected static function boot()
     {
         parent::boot();
-
-        static::creating(function (\App\Category $model) {
-            // Проверить slug.
-            $model->fixSlug();
-        });
+        static::slugBoot();
+        static::imageBoot();
+        static::metasBoot();
 
         static::created(function (\App\Category $model) {
-            // Создать метатеги по умолчанию.
-            $model->createDefaultMetas();
             // Поля родителя.
             $model->setParentFields();
             // Очистка кэша.
             $model->forgetChildrenListCache();
-        });
-
-        static::updating(function (\App\Category $model) {
-            // Проверить slug.
-            $model->fixSlug(true);
         });
 
         static::updated(function (\App\Category $model) {
@@ -59,10 +57,6 @@ class Category extends Model
         });
 
         static::deleting(function (\App\Category $model) {
-            // Удаляем главное изображение.
-            $model->clearMainImage();
-            // Удаляем метатеги.
-            $model->clearMetas();
             // Убираем поля.
             foreach ($model->fields as $field) {
                 $model->fields()->detach($field);
@@ -120,35 +114,6 @@ class Category extends Model
     }
 
     /**
-     * Может быть изображение.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function image()
-    {
-        return $this->belongsTo(Image::class, 'main_image');
-    }
-
-    /**
-     * Метатеги.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
-     */
-    public function metas() {
-        return $this->morphMany(Meta::class, 'metable');
-    }
-
-    /**
-     * Подгружать по slug.
-     *
-     * @return string
-     */
-    public function getRouteKeyName()
-    {
-        return 'slug';
-    }
-
-    /**
      * Категории в виде дерева.
      *
      * @return array
@@ -202,108 +167,6 @@ class Category extends Model
                 unset($tree[$key]);
             }
         }
-    }
-
-    /**
-     * Поправить slug.
-     * @param bool $updating
-     */
-    public function fixSlug($updating = false)
-    {
-        if ($updating && ($this->original["slug"] == $this->slug)) {
-            return;
-        }
-        if (empty($this->slug)) {
-            $slug = $this->title;
-        }
-        else {
-            $slug = $this->slug;
-        }
-        $slug = Str::slug($slug);
-        $buf = $slug;
-        $i = 1;
-        if ($updating) {
-            $id = $this->id;
-        }
-        else {
-            $id = 0;
-        }
-        while (self::query()
-            ->select("id")
-            ->where("slug", $buf)
-            ->where("id", "!=", $id)
-            ->count())
-        {
-            $buf = $slug . "-" . $i++;
-        }
-        $this->slug = $buf;
-    }
-
-    /**
-     * Создать метатеги по умолчанию.
-     */
-    public function createDefaultMetas()
-    {
-        $result = Meta::getModel('categories', $this->id, "title");
-        if ($result['success'] && !empty($this->title)) {
-            $meta = Meta::create([
-                'name' => 'title',
-                'content' => $this->title,
-            ]);
-            $meta->metable()->associate($this);
-            $meta->save();
-        }
-        $result = Meta::getModel('categories', $this->id, "description");
-        if ($result['success'] && !empty($this->short)) {
-            $meta = Meta::create([
-                'name' => 'description',
-                'content' => $this->description,
-            ]);
-            $meta->metable()->associate($this);
-            $meta->save();
-        }
-    }
-
-    /**
-     * Удаляем созданные теги.
-     */
-    public function clearMetas()
-    {
-        foreach ($this->metas as $meta) {
-            $meta->delete();
-        }
-    }
-
-    /**
-     * Изменить/создать главное изображение.
-     *
-     * @param $request
-     */
-    public function uploadMainImage($request)
-    {
-        if ($request->hasFile('main_image')) {
-            $this->clearMainImage();
-            $path = $request->file('main_image')->store('categories');
-            $image = Image::create([
-                'path' => $path,
-                'name' => 'categories-' . $this->id,
-            ]);
-            $this->image()->associate($image);
-            $this->save();
-        }
-    }
-
-    /**
-     * Удалить изображение.
-     */
-    public function clearMainImage()
-    {
-        $image = $this->image;
-        if (!empty($image)) {
-            $image->delete();
-        }
-        $this->image()->dissociate();
-        $this->save();
     }
 
     /**
@@ -613,7 +476,6 @@ class Category extends Model
 
         $this->addPriceFilter($fieldsInfo, $includeSubs);
         $this->setAdditionalRangeFilter($fieldsInfo);
-        debugbar()->info($fieldsInfo);
         return $fieldsInfo;
     }
 

@@ -10,12 +10,17 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use PortedCheese\BaseSettings\Traits\HasImage;
+use PortedCheese\BaseSettings\Traits\HasSlug;
 use PortedCheese\Catalog\Events\ProductCategoryChange;
 use PortedCheese\Catalog\Events\ProductListChange;
 use PortedCheese\SeoIntegration\Models\Meta;
+use PortedCheese\SeoIntegration\Traits\HasMetas;
 
 class Product extends Model
 {
+    use HasSlug, HasImage, HasMetas;
+
     const DEFAULT_SORT = "title";
     const DEFAULT_SORT_ORDER = "desc";
 
@@ -29,23 +34,18 @@ class Product extends Model
         'state',
     ];
 
+    protected $imageKey = "main_image";
+    protected $metaKey = "products";
+
     protected static function boot()
     {
         parent::boot();
-
-        static::creating(function (\App\Product $model) {
-            $model->fixSlug();
-        });
+        static::slugBoot();
+        static::imageBoot();
+        static::metasBoot();
 
         static::created(function (\App\Product $model) {
-            // Создать метатеги по умолчанию.
-            $model->createDefaultMetas();
-
             event(new ProductListChange($model));
-        });
-
-        static::updating(function (\App\Product $model) {
-            $model->fixSlug(true);
         });
 
         static::updated(function (\App\Product $model) {
@@ -68,15 +68,6 @@ class Product extends Model
         });
 
         static::deleting(function (\App\Product $model) {
-            // Удаляем главное изображение.
-            $model->clearMainImage();
-
-            // Удаляем метатеги.
-            $model->clearMetas();
-
-            // Чистим галлерею.
-            $model->clearImages();
-
             // Очистить вариации.
             $model->clearVariations();
 
@@ -145,34 +136,6 @@ class Product extends Model
     public function category()
     {
         return $this->belongsTo(\App\Category::class);
-    }
-
-    /**
-     * Может быть изображение.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function image()
-    {
-        return $this->belongsTo(Image::class, 'main_image');
-    }
-
-    /**
-     * Галлерея.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
-     */
-    public function images() {
-        return $this->morphMany(Image::class, 'imageable');
-    }
-
-    /**
-     * Метатеги.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
-     */
-    public function metas() {
-        return $this->morphMany(Meta::class, 'metable');
     }
 
     /**
@@ -275,129 +238,6 @@ class Product extends Model
             ->where("value", '=', $value)
             ->where("field_id", '=', $fieldId)
             ->groupBy("product_id");
-    }
-
-    /**
-     * Подгружать по slug.
-     *
-     * @return string
-     */
-    public function getRouteKeyName()
-    {
-        return 'slug';
-    }
-
-    /**
-     * Поправить slug.
-     *
-     * @param bool $updating
-     */
-    public function fixSlug($updating = false)
-    {
-        if ($updating && ($this->original["slug"] == $this->slug)) {
-            return;
-        }
-        if (empty($this->slug)) {
-            $slug = $this->title;
-        }
-        else {
-            $slug = $this->slug;
-        }
-        $slug = Str::slug($slug);
-        $buf = $slug;
-        $i = 1;
-        if ($updating) {
-            $id = $this->id;
-        }
-        else {
-            $id = 0;
-        }
-        while (self::query()
-            ->select("id")
-            ->where("slug", $buf)
-            ->where("id", "!=", $id)
-            ->count())
-        {
-            $buf = $slug . "-" . $i++;
-        }
-        $this->slug = $buf;
-    }
-
-    /**
-     * Создать метатеги по умолчанию.
-     */
-    public function createDefaultMetas()
-    {
-        $result = Meta::getModel('products', $this->id, "title");
-        if ($result['success'] && !empty($this->title)) {
-            $meta = Meta::create([
-                'name' => 'title',
-                'content' => $this->title,
-            ]);
-            $meta->metable()->associate($this);
-            $meta->save();
-        }
-        $result = Meta::getModel('products', $this->id, "description");
-        if ($result['success'] && !empty($this->short)) {
-            $meta = Meta::create([
-                'name' => 'description',
-                'content' => $this->short,
-            ]);
-            $meta->metable()->associate($this);
-            $meta->save();
-        }
-    }
-
-    /**
-     * Удаляем созданные теги.
-     */
-    public function clearMetas()
-    {
-        foreach ($this->metas as $meta) {
-            $meta->delete();
-        }
-    }
-
-    /**
-     * Изменить/создать главное изображение.
-     *
-     * @param $request
-     */
-    public function uploadMainImage($request)
-    {
-        if ($request->hasFile('main_image')) {
-            $this->clearMainImage();
-            $path = $request->file('main_image')->store('categories');
-            $image = Image::create([
-                'path' => $path,
-                'name' => 'categories-' . $this->id,
-            ]);
-            $this->image()->associate($image);
-            $this->save();
-        }
-    }
-
-    /**
-     * Удалить изображение.
-     */
-    public function clearMainImage()
-    {
-        $image = $this->image;
-        if (!empty($image)) {
-            $image->delete();
-        }
-        $this->image()->dissociate();
-        $this->save();
-    }
-
-    /**
-     * Удалить все изображения.
-     */
-    public function clearImages()
-    {
-        foreach ($this->images as $image) {
-            $image->delete();
-        }
     }
 
     /**

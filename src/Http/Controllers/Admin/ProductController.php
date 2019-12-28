@@ -76,12 +76,17 @@ class ProductController extends Controller
     {
         $this->storeValidator($request->all());
         $product = Product::create($request->all());
-        $product->uploadMainImage($request);
+        $product->uploadImage($request, "products", "main_image");
         return redirect()
             ->route("admin.category.product.show", ['category' => $category, 'product' => $product])
             ->with('success', 'Товар успешно добавлен');
     }
 
+    /**
+     * Валидация сохранения.
+     *
+     * @param array $data
+     */
     protected function storeValidator(array $data)
     {
         Validator::make($data, [
@@ -154,7 +159,7 @@ class ProductController extends Controller
 
         $this->updateValidator($request->all(), $product);
         $product->update($request->all());
-        $product->uploadMainImage($request);
+        $product->uploadImage($request, "products", "main_image");
         // Обновляем метки.
         $stateIds = [];
         foreach ($userInput as $key => $value) {
@@ -169,6 +174,12 @@ class ProductController extends Controller
             ->with('success', 'Товар успешно обновлен');
     }
 
+    /**
+     * Валидация обновления.
+     *
+     * @param array $data
+     * @param Product $product
+     */
     protected function updateValidator(array $data, Product $product)
     {
         $id = $product->id;
@@ -216,7 +227,7 @@ class ProductController extends Controller
      */
     public function destroyImage(Category $category, Product $product)
     {
-        $product->clearMainImage();
+        $product->clearImage();
         return redirect()
             ->back()
             ->with('success', 'Изображение удалено');

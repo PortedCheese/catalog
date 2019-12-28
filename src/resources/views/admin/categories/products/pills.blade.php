@@ -31,7 +31,7 @@
                 <li class="nav-item">
                     <a class="nav-link{{ $currentRoute == 'admin.category.product.gallery' ? ' active' : '' }}"
                        href="{{ route('admin.category.product.gallery', ['category' => $category, 'product' => $product]) }}">
-                        Галлерея
+                        Галерея
                     </a>
                 </li>
                 <li class="nav-item">
