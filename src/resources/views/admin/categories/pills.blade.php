@@ -17,7 +17,7 @@
                 <li class="nav-item">
                     <a href="{{ route('admin.category.index') }}?view=tree"
                        class="nav-link{{ isset($tree) && $tree ? " active" : "" }}">
-                        Дерево каталога
+                        Структура
                     </a>
                 </li>
 
