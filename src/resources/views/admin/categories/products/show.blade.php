@@ -53,23 +53,26 @@
                                   action="{{ route("admin.category.product.change-category", ['category' => $category, 'product' => $product]) }}">
                                 @csrf
                                 @method('put')
-                                <div class="input-group">
-                                    <select name="category_id"
-                                            id="category_id"
-                                            class="custom-select">
-                                        @foreach($categories as $key => $value)
-                                            <option value="{{ $key }}"
-                                                    @if ($key == $category->id)
+                                <div class="form-group">
+                                    <label for="category_id" class="sr-only">Категория</label>
+                                    <div class="input-group">
+                                        <select name="category_id"
+                                                id="category_id"
+                                                class="custom-select">
+                                            @foreach($categories as $key => $value)
+                                                <option value="{{ $key }}"
+                                                        @if ($key == $category->id)
                                                         selected
-                                                    @elseif (old('category_id'))
+                                                        @elseif (old('category_id'))
                                                         selected
-                                                    @endif>
-                                                {{ $value }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <div class="input-group-append">
-                                        <button class="btn btn-success" type="submit">Обновить</button>
+                                                        @endif>
+                                                    {{ $value }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-success" type="submit">Обновить</button>
+                                        </div>
                                     </div>
                                 </div>
                             </form>

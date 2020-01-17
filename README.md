@@ -29,6 +29,8 @@
     v1.1.9:
         - Изменено меню, перенесено в два шаблона
         - Структура каталога с vue draggable
+        - Исправлено изменение категории товара
+        - Изменена валидация добавления категории
     Обновление:
         - Удалить старые пункты меню
         - php artisan vendor:publish --provider="PortedCheese\Catalog\ServiceProvider" --tag=public

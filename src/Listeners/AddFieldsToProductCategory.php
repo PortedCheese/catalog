@@ -6,6 +6,7 @@ use App\Category;
 use App\Product;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\DB;
 use PortedCheese\Catalog\Events\ProductCategoryChange;
 
 class AddFieldsToProductCategory
@@ -72,6 +73,7 @@ class AddFieldsToProductCategory
         if (! $this->setCategory()) {
             return false;
         }
+        $this->changePivots();
         $this->category->setParentFields($this->original);
 
         $this->category->forgetFieldsCache();
@@ -80,6 +82,19 @@ class AddFieldsToProductCategory
         $this->original->forgetFieldsCache();
         $this->original->forgetChildrenFieldsCache();
         return true;
+    }
+
+    /**
+     * Изменить таблицу связку.
+     */
+    private function changePivots()
+    {
+        DB::table("product_fields")
+            ->where("category_id", $this->original->id)
+            ->where("product_id", $this->product->id)
+            ->update([
+                "category_id" => $this->category->id
+            ]);
     }
 
     /**
