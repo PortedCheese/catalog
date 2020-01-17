@@ -10,15 +10,24 @@
 
     php artisan vendor:publish --provider="PortedCheese\Catalog\ServiceProvider" --tag=public
 
-    php artisan make:catalog {--all : Run all}
-                             {--menu : Config menu}
-                             {--models : Export models}
-                             {--controllers : Export controllers}
-                             {--vue : Export vue}
-                             {--config : Make config}
+    php artisan make:catalog
+                            {--all : Run all}
+                            {--menu : Config menu}
+                            {--models : Export models}
+                            {--controllers : Export controllers}
+                            {--vue : Export vue}
+                            {--config : Make config}
 Настройки каталога. Создает необходимые модели и контроллеры, методы которых можно переопределить, создает элементы меню и создает конфигурацию.
 
 `@includeIf("catalog::site.cart.cart-state")` - Добавить элемент li в меню для корзины
 
 ## Settings
 В модели Card есть константа CRON_ENABLED - Включить удаление устаревших корзин анонимов
+
+### Versions
+
+    v1.1.9:
+        - Изменено меню, перенесено в два шаблона
+    Обновление:
+        - Удалить старые пункты меню
+        - php artisan make:catalog --menu

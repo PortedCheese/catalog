@@ -178,8 +178,29 @@ class CatalogMakeCommand extends BaseConfigModelCommand
             return;
         }
 
-        $this->makeCategoryMenu($menu);
-        $this->makeOrderMenu($menu);
+        $title = "Каталог";
+        $itemData = [
+            "title" => $title,
+            "menu_id" => $menu->id,
+            "url" => "#",
+            "template" => "catalog::admin.menu"
+        ];
+
+        try {
+            $menuItem = MenuItem::query()
+                ->where("menu_id", $menu->id)
+                ->where('title', $title)
+                ->firstOrFail();
+            $menuItem->update($itemData);
+            $this->info("Элемент меню '$title' обновлен");
+        }
+        catch (\Exception $e) {
+            MenuItem::create($itemData);
+            $this->info("Элемент меню '$title' создан");
+        }
+
+//        $this->makeCategoryMenu($menu);
+//        $this->makeOrderMenu($menu);
     }
 
     /**
