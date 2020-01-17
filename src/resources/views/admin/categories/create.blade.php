@@ -6,6 +6,7 @@
 @endsection
 
 @section('admin')
+    @include("catalog::admin.categories.pills")
     <div class="col-12">
         <div class="card">
             <div class="card-body">

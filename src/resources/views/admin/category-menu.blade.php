@@ -16,11 +16,6 @@
             Список
         </a>
 
-        <a href="{{ route("admin.category.create") }}"
-           class="dropdown-item">
-            Создать
-        </a>
-
         <a href="{{ route("admin.product.index") }}"
            class="dropdown-item">
             Товары
