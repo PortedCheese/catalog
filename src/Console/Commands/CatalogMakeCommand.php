@@ -118,6 +118,7 @@ class CatalogMakeCommand extends BaseConfigModelCommand
         'admin' => [
             'cart-state' => "CartStateComponent",
             'change-item-quantity' => "ChangeItemQuantityComponent",
+            'admin-category-list' => "CategoryListComponent",
         ],
         'app' => [
             "catalog-single-order" => "SingleProductComponent",

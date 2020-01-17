@@ -35,6 +35,8 @@ Route::group([
     ]);
     // Управление категориями.
     Route::resource('category', 'CategoryController');
+    Route::put("category", "CategoryController@changeItemsWeight")
+        ->name("category.items-weight");
     // Все товары.
     Route::get('product', 'ProductController@index')
         ->name('product.index');

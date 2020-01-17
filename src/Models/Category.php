@@ -7,6 +7,7 @@ use App\ProductField;
 use App\Product;
 use App\ProductVariation;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -118,35 +119,57 @@ class Category extends Model
      *
      * @return array
      */
-    public static function getTree()
+    public static function getTree($forJs = false)
     {
         $tree = [];
         $categories = DB::table('categories')
-            ->select(['id', 'title', 'slug', 'parent_id'])
+            ->select(['id', 'title', 'slug', 'parent_id', "weight"])
             ->orderBy('parent_id')
             ->get();
         $noParent = [];
         foreach ($categories as $category) {
-            $tree[$category->id] = (object) [
+            $tree[$category->id] = [
                 'title' => $category->title,
                 'slug' => $category->slug,
                 'parent' => $category->parent_id,
+                "weight" => $category->weight,
+                "id" => $category->id,
                 'children' => [],
+                "url" => route("admin.category.show", ['category' => $category->slug])
             ];
             if (empty($category->parent_id)) {
                 $noParent[] = $category->id;
             }
         }
         foreach ($tree as $id => $item) {
-            if (empty($item->parent)) {
+            if (empty($item["parent"])) {
                 continue;
             }
-            $tree[$item->parent]->children[$id] = $item;
+            $tree[$item["parent"]]["children"][$id] = $item;
         }
         foreach ($noParent as $id) {
             self::removeChildren($tree, $id);
         }
-        return $tree;
+        return self::sortByWeight($tree);
+    }
+
+    /**
+     * Сортировка элементов по весу.
+     *
+     * @param $tree
+     * @return array
+     */
+    private static function sortByWeight($tree)
+    {
+        $sorted = array_values(Arr::sort($tree, function ($value) {
+            return $value['weight'];
+        }));
+        foreach ($sorted as &$item) {
+            if (! empty($item['children'])) {
+                $item['children'] = self::sortByWeight($item["children"]);
+            }
+        }
+        return $sorted;
     }
 
     /**
@@ -161,7 +184,7 @@ class Category extends Model
             return;
         }
         $item = $tree[$id];
-        foreach ($item->children as $key => $child) {
+        foreach ($item["children"] as $key => $child) {
             self::removeChildren($tree, $key);
             if (!empty($tree[$key])) {
                 unset($tree[$key]);

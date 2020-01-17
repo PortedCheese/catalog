@@ -28,6 +28,8 @@
 
     v1.1.9:
         - Изменено меню, перенесено в два шаблона
+        - Структура каталога с vue draggable
     Обновление:
         - Удалить старые пункты меню
-        - php artisan make:catalog --menu
+        - php artisan vendor:publish --provider="PortedCheese\Catalog\ServiceProvider" --tag=public
+        - php artisan make:catalog --menu --vue

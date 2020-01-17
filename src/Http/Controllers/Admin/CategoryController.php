@@ -5,6 +5,7 @@ namespace PortedCheese\Catalog\Http\Controllers\Admin;
 use App\Category;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -25,8 +26,9 @@ class CategoryController extends Controller
             $collection = Category::getTree();
         }
         else {
-            $collection = Category::where('parent_id', null)
-                ->orderBy('weight', 'desc')
+            $collection = Category::query()
+                ->where('parent_id', null)
+                ->orderBy('weight', 'asc')
                 ->get();
             foreach ($collection as $item) {
                 $parents[$item->id] = $item->title;
@@ -37,6 +39,46 @@ class CategoryController extends Controller
             'parents' => $parents,
             'tree' => $view == 'tree',
         ]);
+    }
+
+    /**
+     * Применить порядок.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function changeItemsWeight(Request $request)
+    {
+        if (! empty($request->get("items"))) {
+            $items = $request->get("items");
+            $this->setWeight($items, 0);
+            return response()
+                ->json("Порядок сохранен");
+        }
+        else {
+            return response()
+                ->json("Ошибка, недостаточно данных");
+        }
+    }
+
+    /**
+     * Установить вес.
+     *
+     * @param array $items
+     * @param int $parent
+     */
+    private function setWeight(array $items, int $parent)
+    {
+        foreach ($items as $weight => $item) {
+            if (! empty($item['children'])) {
+                $this->setWeight($item['children'], $item['id']);
+            }
+            $id = $item['id'];
+            $parentId = !empty($parent) ? $parent : NULL;
+            DB::table("categories")
+                ->where("id", $id)
+                ->update(["weight" => $weight, "parent_id" => $parentId]);
+        }
     }
 
     /**
