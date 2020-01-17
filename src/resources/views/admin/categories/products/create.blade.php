@@ -4,7 +4,7 @@
 @section('header-title', "{$category->title}")
 
 @section('admin')
-    @include("catalog::admin.categories.pills", ['category' => $category])
+    @include("catalog::admin.categories.products.pills", ['category' => $category, 'product' => false])
 
     <div class="col-12">
         <div class="card">

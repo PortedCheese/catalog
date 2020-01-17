@@ -6,6 +6,8 @@
 @endsection
 
 @section('admin')
+    @include("catalog::admin.categories.products.pills", ['category' => $category, 'product' => false])
+
     <div class="col-12">
         <div class="card">
             <div class="card-body">
@@ -94,9 +96,6 @@
                     <div class="btn-group"
                          role="group">
                         <button type="submit" class="btn btn-success">Обновить</button>
-                        <a href="{{ route('admin.category.show', ['category' => $category]) }}" class="btn btn-dark">
-                            Назад к категории
-                        </a>
                     </div>
                 </form>
             </div>

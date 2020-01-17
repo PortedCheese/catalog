@@ -5,6 +5,7 @@
 
 @section('admin')
     @include("catalog::admin.categories.products.pills", ['category' => $category, 'product' => $product])
+
     <div class="col-12 mt-2">
         <div class="row">
             @if ($image)

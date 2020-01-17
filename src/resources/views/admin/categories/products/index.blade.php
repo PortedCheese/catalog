@@ -12,8 +12,9 @@
 
 @section('admin')
     @isset($category)
-        @include("catalog::admin.categories.pills", ['category' => $category])
+        @include("catalog::admin.categories.products.pills", ['category' => $category, 'product' => false])
     @endisset
+
 
     <div class="col-12">
         <div class="card">
@@ -56,14 +57,6 @@
 
     <div class="col-12">
         <div class="card">
-            @isset($category)
-                <div class="card-header">
-                    <a href="{{ route('admin.category.product.create', ['category' => $category]) }}"
-                       class="btn btn-success">
-                        Добавить
-                    </a>
-                </div>
-            @endisset
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table">

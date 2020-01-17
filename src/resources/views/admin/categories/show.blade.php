@@ -69,26 +69,13 @@
             <div class="card-body">
                 <div role="toolbar" class="btn-toolbar">
                     <div class="btn-group mr-1">
-                        <a href="{{ route("admin.category.edit", ["category" => $category]) }}" class="btn btn-primary">
-                            <i class="far fa-edit"></i>
-                        </a>
                         <button type="button" class="btn btn-danger" data-confirm="{{ "delete-form-{$category->id}" }}">
-                            <i class="fas fa-trash-alt"></i>
+                            Удлаить
                         </button>
                     </div>
                     <div class="btn-group">
-                        <a href="{{ route('admin.category.index') }}"
-                           class="btn btn-outline-secondary">
-                            Список
-                        </a>
-                        @if ($parent)
-                            <a href="{{ route('admin.category.show', ['category' => $parent]) }}"
-                               class="btn btn-outline-secondary">
-                                {{ $parent->title }}
-                            </a>
-                        @endif
                         <a href="{{ route('admin.category.create-child', ['category' => $category]) }}"
-                           class="btn btn-outline-success">
+                           class="btn btn-success">
                             Добавить
                         </a>
                     </div>
