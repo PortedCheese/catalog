@@ -8,15 +8,17 @@
 
     <div class="col-12">
         <div class="card">
-            <div class="card-header">
-                <div class="btn-group"
-                     role="group">
-                    <a href="{{ route('admin.category.product.field.create', ['category' => $category, 'product' => $product]) }}"
-                       class="btn btn-success">
-                        Добавить
-                    </a>
+            @can("create", \App\ProductField::class)
+                <div class="card-header">
+                    <div class="btn-group"
+                         role="group">
+                        <a href="{{ route('admin.category.product.field.create', ['category' => $category, 'product' => $product]) }}"
+                           class="btn btn-success">
+                            Добавить
+                        </a>
+                    </div>
                 </div>
-            </div>
+            @endcan
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table">
@@ -24,7 +26,9 @@
                         <tr>
                             <th>Поле</th>
                             <th>Значение</th>
-                            <th>Действия</th>
+                            @canany(["update", "delete"], \App\ProductField::class)
+                                <th>Действия</th>
+                            @endcan
                         </tr>
                         </thead>
                         <tbody>
@@ -37,38 +41,46 @@
                                     @endif
                                 </td>
                                 <td>{{ $field->value }}</td>
-                                <td>
-                                    <div role="toolbar" class="btn-toolbar">
-                                        <div class="btn-group mr-1">
-                                            <a href="{{ route('admin.category.product.field.edit', [
-                                                                    'category' => $category,
-                                                                    'product' => $product,
-                                                                    'field' => $field
-                                                                ]) }}"
-                                               class="btn btn-primary">
-                                                <i class="far fa-edit"></i>
-                                            </a>
-                                            <button type="button" class="btn btn-danger" data-confirm="{{ "delete-field-form-{$field->id}" }}">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </button>
+                                @canany(["update", "delete"], $field)
+                                        <td>
+                                        <div role="toolbar" class="btn-toolbar">
+                                            <div class="btn-group mr-1">
+                                                @can("update", $field)
+                                                    <a href="{{ route('admin.category.product.field.edit', [
+                                                                            'category' => $category,
+                                                                            'product' => $product,
+                                                                            'field' => $field
+                                                                        ]) }}"
+                                                       class="btn btn-primary">
+                                                        <i class="far fa-edit"></i>
+                                                    </a>
+                                                @endcan
+                                                @can("delete", $field)
+                                                    <button type="button" class="btn btn-danger" data-confirm="{{ "delete-field-form-{$field->id}" }}">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                @endcan
+                                            </div>
                                         </div>
-                                    </div>
-                                    <confirm-form :id="'{{ "delete-field-form-{$field->id}" }}'">
-                                        <template>
-                                            <form action="{{ route('admin.category.product.field.destroy', [
-                                                                    'category' => $category,
-                                                                    'product' => $product,
-                                                                    'field' => $field
-                                                                ]) }}"
-                                                  id="delete-field-form-{{ $field->id }}"
-                                                  class="btn-group"
-                                                  method="post">
-                                                @csrf
-                                                <input type="hidden" name="_method" value="DELETE">
-                                            </form>
-                                        </template>
-                                    </confirm-form>
-                                </td>
+                                        @can("delete", $field)
+                                            <confirm-form :id="'{{ "delete-field-form-{$field->id}" }}'">
+                                                <template>
+                                                    <form action="{{ route('admin.category.product.field.destroy', [
+                                                                            'category' => $category,
+                                                                            'product' => $product,
+                                                                            'field' => $field
+                                                                        ]) }}"
+                                                          id="delete-field-form-{{ $field->id }}"
+                                                          class="btn-group"
+                                                          method="post">
+                                                        @csrf
+                                                        <input type="hidden" name="_method" value="DELETE">
+                                                    </form>
+                                                </template>
+                                            </confirm-form>
+                                        @endcan
+                                    </td>
+                                @endcanany
                             </tr>
                         @endforeach
                         </tbody>

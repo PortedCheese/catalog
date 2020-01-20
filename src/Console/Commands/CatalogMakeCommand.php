@@ -150,6 +150,11 @@ class CatalogMakeCommand extends BaseConfigModelCommand
             "slug" => "product",
             "policy" => "ProductPolicy",
         ],
+        [
+            "title" => "Характеристики товаров",
+            "slug" => "product-field",
+            "policy" => "ProductFieldPolicy",
+        ],
     ];
 
     /**

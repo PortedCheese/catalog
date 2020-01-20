@@ -11,6 +11,12 @@ use Illuminate\Support\Facades\Validator;
 
 class ProductFieldController extends Controller
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->authorizeResource(ProductField::class, "field");
+    }
+
     /**
      * Display a listing of the resource.
      *

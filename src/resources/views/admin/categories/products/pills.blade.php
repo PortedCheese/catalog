@@ -33,12 +33,14 @@
                             </a>
                         </li>
                     @endcan
+                    @can("viewAny", \App\ProductField::class)
                     <li class="nav-item">
                         <a class="nav-link{{ strstr($currentRoute, 'admin.category.product.field') !== FALSE ? ' active' : '' }}"
                            href="{{ route('admin.category.product.field.index', ['category' => $category, 'product' => $product]) }}">
                             Характеристики
                         </a>
                     </li>
+                    @endcan
                     @can("update", $product)
                         <li class="nav-item">
                             <a class="nav-link{{ $currentRoute == 'admin.category.product.metas' ? ' active' : '' }}"
