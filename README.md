@@ -15,6 +15,7 @@
                             {--menu : Config menu}
                             {--models : Export models}
                             {--controllers : Export controllers}
+                            {--policies : Export and create rules}
                             {--vue : Export vue}
                             {--config : Make config}
 Настройки каталога. Создает необходимые модели и контроллеры, методы которых можно переопределить, создает элементы меню и создает конфигурацию.
@@ -25,6 +26,11 @@
 В модели Card есть константа CRON_ENABLED - Включить удаление устаревших корзин анонимов
 
 ### Versions
+    
+    v1.1.10:
+        - Добавлены права доступа
+    Обновление:
+        - php artisan make:catalog --policies
 
     v1.1.9:
         - Изменено меню, перенесено в два шаблона

@@ -7,10 +7,15 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->authorizeResource(Category::class, 'category');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -231,9 +236,11 @@ class CategoryController extends Controller
      *
      * @param Category $category
      * @return \Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function destroyImage(Category $category)
     {
+        $this->authorize("update", $category);
         $category->clearImage();
         return redirect()
             ->back()
@@ -297,9 +304,11 @@ class CategoryController extends Controller
      *
      * @param Category $category
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function metas(Category $category)
     {
+        $this->authorize("update", $category);
         return view("catalog::admin.categories.metas", [
             'category' => $category,
         ]);

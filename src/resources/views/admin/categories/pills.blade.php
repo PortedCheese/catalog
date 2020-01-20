@@ -7,69 +7,79 @@
     <div class="card">
         <div class="card-body">
             <ul class="nav nav-pills">
-                <li class="nav-item">
-                    <a href="{{ route('admin.category.index') }}"
-                       class="nav-link{{ isset($tree) && !$tree ? " active" : "" }}">
-                        Категории
-                    </a>
-                </li>
+                @can("viewAny", \App\Category::class)
+                    <li class="nav-item">
+                        <a href="{{ route('admin.category.index') }}"
+                           class="nav-link{{ isset($tree) && !$tree ? " active" : "" }}">
+                            Категории
+                        </a>
+                    </li>
 
-                <li class="nav-item">
-                    <a href="{{ route('admin.category.index') }}?view=tree"
-                       class="nav-link{{ isset($tree) && $tree ? " active" : "" }}">
-                        Структура
-                    </a>
-                </li>
+                    <li class="nav-item">
+                        <a href="{{ route('admin.category.index') }}?view=tree"
+                           class="nav-link{{ isset($tree) && $tree ? " active" : "" }}">
+                            Структура
+                        </a>
+                    </li>
+                @endcan
 
                 @empty($category)
-                    <li class="nav-item">
-                        <a href="{{ route('admin.category.create') }}"
-                           class="nav-link{{ $currentRoute == 'admin.category.create' ? " active" : "" }}">
-                            Добавить
-                        </a>
-                    </li>
+                    @can("create", \App\Category::class)
+                        <li class="nav-item">
+                            <a href="{{ route('admin.category.create') }}"
+                               class="nav-link{{ $currentRoute == 'admin.category.create' ? " active" : "" }}">
+                                Добавить
+                            </a>
+                        </li>
+                    @endcan
                 @else
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle {{ $currentRoute == 'admin.category.create-child' ? " active" : "" }}"
-                           data-toggle="dropdown"
-                           href="#"
-                           role="button"
-                           aria-haspopup="true"
-                           aria-expanded="false">
-                            Добавить
-                        </a>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item"
-                               href="{{ route('admin.category.create') }}">
-                                Основную
+                    @can("create", \App\Category::class)
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle {{ $currentRoute == 'admin.category.create-child' ? " active" : "" }}"
+                               data-toggle="dropdown"
+                               href="#"
+                               role="button"
+                               aria-haspopup="true"
+                               aria-expanded="false">
+                                Добавить
                             </a>
-                            <a class="dropdown-item"
-                               href="{{ route('admin.category.create-child', ['category' => $category]) }}">
-                                Подкатегорию
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item"
+                                   href="{{ route('admin.category.create') }}">
+                                    Основную
+                                </a>
+                                <a class="dropdown-item"
+                                   href="{{ route('admin.category.create-child', ['category' => $category]) }}">
+                                    Подкатегорию
+                                </a>
+                            </div>
+                        </li>
+                    @endcan
+
+                    @can("view", \App\Category::class)
+                        <li class="nav-item">
+                            <a href="{{ route('admin.category.show', ['category' => $category]) }}"
+                               class="nav-link{{ $currentRoute == 'admin.category.show' ? ' active' : '' }}">
+                                Просмотр
                             </a>
-                        </div>
-                    </li>
+                        </li>
+                    @endcan
 
-                    <li class="nav-item">
-                        <a href="{{ route('admin.category.show', ['category' => $category]) }}"
-                           class="nav-link{{ $currentRoute == 'admin.category.show' ? ' active' : '' }}">
-                            Просмотр
-                        </a>
-                    </li>
+                    @can("update", \App\Category::class)
+                        <li class="nav-item">
+                            <a href="{{ route('admin.category.edit', ['category' => $category]) }}"
+                               class="nav-link{{ $currentRoute == 'admin.category.edit' ? ' active' : '' }}">
+                                Редактировать
+                            </a>
+                        </li>
 
-                    <li class="nav-item">
-                        <a href="{{ route('admin.category.edit', ['category' => $category]) }}"
-                           class="nav-link{{ $currentRoute == 'admin.category.edit' ? ' active' : '' }}">
-                            Редактировать
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a href="{{ route('admin.category.metas', ['category' => $category]) }}"
-                           class="nav-link{{ $currentRoute == 'admin.category.metas' ? ' active' : '' }}">
-                            Мета
-                        </a>
-                    </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.category.metas', ['category' => $category]) }}"
+                               class="nav-link{{ $currentRoute == 'admin.category.metas' ? ' active' : '' }}">
+                                Мета
+                            </a>
+                        </li>
+                    @endcan
 
                     <li class="nav-item">
                         <a href="{{ route('admin.category.field.index', ['category' => $category]) }}"

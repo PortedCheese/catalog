@@ -64,34 +64,42 @@
 @endsection
 
 @section('links')
-    <div class="col-12">
-        <div class="card">
-            <div class="card-body">
-                <div role="toolbar" class="btn-toolbar">
-                    <div class="btn-group mr-1">
-                        <button type="button" class="btn btn-danger" data-confirm="{{ "delete-form-{$category->id}" }}">
-                            Удлаить
-                        </button>
+    @canany(["delete", "create"], \App\Category::class)
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div role="toolbar" class="btn-toolbar">
+                        @can("delete", \App\Category::class)
+                            <div class="btn-group mr-1">
+                                <button type="button" class="btn btn-danger" data-confirm="{{ "delete-form-{$category->id}" }}">
+                                    Удалить
+                                </button>
+                            </div>
+                        @endcan
+                        @can("create", \App\Category::class)
+                            <div class="btn-group">
+                                <a href="{{ route('admin.category.create-child', ['category' => $category]) }}"
+                                   class="btn btn-success">
+                                    Добавить
+                                </a>
+                            </div>
+                        @endcan
                     </div>
-                    <div class="btn-group">
-                        <a href="{{ route('admin.category.create-child', ['category' => $category]) }}"
-                           class="btn btn-success">
-                            Добавить
-                        </a>
-                    </div>
+                    @can("delete", \App\Category::class)
+                        <confirm-form :id="'{{ "delete-form-{$category->id}" }}'">
+                            <template>
+                                <form action="{{ route('admin.category.destroy', ['category' => $category]) }}"
+                                      id="delete-form-{{ $category->id }}"
+                                      class="btn-group"
+                                      method="post">
+                                    @csrf
+                                    <input type="hidden" name="_method" value="DELETE">
+                                </form>
+                            </template>
+                        </confirm-form>
+                    @endcan
                 </div>
-                <confirm-form :id="'{{ "delete-form-{$category->id}" }}'">
-                    <template>
-                        <form action="{{ route('admin.category.destroy', ['category' => $category]) }}"
-                              id="delete-form-{{ $category->id }}"
-                              class="btn-group"
-                              method="post">
-                            @csrf
-                            <input type="hidden" name="_method" value="DELETE">
-                        </form>
-                    </template>
-                </confirm-form>
             </div>
         </div>
-    </div>
+    @endcanany
 @endsection

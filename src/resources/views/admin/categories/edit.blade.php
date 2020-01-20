@@ -6,7 +6,7 @@
 @endsection
 
 @section('admin')
-    @include("catalog::admin.categories.products.pills", ['category' => $category, 'product' => false])
+    @include("catalog::admin.categories.pills", ['category' => $category])
 
     <div class="col-12">
         <div class="card">

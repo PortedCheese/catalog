@@ -38,6 +38,12 @@ class CartController extends Controller
         ]);
     }
 
+    /**
+     * Просмотр корзины.
+     *
+     * @param Cart $cart
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function show(Cart $cart)
     {
         return view("catalog::admin.carts.show", [
@@ -45,6 +51,13 @@ class CartController extends Controller
         ]);
     }
 
+    /**
+     * Удаление корзины.
+     *
+     * @param Cart $cart
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Exception
+     */
     public function destroy(Cart $cart)
     {
         $cart->delete();

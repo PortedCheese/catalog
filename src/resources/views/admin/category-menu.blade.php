@@ -11,10 +11,12 @@
     </a>
 
     <div class="dropdown-menu" aria-labelledby="category-menu">
-        <a href="{{ route("admin.category.index") }}"
-           class="dropdown-item">
-            Список
-        </a>
+        @can("viewAll", \App\Category::class)
+            <a href="{{ route("admin.category.index") }}"
+               class="dropdown-item">
+                Список
+            </a>
+        @endcan
 
         <a href="{{ route("admin.product.index") }}"
            class="dropdown-item">

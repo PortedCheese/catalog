@@ -19,6 +19,7 @@ class CatalogMakeCommand extends BaseConfigModelCommand
                     {--menu : Config menu}
                     {--models : Export models}
                     {--controllers : Export controllers}
+                    {--policies : Export and create rules}
                     {--vue : Export vue}
                     {--config : Make config}';
 
@@ -128,6 +129,14 @@ class CatalogMakeCommand extends BaseConfigModelCommand
         ],
     ];
 
+    protected $ruleRules = [
+        [
+            "title" => "Категории",
+            "slug" => "category",
+            "policy" => "CategoryPolicy",
+        ],
+    ];
+
     /**
      * Create a new command instance.
      *
@@ -165,6 +174,10 @@ class CatalogMakeCommand extends BaseConfigModelCommand
         
         if ($this->option("config") || $all) {
             $this->makeConfig();
+        }
+
+        if ($this->option("policies") || $all) {
+            $this->makeRules();
         }
     }
 

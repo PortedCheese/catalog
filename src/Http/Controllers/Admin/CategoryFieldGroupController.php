@@ -54,6 +54,11 @@ class CategoryFieldGroupController extends Controller
             ->with("success", "Группа добавлена");
     }
 
+    /**
+     * Валидация сохранения.
+     *
+     * @param array $data
+     */
     protected function storeValidator(array $data)
     {
         Validator::make($data, [
@@ -90,7 +95,7 @@ class CategoryFieldGroupController extends Controller
      */
     public function update(Request $request, CategoryFieldGroup $group)
     {
-        $this->updateValidatior($request->all());
+        $this->updateValidator($request->all());
 
         $group->update($request->all());
 
@@ -99,7 +104,12 @@ class CategoryFieldGroupController extends Controller
             ->with("success", "Обновлено");
     }
 
-    protected function updateValidatior(array $data)
+    /**
+     * Валидация обновления.
+     *
+     * @param array $data
+     */
+    protected function updateValidator(array $data)
     {
         Validator::make($data, [
             "title" => ["required", "min:2", "max:200"],

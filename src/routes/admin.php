@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::group([
     'namespace' => 'App\Http\Controllers\Vendor\Catalog\Admin',
-    'middleware' => ['web', 'role:admin|editor'],
+    'middleware' => ['web', 'management'],
     'as' => 'admin.',
     'prefix' => 'admin',
 ], function () {
@@ -21,25 +21,26 @@ Route::group([
                 ->name('destroy');
         });
     }
+
     // Статусы заказа.
     Route::resource('order-state', 'OrderStateController')->parameters([
         'order-state' => 'state',
     ]);
+
     // Заказы.
     Route::resource('order', 'OrderController')->except([
         'create', 'store', 'edit'
     ]);
+
     // Метки товара.
     Route::resource('product-state', 'ProductStateController')->parameters([
         'product-state' => 'state',
     ]);
-    // Управление категориями.
-    Route::resource('category', 'CategoryController');
-    Route::put("category", "CategoryController@changeItemsWeight")
-        ->name("category.items-weight");
+
     // Все товары.
     Route::get('product', 'ProductController@index')
         ->name('product.index');
+
     // Доступные поля категори.
     Route::group([
         'prefix' => 'category-fields',
@@ -52,6 +53,7 @@ Route::group([
         Route::put("/{field}", "CategoryFieldController@selfUpdate")
             ->name("self-update");
     });
+
     // Группы характеристик.
     Route::group([
         'as' => "category.",
@@ -60,6 +62,12 @@ Route::group([
             'edit',
         ]);
     });
+
+    // Управление категориями.
+    Route::resource('category', 'CategoryController');
+    Route::put("category", "CategoryController@changeItemsWeight")
+        ->name("category.items-weight");
+
     // Категории.
     Route::group([
         'prefix' => 'category/{category}',
@@ -87,6 +95,7 @@ Route::group([
         // Синхронизация полей.
         Route::post('field/sync', 'CategoryFieldController@syncChildren')
             ->name('field.sync');
+
         // Товары категории.
         Route::resource('product', 'ProductController');
         Route::group([

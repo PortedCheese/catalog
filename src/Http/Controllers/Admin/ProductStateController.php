@@ -34,24 +34,6 @@ class ProductStateController extends Controller
         ]);
     }
 
-    public function show(Request $request, ProductState $state)
-    {
-        $query = $request->query;
-        $products = $state->products();
-        if ($query->get('title')) {
-            $title = trim($query->get('title'));
-            $products->where('title', 'LIKE', "%$title%");
-        }
-        $products->orderBy('created_at', 'desc');
-        $perPage = siteconf()->get("catalog", "productStatesAdminPager");
-        return view("catalog::admin.states.products.show", [
-            'state' => $state,
-            'products' => $products->paginate($perPage)->appends($request->input()),
-            'query' => $query,
-            'categories' => [],
-        ]);
-    }
-
     /**
      * Store a newly created resource in storage.
      *
@@ -78,6 +60,24 @@ class ProductStateController extends Controller
             "slug" => "Slug",
             'color' => 'Цвет',
         ])->validate();
+    }
+
+    public function show(Request $request, ProductState $state)
+    {
+        $query = $request->query;
+        $products = $state->products();
+        if ($query->get('title')) {
+            $title = trim($query->get('title'));
+            $products->where('title', 'LIKE', "%$title%");
+        }
+        $products->orderBy('created_at', 'desc');
+        $perPage = siteconf()->get("catalog", "productStatesAdminPager");
+        return view("catalog::admin.states.products.show", [
+            'state' => $state,
+            'products' => $products->paginate($perPage)->appends($request->input()),
+            'query' => $query,
+            'categories' => [],
+        ]);
     }
 
     /**
