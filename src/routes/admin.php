@@ -25,6 +25,8 @@ Route::group([
     // Статусы заказа.
     Route::resource('order-state', 'OrderStateController')->parameters([
         'order-state' => 'state',
+    ])->except([
+        "show",
     ]);
 
     // Заказы.

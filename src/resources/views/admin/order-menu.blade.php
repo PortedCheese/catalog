@@ -16,10 +16,12 @@
             Список
         </a>
 
-        <a href="{{ route("admin.order-state.index") }}"
-           class="dropdown-item">
-            Статусы
-        </a>
+        @can("viewAny", \App\OrderState::class)
+            <a href="{{ route("admin.order-state.index") }}"
+               class="dropdown-item">
+                Статусы
+            </a>
+        @endcan
 
         @if (siteconf()->get("catalog", "useCart"))
             <a href="{{ route("admin.cart.index") }}"
