@@ -55,12 +55,14 @@
                             </a>
                         </li>
                     @endcan
-                    <li class="nav-item">
-                        <a class="nav-link{{ strstr($currentRoute, 'admin.category.product.variation') !== FALSE ? ' active' : '' }}"
-                           href="{{ route('admin.category.product.variation.index', ['category' => $category, 'product' => $product]) }}">
-                            Вариации
-                        </a>
-                    </li>
+                    @can("viewAny", \App\ProductVariation::class)
+                        <li class="nav-item">
+                            <a class="nav-link{{ strstr($currentRoute, 'admin.category.product.variation') !== FALSE ? ' active' : '' }}"
+                               href="{{ route('admin.category.product.variation.index', ['category' => $category, 'product' => $product]) }}">
+                                Вариации
+                            </a>
+                        </li>
+                    @endcan
                 @endif
             </ul>
         </div>

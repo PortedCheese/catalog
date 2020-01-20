@@ -11,6 +11,12 @@ use Illuminate\Support\Facades\Validator;
 
 class ProductVariationController extends Controller
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->authorizeResource(ProductVariation::class, "variation");
+    }
+
     /**
      * Display a listing of the resource.
      *
