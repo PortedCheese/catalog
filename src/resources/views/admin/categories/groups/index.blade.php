@@ -9,12 +9,14 @@
 @section('admin')
     <div class="col-12">
         <div class="card">
-            <div class="card-header">
-                <div class="btn-group"
-                     role="group">
-                    <a href="{{ route("admin.category.groups.create") }}" class="btn btn-success">Добавить</a>
+            @can("create", \App\CategoryFieldGroup::class)
+                <div class="card-header">
+                    <div class="btn-group"
+                         role="group">
+                        <a href="{{ route("admin.category.groups.create") }}" class="btn btn-success">Добавить</a>
+                    </div>
                 </div>
-            </div>
+            @endcan
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table">
@@ -23,7 +25,9 @@
                             <th>Заголовок</th>
                             <th>Машинное имя</th>
                             <th>Приоритет</th>
-                            <th>Действия</th>
+                            @canany(["delete", "view"], \App\CategoryFieldGroup::class)
+                                <th>Действия</th>
+                            @endcanany
                         </tr>
                         </thead>
                         <tbody>
@@ -32,29 +36,37 @@
                                 <td>{{ $group->title }}</td>
                                 <td>{{ $group->machine }}</td>
                                 <td>{{ $group->weight }}</td>
-                                <td>
-                                    <div role="toolbar" class="btn-toolbar">
-                                        <div class="btn-group mr-1">
-                                            <a href="{{ route('admin.category.groups.show', ['group' => $group]) }}" class="btn btn-dark">
-                                                <i class="far fa-eye"></i>
-                                            </a>
-                                            <button type="button" class="btn btn-danger" data-confirm="{{ "delete-form-{$group->id}" }}">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </button>
+                                @canany(["view", "delete"], $group)
+                                    <td>
+                                        <div role="toolbar" class="btn-toolbar">
+                                            <div class="btn-group mr-1">
+                                                @can("view", $group)
+                                                    <a href="{{ route('admin.category.groups.show', ['group' => $group]) }}" class="btn btn-dark">
+                                                        <i class="far fa-eye"></i>
+                                                    </a>
+                                                @endcan
+                                                @can("delete", $group)
+                                                    <button type="button" class="btn btn-danger" data-confirm="{{ "delete-form-{$group->id}" }}">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                @endcan
+                                            </div>
                                         </div>
-                                    </div>
-                                    <confirm-form :id="'{{ "delete-form-{$group->id}" }}'">
-                                        <template>
-                                            <form action="{{ route('admin.category.groups.destroy', ['group' => $group]) }}"
-                                                  id="delete-form-{{ $group->id }}"
-                                                  class="btn-group"
-                                                  method="post">
-                                                @csrf
-                                                <input type="hidden" name="_method" value="DELETE">
-                                            </form>
-                                        </template>
-                                    </confirm-form>
-                                </td>
+                                        @can("delete", $group)
+                                            <confirm-form :id="'{{ "delete-form-{$group->id}" }}'">
+                                                <template>
+                                                    <form action="{{ route('admin.category.groups.destroy', ['group' => $group]) }}"
+                                                          id="delete-form-{{ $group->id }}"
+                                                          class="btn-group"
+                                                          method="post">
+                                                        @csrf
+                                                        <input type="hidden" name="_method" value="DELETE">
+                                                    </form>
+                                                </template>
+                                            </confirm-form>
+                                        @endcan
+                                    </td>
+                                @endcanany
                             </tr>
                         @endforeach
                         </tbody>

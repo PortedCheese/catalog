@@ -12,6 +12,12 @@ use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->authorizeResource(Product::class, "product");
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -239,9 +245,11 @@ class ProductController extends Controller
      * @param Category $category
      * @param Product $product
      * @return \Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function published(Category $category, Product $product)
     {
+        $this->authorize("publish", $product);
         $product->published = !$product->published;
         $product->save();
         return redirect()
@@ -256,9 +264,11 @@ class ProductController extends Controller
      * @param Category $category
      * @param Product $product
      * @return \Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function changeCategory(Request $request, Category $category, Product $product)
     {
+        $this->authorize("changeCategory", $product);
         $this->changeCategoryValidator($request->all());
 
         $product->category_id = $request->get('category_id');
@@ -268,6 +278,11 @@ class ProductController extends Controller
             ->with('success', 'Категория изменена');
     }
 
+    /**
+     * Валидация смены категории.
+     *
+     * @param array $data
+     */
     protected function changeCategoryValidator(array $data)
     {
         Validator::make($data, [
@@ -283,9 +298,11 @@ class ProductController extends Controller
      * @param Category $category
      * @param Product $product
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function metas(Category $category, Product $product)
     {
+        $this->authorize("update", $product);
         return view("catalog::admin.categories.products.metas", [
             'category' => $category,
             'product' => $product
@@ -293,14 +310,16 @@ class ProductController extends Controller
     }
 
     /**
-     * Галлерея.
+     * Галерея.
      *
      * @param Category $category
      * @param Product $product
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function gallery(Category $category, Product $product)
     {
+        $this->authorize("update", $product);
         return view("catalog::admin.categories.products.gallery", [
             'category' => $category,
             'product' => $product,

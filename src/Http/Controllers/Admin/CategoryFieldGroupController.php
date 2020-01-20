@@ -10,6 +10,12 @@ use Illuminate\Support\Str;
 
 class CategoryFieldGroupController extends Controller
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->authorizeResource(CategoryFieldGroup::class, "group");
+    }
+
     /**
      * Display a listing of the resource.
      *

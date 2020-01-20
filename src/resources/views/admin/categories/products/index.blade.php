@@ -66,7 +66,9 @@
                             @if ($all)
                                 <th>Категория</th>
                             @endif
-                            <th>Действия</th>
+                            @canany(["update", "view", "delete", "publish"], \App\Product::class)
+                                <th>Действия</th>
+                            @endcanany
                         </tr>
                         </thead>
                         <tbody>
@@ -89,54 +91,67 @@
                                         </a>
                                     </td>
                                 @endif
-                                <td>
-                                    <div role="toolbar" class="btn-toolbar">
-                                        <div class="btn-group mr-1">
-                                            <a href="{{ route('admin.category.product.edit', ['category' => $category, 'product' => $product]) }}"
-                                               class="btn btn-primary">
-                                                <i class="far fa-edit"></i>
-                                            </a>
-                                            <a href="{{ route('admin.category.product.show', ['category' => $category, 'product' => $product]) }}"
-                                               class="btn btn-dark">
-                                                <i class="far fa-eye"></i>
-                                            </a>
-                                            <button type="button" class="btn btn-danger" data-confirm="{{ "delete-product-form-{$product->id}" }}">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </button>
+                                @canany(["update", "view", "delete", "publish"], $product)
+                                    <td>
+                                        <div role="toolbar" class="btn-toolbar">
+                                            <div class="btn-group mr-1">
+                                                @can("update", $product)
+                                                    <a href="{{ route('admin.category.product.edit', ['category' => $category, 'product' => $product]) }}"
+                                                       class="btn btn-primary">
+                                                        <i class="far fa-edit"></i>
+                                                    </a>
+                                                @endcan
+                                                @can("view", $product)
+                                                    <a href="{{ route('admin.category.product.show', ['category' => $category, 'product' => $product]) }}"
+                                                       class="btn btn-dark">
+                                                        <i class="far fa-eye"></i>
+                                                    </a>
+                                                @endcan
+                                                @can("delete", $product)
+                                                    <button type="button" class="btn btn-danger" data-confirm="{{ "delete-product-form-{$product->id}" }}">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                @endcan
+                                            </div>
+                                            @can("publish", $product)
+                                                <div class="btn-group">
+                                                    <button type="button"
+                                                            class="btn btn-{{ $product->published ? "success" : "secondary" }}"
+                                                            data-confirm="{{ "change-published-form-{$product->id}" }}">
+                                                        <i class="fas fa-toggle-{{ $product->published ? "on" : "off" }}"></i>
+                                                    </button>
+                                                </div>
+                                            @endcan
                                         </div>
-                                        <div class="btn-group">
-                                            <button type="button"
-                                                    class="btn btn-{{ $product->published ? "success" : "secondary" }}"
-                                                    data-confirm="{{ "change-published-form-{$product->id}" }}">
-                                                <i class="fas fa-toggle-{{ $product->published ? "on" : "off" }}"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <confirm-form :id="'{{ "change-published-form-{$product->id}" }}'"
-                                                  confirm-text="Да, изменить!"
-                                                  text="Это изменит статус показа товара на сайте">
-                                        <template>
-                                            <form id="change-published-form-{{ $product->id }}"
-                                                  action="{{ route("admin.category.product.published", ['category' => $category, 'product' => $product]) }}"
-                                                  method="post">
-                                                @method('put')
-                                                @csrf
-                                            </form>
-                                        </template>
-                                    </confirm-form>
-                                    <confirm-form :id="'{{ "delete-product-form-{$product->id}" }}'">
-                                        <template>
-                                            <form action="{{ route('admin.category.product.destroy', ['category' => $category, 'product' => $product]) }}"
-                                                  id="delete-product-form-{{ $product->id }}"
-                                                  class="btn-group"
-                                                  method="post">
-                                                @csrf
-                                                <input type="hidden" name="_method" value="DELETE">
-                                            </form>
-                                        </template>
-                                    </confirm-form>
-
-                                </td>
+                                        @can("publish", $product)
+                                            <confirm-form :id="'{{ "change-published-form-{$product->id}" }}'"
+                                                          confirm-text="Да, изменить!"
+                                                          text="Это изменит статус показа товара на сайте">
+                                                <template>
+                                                    <form id="change-published-form-{{ $product->id }}"
+                                                          action="{{ route("admin.category.product.published", ['category' => $category, 'product' => $product]) }}"
+                                                          method="post">
+                                                        @method('put')
+                                                        @csrf
+                                                    </form>
+                                                </template>
+                                            </confirm-form>
+                                        @endcan
+                                        @can("delete", $product)
+                                            <confirm-form :id="'{{ "delete-product-form-{$product->id}" }}'">
+                                                <template>
+                                                    <form action="{{ route('admin.category.product.destroy', ['category' => $category, 'product' => $product]) }}"
+                                                          id="delete-product-form-{{ $product->id }}"
+                                                          class="btn-group"
+                                                          method="post">
+                                                        @csrf
+                                                        <input type="hidden" name="_method" value="DELETE">
+                                                    </form>
+                                                </template>
+                                            </confirm-form>
+                                        @endcan
+                                    </td>
+                                @endcanany
                             </tr>
                         @endforeach
                         </tbody>

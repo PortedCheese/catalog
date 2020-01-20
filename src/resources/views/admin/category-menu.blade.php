@@ -18,10 +18,12 @@
             </a>
         @endcan
 
-        <a href="{{ route("admin.product.index") }}"
-           class="dropdown-item">
-            Товары
-        </a>
+        @can("viewAny", \App\Product::class)
+            <a href="{{ route("admin.product.index") }}"
+               class="dropdown-item">
+                Товары
+            </a>
+        @endcan
 
         <a href="{{ route("admin.product-state.index") }}"
            class="dropdown-item">
@@ -35,9 +37,11 @@
             </a>
         @endcan
 
-        <a href="{{ route("admin.category.groups.index") }}"
-           class="dropdown-item">
-            Группы
-        </a>
+        @can("viewAny", \App\CategoryFieldGroup::class)
+            <a href="{{ route("admin.category.groups.index") }}"
+               class="dropdown-item">
+                Группы
+            </a>
+        @endcan
     </div>
 </li>

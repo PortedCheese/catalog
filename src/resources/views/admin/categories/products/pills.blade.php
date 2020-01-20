@@ -10,12 +10,14 @@
                         Список
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a href="{{ route('admin.category.product.create', ['category' => $category]) }}"
-                       class="nav-link{{ $currentRoute == 'admin.category.product.create' ? ' active' : '' }}">
-                        Добавить
-                    </a>
-                </li>
+                @can("create", \App\Product::class)
+                    <li class="nav-item">
+                        <a href="{{ route('admin.category.product.create', ['category' => $category]) }}"
+                           class="nav-link{{ $currentRoute == 'admin.category.product.create' ? ' active' : '' }}">
+                            Добавить
+                        </a>
+                    </li>
+                @endcan
                 @if (! empty($product))
                     <li class="nav-item">
                         <a class="nav-link{{ $currentRoute == 'admin.category.product.show' ? ' active' : '' }}"
@@ -23,30 +25,34 @@
                             Просмотр
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link{{ $currentRoute == 'admin.category.product.edit' ? ' active' : '' }}"
-                           href="{{ route('admin.category.product.edit', ['category' => $category, 'product' => $product]) }}">
-                            Редактировать
-                        </a>
-                    </li>
+                    @can("update", $product)
+                        <li class="nav-item">
+                            <a class="nav-link{{ $currentRoute == 'admin.category.product.edit' ? ' active' : '' }}"
+                               href="{{ route('admin.category.product.edit', ['category' => $category, 'product' => $product]) }}">
+                                Редактировать
+                            </a>
+                        </li>
+                    @endcan
                     <li class="nav-item">
                         <a class="nav-link{{ strstr($currentRoute, 'admin.category.product.field') !== FALSE ? ' active' : '' }}"
                            href="{{ route('admin.category.product.field.index', ['category' => $category, 'product' => $product]) }}">
                             Характеристики
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link{{ $currentRoute == 'admin.category.product.metas' ? ' active' : '' }}"
-                           href="{{ route('admin.category.product.metas', ['category' => $category, 'product' => $product]) }}">
-                            Мета
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link{{ $currentRoute == 'admin.category.product.gallery' ? ' active' : '' }}"
-                           href="{{ route('admin.category.product.gallery', ['category' => $category, 'product' => $product]) }}">
-                            Галерея
-                        </a>
-                    </li>
+                    @can("update", $product)
+                        <li class="nav-item">
+                            <a class="nav-link{{ $currentRoute == 'admin.category.product.metas' ? ' active' : '' }}"
+                               href="{{ route('admin.category.product.metas', ['category' => $category, 'product' => $product]) }}">
+                                Мета
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link{{ $currentRoute == 'admin.category.product.gallery' ? ' active' : '' }}"
+                               href="{{ route('admin.category.product.gallery', ['category' => $category, 'product' => $product]) }}">
+                                Галерея
+                            </a>
+                        </li>
+                    @endcan
                     <li class="nav-item">
                         <a class="nav-link{{ strstr($currentRoute, 'admin.category.product.variation') !== FALSE ? ' active' : '' }}"
                            href="{{ route('admin.category.product.variation.index', ['category' => $category, 'product' => $product]) }}">

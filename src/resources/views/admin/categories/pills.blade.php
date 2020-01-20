@@ -90,12 +90,14 @@
                         </li>
                     @endcan
 
-                    <li class="nav-item">
-                        <a href="{{ route('admin.category.product.index', ['category' => $category]) }}"
-                           class="nav-link{{ strstr($currentRoute, 'admin.category.product') !== FALSE ? ' active' : '' }}">
-                            Товары
-                        </a>
-                    </li>
+                    @can("viewAny", \App\Product::class)
+                        <li class="nav-item">
+                            <a href="{{ route('admin.category.product.index', ['category' => $category]) }}"
+                               class="nav-link{{ strstr($currentRoute, 'admin.category.product') !== FALSE ? ' active' : '' }}">
+                                Товары
+                            </a>
+                        </li>
+                    @endcan
                 @endempty
             </ul>
         </div>

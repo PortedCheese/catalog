@@ -60,16 +60,18 @@
                     <dt class="col-sm-3">Группа</dt>
                     <dd class="col-sm-9">{{ empty($group) ? "Не задана" : $group->title }}</dd>
                 </dl>
-                <h3>Категори, в которых используется характеристика</h3>
-                <ul>
-                    @foreach($categories as $category)
-                        <li>
-                            <a href="{{ route('admin.category.show', ['category' => $category]) }}">
-                                {{ $category->title }}
-                            </a>
-                        </li>
-                    @endforeach
-                </ul>
+                @can("view", \App\Category::class)
+                    <h3>Категори, в которых используется характеристика</h3>
+                    <ul>
+                        @foreach($categories as $category)
+                            <li>
+                                <a href="{{ route('admin.category.show', ['category' => $category]) }}">
+                                    {{ $category->title }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endcan
             </div>
         </div>
     </div>
