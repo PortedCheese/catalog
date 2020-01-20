@@ -15,7 +15,9 @@
                             <th>Тип</th>
                             <th>Машинное имя</th>
                             <th>Группа</th>
-                            <th>Действия</th>
+                            @can("view", \App\CategoryField::class)
+                                <th>Действия</th>
+                            @endcan
                         </tr>
                         </thead>
                         <tbody>
@@ -31,11 +33,13 @@
                                         Не задана
                                     @endif
                                 </td>
-                                <td>
-                                    <a href="{{ route('admin.category.all-fields.show', ['field' => $field]) }}" class="btn btn-dark">
-                                        <i class="far fa-eye"></i>
-                                    </a>
-                                </td>
+                                @can("view", \App\CategoryField::class)
+                                    <td>
+                                        <a href="{{ route('admin.category.all-fields.show', ['field' => $field]) }}" class="btn btn-dark">
+                                            <i class="far fa-eye"></i>
+                                        </a>
+                                    </td>
+                                @endcan
                             </tr>
                         @endforeach
                         </tbody>

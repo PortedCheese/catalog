@@ -81,12 +81,14 @@
                         </li>
                     @endcan
 
-                    <li class="nav-item">
-                        <a href="{{ route('admin.category.field.index', ['category' => $category]) }}"
-                           class="nav-link{{ strstr($currentRoute, 'admin.category.field') !== FALSE ? ' active' : '' }}">
-                            Характеристики <span class="badge badge-dark">{{ $category->fields->count() }}</span>
-                        </a>
-                    </li>
+                    @can("viewAny", \App\CategoryField::class)
+                        <li class="nav-item">
+                            <a href="{{ route('admin.category.field.index', ['category' => $category]) }}"
+                               class="nav-link{{ strstr($currentRoute, 'admin.category.field') !== FALSE ? ' active' : '' }}">
+                                Характеристики <span class="badge badge-dark">{{ $category->fields->count() }}</span>
+                            </a>
+                        </li>
+                    @endcan
 
                     <li class="nav-item">
                         <a href="{{ route('admin.category.product.index', ['category' => $category]) }}"

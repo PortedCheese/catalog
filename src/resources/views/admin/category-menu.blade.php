@@ -11,7 +11,7 @@
     </a>
 
     <div class="dropdown-menu" aria-labelledby="category-menu">
-        @can("viewAll", \App\Category::class)
+        @can("viewAny", \App\Category::class)
             <a href="{{ route("admin.category.index") }}"
                class="dropdown-item">
                 Список
@@ -28,10 +28,12 @@
             Метки товара
         </a>
 
-        <a href="{{ route("admin.category.all-fields.list") }}"
-           class="dropdown-item">
-            Характеристики
-        </a>
+        @can("viewAny", \App\CategoryField::class)
+            <a href="{{ route("admin.category.all-fields.list") }}"
+               class="dropdown-item">
+                Характеристики
+            </a>
+        @endcan
 
         <a href="{{ route("admin.category.groups.index") }}"
            class="dropdown-item">

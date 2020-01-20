@@ -17,7 +17,9 @@
                             <th>В фильтре</th>
                             <th>Группа</th>
                             <th>Приоритет</th>
-                            <th>Действия</th>
+                            @canany(["update", "delete"], \App\CategoryField::class)
+                                <th>Действия</th>
+                            @endcan
                         </tr>
                         </thead>
                         <tbody>
@@ -38,29 +40,37 @@
                                 <td>
                                     {{ $field->pivot->weight }}
                                 </td>
-                                <td>
-                                    <div role="toolbar" class="btn-toolbar">
-                                        <div class="btn-group mr-1">
-                                            <a href="{{ route("admin.category.field.edit", ['category' => $category, "field" => $field]) }}" class="btn btn-primary">
-                                                <i class="far fa-edit"></i>
-                                            </a>
-                                            <button type="button" class="btn btn-danger" data-confirm="{{ "delete-form-{$field->id}" }}">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </button>
+                                @canany(["update", "delete"], $field)
+                                    <td>
+                                        <div role="toolbar" class="btn-toolbar">
+                                            <div class="btn-group mr-1">
+                                                @can("update", $field)
+                                                    <a href="{{ route("admin.category.field.edit", ['category' => $category, "field" => $field]) }}" class="btn btn-primary">
+                                                        <i class="far fa-edit"></i>
+                                                    </a>
+                                                @endcan
+                                                @can("delete", $field)
+                                                    <button type="button" class="btn btn-danger" data-confirm="{{ "delete-form-{$field->id}" }}">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                @endcan
+                                            </div>
                                         </div>
-                                    </div>
-                                    <confirm-form :id="'{{ "delete-form-{$field->id}" }}'">
-                                        <template>
-                                            <form action="{{ route('admin.category.field.destroy', ['category' => $category, 'field' => $field]) }}"
-                                                  id="delete-form-{{ $field->id }}"
-                                                  class="btn-group"
-                                                  method="post">
-                                                @csrf
-                                                <input type="hidden" name="_method" value="DELETE">
-                                            </form>
-                                        </template>
-                                    </confirm-form>
-                                </td>
+                                        @can("delete", $field)
+                                            <confirm-form :id="'{{ "delete-form-{$field->id}" }}'">
+                                                <template>
+                                                    <form action="{{ route('admin.category.field.destroy', ['category' => $category, 'field' => $field]) }}"
+                                                          id="delete-form-{{ $field->id }}"
+                                                          class="btn-group"
+                                                          method="post">
+                                                        @csrf
+                                                        <input type="hidden" name="_method" value="DELETE">
+                                                    </form>
+                                                </template>
+                                            </confirm-form>
+                                        @endcan
+                                    </td>
+                                @endcanany
                             </tr>
                         @endforeach
                         </tbody>
@@ -72,32 +82,40 @@
 @endsection
 
 @section('links')
-    <div class="col-12">
-        <div class="card">
-            <div class="card-body">
-                <div class="btn-group"
-                     role="group">
-                    <a href="{{ route('admin.category.field.create', ['category' => $category]) }}"
-                       class="btn btn-success">
-                        Добавить
-                    </a>
-                    <button type="button"
-                            class="btn btn-warning"
-                            data-toggle="tooltip"
-                            data-placement="top"
-                            onclick="event.preventDefault();document.getElementById('sycn-fields').submit();"
-                            title="Добавить недостающие характеристики у дочерних категорий и обновить значения">
-                        Синхронизировать
-                    </button>
-                </div>
-                <div class="d-none">
-                    <form id="sycn-fields"
-                          action="{{ route('admin.category.field.sync', ['category' => $category]) }}"
-                          method="post">
-                        @csrf
-                    </form>
+    @canany(["create", "update"], \App\CategoryField::class)
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="btn-group"
+                         role="group">
+                        @can("create", \App\CategoryField::class)
+                            <a href="{{ route('admin.category.field.create', ['category' => $category]) }}"
+                               class="btn btn-success">
+                                Добавить
+                            </a>
+                        @endcan
+                        @can("update", \App\CategoryField::class)
+                            <button type="button"
+                                    class="btn btn-warning"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    onclick="event.preventDefault();document.getElementById('sycn-fields').submit();"
+                                    title="Добавить недостающие характеристики у дочерних категорий и обновить значения">
+                                Синхронизировать
+                            </button>
+                        @endcan
+                    </div>
+                    @can("update", \App\CategoryField::class)
+                        <div class="d-none">
+                            <form id="sycn-fields"
+                                  action="{{ route('admin.category.field.sync', ['category' => $category]) }}"
+                                  method="post">
+                                @csrf
+                            </form>
+                        </div>
+                    @endcan
                 </div>
             </div>
         </div>
-    </div>
+    @endcanany
 @endsection

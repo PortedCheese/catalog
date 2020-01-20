@@ -12,14 +12,22 @@ use PortedCheese\Catalog\Events\CategoryFieldUpdate;
 
 class CategoryFieldController extends Controller
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->authorizeResource(CategoryField::class, "field");
+    }
+
     /**
      * Список всех созданных характеристик.
      *
      * @param Request $request
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function list(Request $request)
     {
+        $this->authorize("viewAny", CategoryField::class);
         $fields = CategoryField::query()
             ->orderBy('category_fields.updated_at')
             ->paginate(20)->appends($request->input());
