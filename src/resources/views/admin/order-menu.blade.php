@@ -24,10 +24,12 @@
         @endcan
 
         @if (siteconf()->get("catalog", "useCart"))
-            <a href="{{ route("admin.cart.index") }}"
-               class="dropdown-item">
-                Корзины
-            </a>
+            @can("viewAny", \App\Cart::class)
+                <a href="{{ route("admin.cart.index") }}"
+                   class="dropdown-item">
+                    Корзины
+                </a>
+            @endcan
         @endif
     </div>
 </li>
