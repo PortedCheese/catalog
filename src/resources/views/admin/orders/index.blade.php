@@ -16,8 +16,9 @@
                            id="email"
                            placeholder="E-mail">
 
+                    <label for="state" class="sr-only">Статус</label>
                     <select name="state"
-                            id="parent"
+                            id="state"
                             class="custom-select mb-2 mr-sm-2">
                         <option value=""{{ $query->has('state') ? '' : ' selected' }}>-- Статус --</option>
                         @foreach($states as $key => $value)
@@ -61,7 +62,9 @@
                             <th>Статус</th>
                             <th>Сумма</th>
                             <th>Создан</th>
-                            <th>Действия</th>
+                            @canany(["view", "delete"], \App\Order::class)
+                                <th>Действия</th>
+                            @endcan
                         </tr>
                         </thead>
                         <tbody>
@@ -102,63 +105,76 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <form action="{{ route('admin.order.update', ['order' => $order]) }}"
-                                          method="post"
-                                          style="width: 150px">
-                                        @csrf
-                                        @method('put')
+                                    @can("update", $order)
+                                        <form action="{{ route('admin.order.update', ['order' => $order]) }}"
+                                              method="post"
+                                              style="width: 150px">
+                                            @csrf
+                                            @method('put')
 
-                                        <div class="input-group">
-                                            <select name="state"
-                                                    id="parent"
-                                                    class="custom-select{{ $errors->has('title') ? ' is-invalid' : '' }}">
-                                                @foreach($states as $key => $value)
-                                                    <option value="{{ $key }}"{{ $key == $order->state_id ? ' selected' : '' }}>
-                                                        {{ $value->title }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                            <div class="input-group-append">
-                                                <button type="submit" class="btn btn-outline-success">
-                                                    <i class="far fa-save"></i>
-                                                </button>
+                                            <div class="input-group">
+                                                <select name="state"
+                                                        id="parent"
+                                                        class="custom-select{{ $errors->has('title') ? ' is-invalid' : '' }}">
+                                                    @foreach($states as $key => $value)
+                                                        <option value="{{ $key }}"{{ $key == $order->state_id ? ' selected' : '' }}>
+                                                            {{ $value->title }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <div class="input-group-append">
+                                                    <button type="submit" class="btn btn-outline-success">
+                                                        <i class="far fa-save"></i>
+                                                    </button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </form>
+                                        </form>
+                                    @else
+                                        {{ $order->state->title }}
+                                    @endcan
                                 </td>
                                 <td>{{ $order->total }}</td>
-                                <td>{{ date('d.m.Y H:i:s', strtotime($order->created_at)) }}</td>
-                                <td>
-                                    <div role="toolbar" class="btn-toolbar">
-                                        <div class="btn-group mr-1">
-                                            <button type="button"
-                                                    class="btn btn-info"
-                                                    data-toggle="modal"
-                                                    data-target="#orderInfo{{ $order->id }}">
-                                                <i class="fas fa-info"></i>
-                                            </button>
-                                            <a href="{{ route('admin.order.show', ['order' => $order]) }}" class="btn btn-dark">
-                                                <i class="far fa-eye"></i>
-                                            </a>
-                                            <button type="button" class="btn btn-danger" data-confirm="{{ "delete-order-form-{$order->id}" }}">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </button>
+                                <td>{{ datehelper()->format($order->created_at, "d.m.Y H:i") }}</td>
+                                @canany(["view", "delete"], $order)
+                                    <td>
+                                        <div role="toolbar" class="btn-toolbar">
+                                            <div class="btn-group mr-1">
+                                                @can("view", $order)
+                                                    <button type="button"
+                                                            class="btn btn-info"
+                                                            data-toggle="modal"
+                                                            data-target="#orderInfo{{ $order->id }}">
+                                                        <i class="fas fa-info"></i>
+                                                    </button>
+                                                    <a href="{{ route('admin.order.show', ['order' => $order]) }}" class="btn btn-dark">
+                                                        <i class="far fa-eye"></i>
+                                                    </a>
+                                                @endcan
+                                                @can("delete", $order)
+                                                    <button type="button" class="btn btn-danger" data-confirm="{{ "delete-order-form-{$order->id}" }}">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                @endcan
+                                            </div>
                                         </div>
-                                    </div>
-                                    <confirm-form :id="'{{ "delete-order-form-{$order->id}" }}'">
-                                        <template>
-                                            <form action="{{ route('admin.order.destroy', ['order' => $order]) }}"
-                                                  id="delete-order-form-{{ $order->id }}"
-                                                  class="btn-group"
-                                                  method="post">
-                                                @csrf
-                                                <input type="hidden" name="_method" value="DELETE">
-                                            </form>
-                                        </template>
-                                    </confirm-form>
-
-                                    @include("catalog::admin.orders.user-info-modal", ['order' => $order, 'userData' => $userData])
-                                </td>
+                                        @can("delete", $order)
+                                            <confirm-form :id="'{{ "delete-order-form-{$order->id}" }}'">
+                                                <template>
+                                                    <form action="{{ route('admin.order.destroy', ['order' => $order]) }}"
+                                                          id="delete-order-form-{{ $order->id }}"
+                                                          class="btn-group"
+                                                          method="post">
+                                                        @csrf
+                                                        <input type="hidden" name="_method" value="DELETE">
+                                                    </form>
+                                                </template>
+                                            </confirm-form>
+                                        @endcan
+                                        @can("view", $order)
+                                            @include("catalog::admin.orders.user-info-modal", ['order' => $order, 'userData' => $userData])
+                                        @endcan
+                                    </td>
+                                @endcanany
                             </tr>
                         @endforeach
                         </tbody>

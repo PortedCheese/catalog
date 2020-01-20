@@ -105,6 +105,17 @@ class Order extends Model
     }
 
     /**
+     * Изменить дату создания.
+     *
+     * @param $value
+     * @return string
+     */
+    public function getCreatedAtAttribute($value)
+    {
+        return datehelper()->changeTz($value);
+    }
+
+    /**
      * Добавить вариацию к заказу.
      *
      * @param $variationsInfo

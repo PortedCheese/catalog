@@ -11,14 +11,14 @@
     </a>
 
     <div class="dropdown-menu" aria-labelledby="category-menu">
-        <a href="{{ route("admin.order-state.index") }}"
-           class="dropdown-item">
-            Статусы
-        </a>
-
         <a href="{{ route("admin.order.index") }}"
            class="dropdown-item">
             Список
+        </a>
+
+        <a href="{{ route("admin.order-state.index") }}"
+           class="dropdown-item">
+            Статусы
         </a>
 
         @if (siteconf()->get("catalog", "useCart"))

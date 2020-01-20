@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->authorizeResource(Order::class, "order");
+    }
+
     /**
      * Display a listing of the resource.
      *
