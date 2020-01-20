@@ -81,7 +81,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="comment">Комметарий</label>
+                        <label for="comment">Комментарий</label>
                         <textarea class="form-control" name="comment" id="comment" rows="3"></textarea>
                     </div>
                 </form>
