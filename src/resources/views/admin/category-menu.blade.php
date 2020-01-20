@@ -25,10 +25,12 @@
             </a>
         @endcan
 
-        <a href="{{ route("admin.product-state.index") }}"
-           class="dropdown-item">
-            Метки товара
-        </a>
+        @can("viewAny", \App\ProductState::class)
+            <a href="{{ route("admin.product-state.index") }}"
+               class="dropdown-item">
+                Метки товара
+            </a>
+        @endcan
 
         @can("viewAny", \App\CategoryField::class)
             <a href="{{ route("admin.category.all-fields.list") }}"

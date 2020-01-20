@@ -10,6 +10,12 @@ use Illuminate\Support\Str;
 
 class ProductStateController extends Controller
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->authorizeResource(ProductState::class, "state");
+    }
+
     /**
      * Display a listing of the resource.
      *

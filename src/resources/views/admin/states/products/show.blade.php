@@ -61,20 +61,22 @@
                                     </a>
                                 </td>
                                 <td>
-                                    <confirm-delete-model-button model-id="{{ $product->id }}">
-                                        <template slot="edit">
-                                            <a href="{{ route('admin.category.product.edit', ['category' => $category, 'product' => $product]) }}"
-                                               class="btn btn-primary">
-                                                <i class="far fa-edit"></i>
-                                            </a>
-                                        </template>
-                                        <template slot="show">
-                                            <a href="{{ route('admin.category.product.show', ['category' => $category, 'product' => $product]) }}"
-                                               class="btn btn-dark">
-                                                <i class="far fa-eye"></i>
-                                            </a>
-                                        </template>
-                                    </confirm-delete-model-button>
+                                    <div role="toolbar" class="btn-toolbar">
+                                        <div class="btn-group mr-1">
+                                            @can("update", $product)
+                                                <a href="{{ route('admin.category.product.edit', ['category' => $category, 'product' => $product]) }}"
+                                                   class="btn btn-primary">
+                                                    <i class="far fa-edit"></i>
+                                                </a>
+                                            @endcan
+                                            @can("view", $product)
+                                                <a href="{{ route('admin.category.product.show', ['category' => $category, 'product' => $product]) }}"
+                                                   class="btn btn-dark">
+                                                    <i class="far fa-eye"></i>
+                                                </a>
+                                            @endcan
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach
