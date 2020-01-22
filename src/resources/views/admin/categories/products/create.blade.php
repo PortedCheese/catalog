@@ -32,7 +32,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="slug">Slug</label>
+                        <label for="slug">Адресная строка</label>
                         <input type="text"
                                id="slug"
                                name="slug"
@@ -50,7 +50,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="description">Описание <span class="text-danger">*</span></label>
+                        <label for="ckDescription">Описание <span class="text-danger">*</span></label>
                         <textarea class="form-control"
                                   name="description"
                                   id="ckDescription"
@@ -65,6 +65,7 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="custom-file-input">Главное изображение</label>
                         <div class="custom-file">
                             <input type="file"
                                    class="custom-file-input{{ $errors->has('main_image') ? ' is-invalid' : '' }}"

@@ -113,6 +113,7 @@
                     @endif
 
                     <div class="form-group">
+                        <label for="custom-file-input">Главное изображение</label>
                         <div class="custom-file">
                             <input type="file"
                                    class="custom-file-input{{ $errors->has('main_image') ? ' is-invalid' : '' }}"

@@ -35,7 +35,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="slug">Slug</label>
+                        <label for="slug">Адресная строка</label>
                         <input type="text"
                                id="slug"
                                name="slug"
@@ -43,27 +43,30 @@
                                class="form-control">
                     </div>
 
-                    <div class="custom-file">
-                        <input type="file"
-                               class="custom-file-input{{ $errors->has('main_image') ? ' is-invalid' : '' }}"
-                               id="custom-file-input"
-                               lang="ru"
-                               name="main_image"
-                               aria-describedby="inputGroupMainImage">
-                        <label class="custom-file-label"
-                               for="custom-file-input">
-                            Выберите файл изображения
-                        </label>
-                        @if ($errors->has('main_image'))
-                            <div class="invalid-feedback">
-                                <strong>{{ $errors->first('main_image') }}</strong>
-                            </div>
-                        @endif
+                    <div class="form-group">
+                        <label for="custom-file-input">Главное изображение</label>
+                        <div class="custom-file">
+                            <input type="file"
+                                   class="custom-file-input{{ $errors->has('main_image') ? ' is-invalid' : '' }}"
+                                   id="custom-file-input"
+                                   lang="ru"
+                                   name="main_image"
+                                   aria-describedby="inputGroupMainImage">
+                            <label class="custom-file-label"
+                                   for="custom-file-input">
+                                Выберите файл изображения
+                            </label>
+                            @if ($errors->has('main_image'))
+                                <div class="invalid-feedback">
+                                    <strong>{{ $errors->first('main_image') }}</strong>
+                                </div>
+                            @endif
+                        </div>
                     </div>
 
                     <div class="form-group">
                         <label for="description">Описание</label>
-                        <textarea class="form-control" name="description" rows="3">
+                        <textarea class="form-control" id="description" name="description" rows="3">
                     {{ old('description') }}
                 </textarea>
                     </div>

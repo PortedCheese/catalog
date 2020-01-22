@@ -7,7 +7,7 @@
        aria-haspopup="true"
        aria-expanded="false">
         <i class="fas fa-stream"></i>
-        Категори
+        Категории
     </a>
 
     <div class="dropdown-menu" aria-labelledby="category-menu">
