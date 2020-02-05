@@ -81,7 +81,7 @@ class ProductVariationController extends Controller
         Validator::make($data, [
             'sku' => ['nullable', 'min:2', "max:250", 'unique:product_variations,sku'],
             'product_id' => ['required', 'exists:products,id'],
-            'price' => ['required', 'numeric', 'min:0'],
+            'price' => ['nullable', 'numeric', 'min:0'],
             'sale_price' => ['nullable', 'numeric', 'min:0'],
             'description' => ['required', 'min:2'],
         ], [], [

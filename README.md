@@ -16,6 +16,7 @@
                             {--models : Export models}
                             {--controllers : Export controllers}
                             {--policies : Export and create rules}
+                            {--only-default : Create default rules}
                             {--vue : Export vue}
                             {--config : Make config}
 Настройки каталога. Создает необходимые модели и контроллеры, методы которых можно переопределить, создает элементы меню и создает конфигурацию.
@@ -26,6 +27,12 @@
 В модели Card есть константа CRON_ENABLED - Включить удаление устаревших корзин анонимов
 
 ### Versions
+    
+    v1.1.12:
+        - Изменены поля в вариации(float на decimal)
+        - Добвлен параметр в команду --only-default
+    Обновление:
+        - php artisan migrate
     
     v1.1.10:
         - Добавлены права доступа

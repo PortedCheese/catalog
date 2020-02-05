@@ -20,6 +20,7 @@ class CatalogMakeCommand extends BaseConfigModelCommand
                     {--models : Export models}
                     {--controllers : Export controllers}
                     {--policies : Export and create rules}
+                    {--only-default : Create default rules}
                     {--vue : Export vue}
                     {--config : Make config}';
 

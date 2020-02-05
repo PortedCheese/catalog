@@ -27,7 +27,8 @@ class CreateProductVariationsTable extends Migration
                 ->comment("Цена");
             
             $table->float('sale_price')
-                ->nullable("Цена со скидкой");
+                ->nullable()
+                ->comment("Цена со скидкой");
             
             $table->boolean('sale')
                 ->default(0)
