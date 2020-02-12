@@ -46,30 +46,6 @@
                         @endif
                     </div>
 
-                    @if ($image)
-                        <div class="form-group">
-                            <div class="d-inline-block">
-                                <img src="{{ route('imagecache', ['template' => 'small', 'filename' => $image->file_name]) }}"
-                                     class="rounded mb-2"
-                                     alt="{{ $image->name }}">
-                                <button type="button" class="close ml-1" data-confirm="{{ "delete-image-form-{$category->id}" }}">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <confirm-form :id="'{{ "delete-image-form-{$category->id}" }}'">
-                                <template>
-                                    <form action="{{ route('admin.category.destroy-image', ['category' => $category]) }}"
-                                          id="delete-image-form-{{ $category->id }}"
-                                          class="btn-group"
-                                          method="post">
-                                        @csrf
-                                        <input type="hidden" name="_method" value="DELETE">
-                                    </form>
-                                </template>
-                            </confirm-form>
-                        </div>
-                    @endif
-
                     <div class="form-group">
                         <label for="custom-file-input">Главное изображение</label>
                         <div class="custom-file">

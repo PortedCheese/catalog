@@ -16,9 +16,13 @@
                         </div>
                         <div class="card-body">
                             <div class="d-inline-block">
-                                <img src="{{ route('imagecache', ['template' => 'medium', 'filename' => $image->file_name]) }}"
-                                     class="rounded mb-2"
-                                     alt="{{ $image->name }}">
+                                @img([
+                                    "image" => $image,
+                                    "template" => "medium",
+                                    "lightbox" => "lightGroup" . $product->id,
+                                    "imgClass" => "rounded mb-2",
+                                    "grid" => [],
+                                ])
                                 <button type="button" class="close ml-1" data-confirm="{{ "delete-image-form-{$category->id}" }}">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
