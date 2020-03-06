@@ -55,6 +55,11 @@ class Category extends Model
             $model->forgetTeaserCache();
             $model->forgetBreadcrumbCache();
             $model->forgetChildrenListCache();
+            // Проверить slug.
+            $changes = $model->getChanges();
+            if (! empty($changes["slug"])) {
+                $model->forgetProductCache();
+            }
         });
 
         static::deleting(function (\App\Category $model) {
@@ -508,7 +513,6 @@ class Category extends Model
     public function forgetFieldsCache()
     {
         Cache::forget("category-getFieldsInfo:{$this->id}");
-        $this->addCacheJob("getFieldsInfo");
     }
 
     /**
@@ -521,9 +525,6 @@ class Category extends Model
         if (! empty($parent)) {
             $parent->forgetChildrenFieldsCache();
         }
-        else {
-            $this->addCacheJob("getChildrenFieldsFilterInfo");
-        }
     }
 
     /**
@@ -532,7 +533,16 @@ class Category extends Model
     public function forgetTeaserCache()
     {
         Cache::forget("category-getTeaser:{$this->id}");
-        $this->addCacheJob("getTeaser");
+    }
+
+    /**
+     * Очистить кэш тизера товаров.
+     */
+    public function forgetProductCache()
+    {
+        foreach ($this->products as $product) {
+            $product->forgetTeaserCache();
+        }
     }
 
     /**
@@ -615,6 +625,7 @@ class Category extends Model
      */
     public function forceSetAllJobsCache()
     {
+        return false;
         $this->addCacheJob("getFieldsInfo", true);
         $this->addCacheJob("getChildrenFieldsFilterInfo", true);
         $this->addCacheJob("getTeaser", true);

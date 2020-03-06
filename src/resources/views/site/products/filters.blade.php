@@ -52,8 +52,8 @@
                                     <input type="number"
                                            name="range-from-{{ $filter->machine }}"
                                            step="1"
-                                           min="{{ (float) min($filter->values) }}"
-                                           max="{{ (float) max($filter->values) }}"
+                                           min="{{ (int) min($filter->values) }}"
+                                           max="{{ (int) max($filter->values) }}"
                                            data-value="{{ min($filter->values) }}"
                                            data-init="{{ $query->get("range-from-{$filter->machine}", min($filter->values)) }}"
                                            class="form-control from-input">
@@ -62,8 +62,8 @@
                                     <input type="number"
                                            name="range-to-{{ $filter->machine }}"
                                            step="1"
-                                           min="{{ min($filter->values) }}"
-                                           max="{{ max($filter->values) }}"
+                                           min="{{ (int) min($filter->values) }}"
+                                           max="{{ (int) max($filter->values) }}"
                                            data-value="{{ max($filter->values) }}"
                                            data-init="{{ $query->get("range-to-{$filter->machine}", max($filter->values)) }}"
                                            class="form-control to-input">
