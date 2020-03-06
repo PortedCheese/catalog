@@ -74,6 +74,29 @@ class ProductVariation extends Model
     }
 
     /**
+     * Получить вариации для товара на вывод.
+     *
+     * @param $productId
+     * @return array
+     */
+    public static function getByProductIdForRender($productId)
+    {
+        $collection = \App\ProductVariation::query()
+            ->where('product_id', $productId)
+            ->orderByDesc('available')
+            ->orderBy('price')
+            ->get();
+        $variations = [];
+        foreach ($collection as $item) {
+            $array = $item->toArray();
+            $array['human_price'] = $item->human_price;
+            $array['human_sale_price'] = $item->human_sale_price;
+            $variations[] = $array;
+        }
+        return $variations;
+    }
+
+    /**
      * Поправить sku.
      *
      * @param bool $updating

@@ -75,18 +75,7 @@ class CatalogController extends Controller
         if (!$product->published) {
             abort(404);
         }
-        $collection = ProductVariation::query()
-            ->where('product_id', $product->id)
-            ->orderByDesc('available')
-            ->orderBy('price')
-            ->get();
-        $variations = [];
-        foreach ($collection as $item) {
-            $array = $item->toArray();
-            $array['human_price'] = $item->human_price;
-            $array['human_sale_price'] = $item->human_sale_price;
-            $variations[] = $array;
-        }
+
         $states = $product->states;
         $data = [
             'category' => $category,
@@ -95,7 +84,7 @@ class CatalogController extends Controller
             'image' => $product->image,
             'fields' => $product->getFieldsInfo($category),
             'groups' => $product->getGroupedFieldsInfo($category),
-            'variations' => $variations,
+            'variations' => ProductVariation::getByProductIdForRender($product->id),
             'gallery' => $product->images,
             'useCart' => siteconf()->get('catalog', "useCart"),
             'hasStates' => $states->count(),
