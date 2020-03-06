@@ -12,6 +12,7 @@
                 <form action="{{ route('admin.category.field.store', ['category' => $category]) }}"
                       method="post">
                     @csrf
+                    <input type="hidden" name="weight" value="{{ $nextField }}">
 
                     @if($available->count())
                         <div class="form-group border border-primary p-2 bg-light rounded">
@@ -22,9 +23,7 @@
                                 <option value="">--Выберите--</option>
                                 @foreach($available as $field)
                                     <option value="{{ $field->id }}"
-                                            @if(old('exists'))
-                                            selected
-                                            @endif>
+                                            {{ old("exists") == $field->id ? "selected" : "" }}>
                                         {{ $field->title }} | {{ $field->type_human }}
                                         @if (! empty($field->group_id))
                                             ({{ $field->group->title }})
@@ -33,9 +32,9 @@
                                 @endforeach
                             </select>
                             @error ('exists')
-                                <span class="invalid-feedback" role="alert">
+                                <div class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
-                                </span>
+                                </div>
                             @enderror
                         </div>
                     @endif
@@ -46,30 +45,12 @@
                                id="title"
                                name="title"
                                value="{{ old('title') }}"
-                               class="form-control @error('title') is-invalid @enderror">
-                        @error ('title')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
+                               class="form-control @error("title") is-invalid @enderror">
+                        @error("title")
+                            <div class="invalid-feedback" role="alert">
+                                {{ $message }}
+                            </div>
                         @enderror
-                    </div>
-
-                    <div class="form-group">
-                        <label for="weight">Приоритет</label>
-                        <input type="number"
-                               step="1"
-                               min="1"
-                               id="weight"
-                               name="weight"
-                               value="{{ old('weight') ? old('weight') : $nextField }}"
-                               required
-                               placeholder="{{ $nextField }}"
-                               class="form-control{{ $errors->has('weight') ? ' is-invalid' : '' }}">
-                        @if ($errors->has('weight'))
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $errors->first('weight') }}</strong>
-                            </span>
-                        @endif
                     </div>
 
                     <div class="form-group">
@@ -86,9 +67,9 @@
                             @endforeach
                         </select>
                         @error ('type')
-                            <span class="invalid-feedback" role="alert">
+                            <div class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
-                            </span>
+                            </div>
                         @enderror
                     </div>
 
@@ -114,18 +95,16 @@
                                value="{{ old('machine') }}"
                                class="form-control @error('machine') is-invalid @enderror">
                         @error ('machine')
-                            <span class="invalid-feedback" role="alert">
+                            <div class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
-                            </span>
+                            </div>
                         @enderror
                     </div>
 
                     <div class="form-group">
                         <div class="custom-control custom-checkbox">
                             <input type="checkbox"
-                                   @if(old('filter'))
-                                   checked
-                                   @endif
+                                   {{ old("filter") ? "checked" : "" }}
                                    class="custom-control-input"
                                    value=""
                                    name="filter"

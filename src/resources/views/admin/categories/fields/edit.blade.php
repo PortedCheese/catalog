@@ -18,14 +18,13 @@
                         <input type="text"
                                id="title"
                                name="title"
-                               value="{{ old('title') ? old('title') : $pivot->title }}"
-                               required
-                               class="form-control{{ $errors->has('title') ? ' is-invalid' : '' }}">
-                        @if ($errors->has('title'))
-                            <span class="invalid-feedback" role="alert">
-                        <strong>{{ $errors->first('title') }}</strong>
-                    </span>
-                        @endif
+                               value="{{ old("title", $pivot->title) }}"
+                               class="form-control @error("title") is-invalid @enderror">
+                        @error("title")
+                            <div class="invalid-feedback" role="alert">
+                                {{ $message }}
+                            </div>
+                        @enderror
                     </div>
 
                     <div class="form-group">
@@ -35,25 +34,19 @@
                                min="1"
                                id="weight"
                                name="weight"
-                               value="{{ old('weight') ? old('weight') : $pivot->weight }}"
-                               required
-                               placeholder="{{ $nextField }}"
-                               class="form-control{{ $errors->has('weight') ? ' is-invalid' : '' }}">
-                        @if ($errors->has('weight'))
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $errors->first('weight') }}</strong>
-                            </span>
-                        @endif
+                               value="{{ old("weight", $pivot->weight) }}"
+                               class="form-control @error("weight") is-invalid @enderror">
+                        @error("weight")
+                            <div class="invalid-feedback" role="alert">
+                                {{ $message }}
+                            </div>
+                        @enderror
                     </div>
 
                     <div class="form-group">
                         <div class="custom-control custom-checkbox">
                             <input type="checkbox"
-                                   @if (old('filter'))
-                                   checked
-                                   @elseif ($pivot->filter)
-                                   checked
-                                   @endif
+                                   {{ (! count($errors->all()) && $pivot->filter) || old("filter") ? "checked" : "" }}
                                    class="custom-control-input"
                                    value=""
                                    name="filter"
@@ -68,6 +61,9 @@
                          role="group">
                         <button type="submit" class="btn btn-success">Обновить</button>
                     </div>
+                    <small class="form-text text-muted">
+                        Группа меняется для всех полей <a target="_blank" href="{{ route("admin.category.all-fields.show", ["field" => $field]) }}">этого</a> типа
+                    </small>
                 </form>
             </div>
         </div>
