@@ -122,6 +122,7 @@ class Category extends Model
     /**
      * Категории в виде дерева.
      *
+     * @param bool $forJs
      * @return array
      */
     public static function getTree($forJs = false)

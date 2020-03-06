@@ -4,9 +4,11 @@ namespace PortedCheese\Catalog\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use PortedCheese\BaseSettings\Traits\HasSlug;
 
 class ProductState extends Model
 {
+    use HasSlug;
 
     const COLORS = [
         'primary',
@@ -27,13 +29,12 @@ class ProductState extends Model
     protected static function boot()
     {
         parent::boot();
+        static::slugBoot();
 
-        static::creating(function (\App\ProductState $model) {
-            $model->fixSlug();
-        });
-
-        static::updating(function (\App\ProductState $model) {
-            $model->fixSlug(true);
+        static::updated(function (\App\ProductState $model) {
+            foreach ($model->products as $product) {
+                $product->forgetTeaserCache();
+            }
         });
 
         static::deleting(function (\App\ProductState $model) {
@@ -53,41 +54,5 @@ class ProductState extends Model
     {
         return $this->belongsToMany(\App\Product::class)
             ->withTimestamps();
-    }
-
-    /**
-     * Поправить slug.
-     *
-     * @param bool $updating
-     */
-    public function fixSlug($updating = false)
-    {
-        if ($updating && ($this->original["slug"] == $this->slug)) {
-            return;
-        }
-        if (empty($this->slug)) {
-            $slug = $this->title;
-        }
-        else {
-            $slug = $this->slug;
-        }
-        $slug = Str::slug($slug);
-        $buf = $slug;
-        $i = 1;
-        if ($updating) {
-            $id = $this->id;
-        }
-        else {
-            $id = 0;
-        }
-        while (self::query()
-            ->select("id")
-            ->where("slug", $buf)
-            ->where("id", "!=", $id)
-            ->count())
-        {
-            $buf = $slug . "-" . $i++;
-        }
-        $this->slug = $buf;
     }
 }

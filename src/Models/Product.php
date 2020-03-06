@@ -269,27 +269,26 @@ class Product extends Model
     public function getTeaser()
     {
         $key = "product-getTeaser:{$this->id}";
-        $cached = Cache::get($key);
-        if (!empty($cached)) {
-            return $cached;
-        }
-        $states = $this->states;
-        $variation = \App\ProductVariation::query()
-            ->select('price')
-            ->where('product_id', $this->id)
-            ->where('available', 1)
-            ->orderBy('price')
-            ->first();
-        $view = view("catalog::site.products.teaser", [
-            'product' => $this,
-            'image' => $this->image,
-            'hasStates' => $states->count(),
-            'states' => $states,
-            'variation' => $variation,
-        ]);
-        $html = $view->render();
-        Cache::forever($key, $html);
-        return $html;
+        $product = $this;
+        $data = Cache::rememberForever($key, function () use ($product) {
+            $states = $product->states;
+            $variation = \App\ProductVariation::query()
+                ->select('price')
+                ->where('product_id', $product->id)
+                ->where('available', 1)
+                ->orderBy('price')
+                ->first();
+            return [
+                'product' => $product,
+                'image' => $product->image,
+                'hasStates' => $states->count(),
+                'states' => $states,
+                'variation' => $variation,
+                "category" => $product->category,
+            ];
+        });
+        $view = view("catalog::site.products.teaser", $data);
+        return $view->render();
     }
 
     /**

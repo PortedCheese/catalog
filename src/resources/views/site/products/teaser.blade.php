@@ -34,7 +34,7 @@
             <h4 class="mb-4 text-primary">от {{ $variation->price }} руб.</h4>
         @endif
         <a href="{{ route('site.catalog.product.show', [
-                            'category' => $product->category,
+                            'category' => $category,
                             'product' => $product
                         ]) }}"
            class="btn btn-primary px-4 py-2">
