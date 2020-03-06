@@ -3,7 +3,7 @@
         <form v-if="variations.length">
             <product-variations :variations="variations" v-model="chosenVariation"></product-variations>
 
-            <div class="form-group">
+            <div class="form-group" v-if="chosenVariation">
                 <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
                     <div class="input-group input-group-lg mb-2 mr-2">
                         <div class="input-group-prepend">

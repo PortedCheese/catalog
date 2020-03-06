@@ -4,16 +4,22 @@
             <h4>
                 <span class="text-primary">{{ variationData.price }} руб.</span>
                 <span v-if="variationData.sale"><del>{{ variationData.sale_price }}</del> руб. </span>
+                <template v-if="variations.length === 1">
+                    <br>
+                    <span>{{ variationData.description }}</span>
+                </template>
             </h4>
         </div>
 
-        <div class="custom-control custom-radio" v-for="variation in variations">
+        <div class="custom-control custom-radio"
+             :class="variations.length <= 1 && variationData ? 'd-none' : ''"
+             v-for="variation in variations">
             <input type="radio"
                    :id="'customRadio' + variation.id"
                    name="customRadio"
                    v-model="chosenVariation"
                    :value="variation.id"
-                   :disabled="!variation.available"
+                   :disabled="! variation.available"
                    @change="$emit('change', chosenVariation)"
                    class="custom-control-input">
             <label class="custom-control-label"
@@ -54,7 +60,6 @@
             if (! this.chosenVariation && this.variations.length) {
                 for (let item in this.variations) {
                     if (this.variations.hasOwnProperty(item)) {
-                        console.log(this.variations[item].available);
                         if (this.variations[item].available) {
                             this.chosenVariation = this.variations[item].id;
                             this.$emit('change', this.chosenVariation);

@@ -31,7 +31,7 @@
     </div>
     <div class="card-footer">
         @if ($variation)
-            <h4 class="mb-4 text-primary">от {{ $variation->price }} руб.</h4>
+            <h4 class="mb-4 text-primary">{{ $variationsCount > 1 ? "от " : "" }}{{ $variation->price }} руб.</h4>
         @endif
         <a href="{{ route('site.catalog.product.show', [
                             'category' => $category,

@@ -272,12 +272,21 @@ class Product extends Model
         $product = $this;
         $data = Cache::rememberForever($key, function () use ($product) {
             $states = $product->states;
-            $variation = \App\ProductVariation::query()
-                ->select('price')
-                ->where('product_id', $product->id)
-                ->where('available', 1)
-                ->orderBy('price')
-                ->first();
+            $countVariations = \App\ProductVariation::query()
+                ->select("id")
+                ->where("product_id", $product->id)
+                ->count();
+            if ($countVariations) {
+                $variation = \App\ProductVariation::query()
+                    ->select('price')
+                    ->where('product_id', $product->id)
+                    ->where('available', 1)
+                    ->orderBy('price')
+                    ->first();
+            }
+            else {
+                $variation = false;
+            }
             return [
                 'product' => $product,
                 'image' => $product->image,
@@ -285,6 +294,7 @@ class Product extends Model
                 'states' => $states,
                 'variation' => $variation,
                 "category" => $product->category,
+                "variationsCount" => $countVariations,
             ];
         });
         $view = view("catalog::site.products.teaser", $data);

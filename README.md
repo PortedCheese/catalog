@@ -8,7 +8,7 @@
 ## Install
     php artisan migrate
 
-    php artisan vendor:publish --provider="PortedCheese\Catalog\ServiceProvider" --tag=public
+    php artisan vendor:publish --provider="PortedCheese\Catalog\ServiceProvider" --tag=public --force
 
     php artisan make:catalog
                             {--all : Run all}
@@ -27,6 +27,15 @@
 В модели Card есть константа CRON_ENABLED - Включить удаление устаревших корзин анонимов
 
 ### Versions
+    
+    v1.1.14:
+        - Сброс кэша тизеров товара при обновлении slug у категории
+        - Изменено кэширование тизера товара, теперь запоминаются только данные не шаблон
+        - При выводе полго товара вариации формируются в модели
+        - Если вариации одна, то радио кнопки скрыты
+    Обновление:
+        - php artisan cache:clear
+        - php artisan vendor:publish --provider="PortedCheese\Catalog\ServiceProvider" --tag=public --force
     
     v1.1.13:
         - Изменен вывод изображение в админке
