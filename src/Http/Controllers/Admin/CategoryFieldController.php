@@ -28,9 +28,16 @@ class CategoryFieldController extends Controller
     public function list(Request $request)
     {
         $this->authorize("viewAny", CategoryField::class);
-        $fields = CategoryField::query()
-            ->orderBy('category_fields.updated_at')
-            ->paginate(20)->appends($request->input());
+        $query = CategoryField::query();
+
+        if ($title = $request->get("title", false)) {
+            $query->where("title", "LIKE", "%$title%");
+        }
+
+        $fields = $query->orderBy('title')
+            ->paginate()
+            ->appends($request->input());
+
         $groups = [];
         foreach ($fields as $field) {
             if (! empty($field->group_id) && empty($groups[$field->group_id])) {
@@ -40,6 +47,7 @@ class CategoryFieldController extends Controller
         return view("catalog::admin.categories.fields.list", [
             'fields' => $fields,
             'groups' => $groups,
+            "query" => $request->query,
         ]);
     }
 

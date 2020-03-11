@@ -7,6 +7,25 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body">
+                <form action="{{ route($currentRoute) }}" method="get" class="form-inline">
+                    <label class="sr-only" for="title">Заголовок</label>
+                    <input type="text"
+                           class="form-control mb-2 mr-sm-2"
+                           id="title"
+                           placeholder="Заголовок"
+                           value="{{ $query->get("title", "") }}"
+                           name="title">
+
+                    <button type="submit" class="btn btn-primary mb-2 mr-sm-2">Поиск</button>
+                    <a href="{{ route($currentRoute) }}" class="btn btn-outline-secondary mb-2">Сбросить</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
                 <div class="table-responsive">
                     <table class="table">
                         <thead>
@@ -48,4 +67,14 @@
             </div>
         </div>
     </div>
+
+    @if ($fields->lastPage() > 1)
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    {{ $fields->links() }}
+                </div>
+            </div>
+        </div>
+    @endif
 @endsection

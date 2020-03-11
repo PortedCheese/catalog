@@ -28,7 +28,8 @@
                                         @if(old('field_id') == $value->id)
                                         selected
                                         @endif>
-                                    {{ $value->title }} | {{ $value->type_human }}
+                                    @php($title = $value->pivot->title)
+                                    {{ $value->pivot->title }} @if ($title != $value->title) ({{ $value->title }}) @endif | {{ $value->type_human }}
                                     @if (! empty($value->group_id))
                                         ({{ $value->group->title }})
                                     @endif

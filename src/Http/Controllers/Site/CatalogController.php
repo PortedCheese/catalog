@@ -85,7 +85,7 @@ class CatalogController extends Controller
             'fields' => $product->getFieldsInfo($category),
             'groups' => $product->getGroupedFieldsInfo($category),
             'variations' => ProductVariation::getByProductIdForRender($product->id),
-            'gallery' => $product->images,
+            'gallery' => $product->images()->orderBy("weight")->get(),
             'useCart' => siteconf()->get('catalog', "useCart"),
             'hasStates' => $states->count(),
             'states' => $states,
