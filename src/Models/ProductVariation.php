@@ -3,7 +3,6 @@
 namespace PortedCheese\Catalog\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 use PortedCheese\Catalog\Events\ProductVariationUpdate;
 
 class ProductVariation extends Model

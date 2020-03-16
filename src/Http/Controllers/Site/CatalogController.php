@@ -4,11 +4,11 @@ namespace PortedCheese\Catalog\Http\Controllers\Site;
 
 use App\Category;
 use App\Http\Controllers\Controller;
+use App\Meta;
 use App\Product;
 use App\ProductVariation;
 use Illuminate\Http\Request;
 use PortedCheese\Catalog\Http\Services\ProductFilterService;
-use PortedCheese\SeoIntegration\Models\Meta;
 
 class CatalogController extends Controller
 {

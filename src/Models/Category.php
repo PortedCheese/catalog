@@ -2,7 +2,6 @@
 
 namespace PortedCheese\Catalog\Models;
 
-use App\Image;
 use App\ProductField;
 use App\Product;
 use App\ProductVariation;
@@ -12,12 +11,10 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
 use PortedCheese\BaseSettings\Traits\HasImage;
 use PortedCheese\BaseSettings\Traits\HasSlug;
 use PortedCheese\Catalog\Events\CategoryFieldUpdate;
 use PortedCheese\Catalog\Jobs\CategoryCache;
-use PortedCheese\SeoIntegration\Models\Meta;
 use PortedCheese\SeoIntegration\Traits\HasMetas;
 
 class Category extends Model

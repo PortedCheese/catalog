@@ -2,19 +2,16 @@
 
 namespace PortedCheese\Catalog\Models;
 
-use App\Image;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
 use PortedCheese\BaseSettings\Traits\HasImage;
 use PortedCheese\BaseSettings\Traits\HasSlug;
 use PortedCheese\Catalog\Events\ProductCategoryChange;
 use PortedCheese\Catalog\Events\ProductListChange;
-use PortedCheese\SeoIntegration\Models\Meta;
 use PortedCheese\SeoIntegration\Traits\HasMetas;
 
 class Product extends Model
