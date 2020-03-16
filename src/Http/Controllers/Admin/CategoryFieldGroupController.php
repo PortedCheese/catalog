@@ -31,6 +31,24 @@ class CategoryFieldGroupController extends Controller
         ]);
     }
 
+    public function priority()
+    {
+        $this->authorize("update", CategoryFieldGroup::class);
+        $groups = [];
+        $collection = CategoryFieldGroup::query()
+            ->orderBy("weight")
+            ->get();
+        foreach ($collection as $item) {
+            $groups[] = [
+                "name" => $item->title,
+                "id" => $item->id,
+            ];
+        }
+        return view("catalog::admin.categories.groups.priority", [
+            'groups' => $groups,
+        ]);
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -70,11 +88,9 @@ class CategoryFieldGroupController extends Controller
         Validator::make($data, [
             "title" => ["required", "min:2", "max:200"],
             "machine" => ["nullable", "min:2", "max:100", "unique:category_field_groups,machine"],
-            "weight" => ["required", "numeric", "min:1"],
         ], [], [
             "title" => "Заголовок",
             "machine" => "Машинное имя",
-            "weight" => "Вес",
         ])->validate();
     }
 
@@ -119,10 +135,8 @@ class CategoryFieldGroupController extends Controller
     {
         Validator::make($data, [
             "title" => ["required", "min:2", "max:200"],
-            "weight" => ["required", "numeric", "min:1"],
         ], [], [
             "title" => "Заголовок",
-            "weight" => "Вес",
         ])->validate();
     }
 

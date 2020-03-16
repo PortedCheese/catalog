@@ -87,19 +87,21 @@
                         </div>
                     @endif
 
-                    <div class="form-group">
-                        <label for="machine">Машинное имя</label>
-                        <input type="text"
-                               id="machine"
-                               name="machine"
-                               value="{{ old('machine') }}"
-                               class="form-control @error('machine') is-invalid @enderror">
-                        @error ('machine')
-                            <div class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </div>
-                        @enderror
-                    </div>
+                    @can("settings-management")
+                        <div class="form-group">
+                            <label for="machine">Машинное имя</label>
+                            <input type="text"
+                                   id="machine"
+                                   name="machine"
+                                   value="{{ old('machine') }}"
+                                   class="form-control @error('machine') is-invalid @enderror">
+                            @error ('machine')
+                                <div class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </div>
+                            @enderror
+                        </div>
+                    @endcan
 
                     <div class="form-group">
                         <div class="custom-control custom-checkbox">

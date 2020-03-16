@@ -60,6 +60,8 @@ Route::group([
     Route::group([
         'as' => "category.",
     ], function () {
+        Route::get("groups/priority", "CategoryFieldGroupController@priority")
+            ->name("groups.priority");
         Route::resource("groups", "CategoryFieldGroupController")->except([
             'edit',
         ]);

@@ -26,11 +26,14 @@ class CategoryField extends Model
 
         self::creating(function ($model) {
             $machine = $model->machine;
+            if (empty($machine)) {
+                $machine = $model->title;
+            }
             $machine = Str::slug($machine, '_');
             $machine = str_replace("-", "_", $machine);
             $buf = $machine;
             $i = 1;
-            while (self::where('machine', $machine)->count()) {
+            while (self::query()->where('machine', $machine)->count()) {
                 $machine = $buf . '_' . $i++;
             }
             $model->machine = $machine;

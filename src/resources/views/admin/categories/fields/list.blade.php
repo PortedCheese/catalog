@@ -32,7 +32,6 @@
                         <tr>
                             <th>Заголовок</th>
                             <th>Тип</th>
-                            <th>Машинное имя</th>
                             <th>Группа</th>
                             @can("view", \App\CategoryField::class)
                                 <th>Действия</th>
@@ -44,7 +43,6 @@
                             <tr>
                                 <td>{{ $field->title }}</td>
                                 <td>{{ $field->type_human }}</td>
-                                <td>{{ $field->machine }}</td>
                                 <td>
                                     @if (! empty($field->group_id))
                                         {{ $groups[$field->group_id]->title }}

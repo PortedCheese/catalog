@@ -131,7 +131,7 @@ class CategoryFieldController extends Controller
             "title" => ["nullable", "required_without:exists", "min:2", "max:200"],
             "exists" => ["nullable", "required_without_all:machine,type,title", "exists:category_fields,id"],
             "type" => ["nullable", "required_without:exists"],
-            "machine" => ["nullable", "required_without:exists", "min:4", "max:100", "unique:category_fields,machine"],
+            "machine" => ["nullable", "max:100", "unique:category_fields,machine"],
             "weight" => ["nullable", "numeric", "min:1"],
         ], [], [
             "title" => "Заголовок",
@@ -159,6 +159,7 @@ class CategoryFieldController extends Controller
             'categories' => $field->categories,
             'group' => $field->group,
             'groups' => $groups,
+            "types" => CategoryField::TYPES,
         ]);
     }
 
@@ -231,9 +232,11 @@ class CategoryFieldController extends Controller
         Validator::make($data, [
             "title" => ["required", "min:2", "max:200"],
             "weight" => ["required", "numeric", "min:1"],
+            "type" => ["required"],
         ], [], [
             "title" => "Заголовок",
             "weight" => "Вес",
+            "type" => "Виджет поля",
         ])->validate();
     }
 

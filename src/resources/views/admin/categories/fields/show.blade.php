@@ -20,12 +20,23 @@
                                    value="{{ old('title') ? old('title') : $field->title }}"
                                    required
                                    class="form-control{{ $errors->has('title') ? ' is-invalid' : '' }}">
-                            @if ($errors->has('title'))
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $errors->first('title') }}</strong>
-                                </span>
-                            @endif
                         </div>
+
+                        <div class="form-group mb-2 mr-sm-2">
+                            <label for="type" class="sr-only">Виджет поля</label>
+                            <select name="type"
+                                    id="type"
+                                    class="form-control custom-select @error("type") is-invalid @enderror">
+                                <option value="">Выберите...</option>
+                                @foreach($types as $key => $item)
+                                    <option value="{{ $key }}"
+                                            {{ old("type", $field->type) == $key ? "selected" : "" }}>
+                                        {{ $item }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
 
                         @if ($groups->count())
                             <div class="form-group mb-2 mr-sm-2">
@@ -44,6 +55,19 @@
                             <button type="submit" class="btn btn-success">Обновить</button>
                         </div>
                     </form>
+
+                    @error("type")
+                        <input type="hidden" class="form-control is-invalid">
+                        <div class="invalid-feedback" role="alert">
+                            {{ $message }}
+                        </div>
+                    @enderror
+                    @error("title")
+                        <input type="hidden" class="form-control is-invalid">
+                        <div class="invalid-feedback" role="alert">
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
             @endcan
             <div class="card-body">
@@ -54,14 +78,11 @@
                     <dt class="col-sm-3">Тип</dt>
                     <dd class="col-sm-9">{{ $field->type_human }}</dd>
 
-                    <dt class="col-sm-3">Машинное имя</dt>
-                    <dd class="col-sm-9">{{ $field->machine }}</dd>
-
                     <dt class="col-sm-3">Группа</dt>
                     <dd class="col-sm-9">{{ empty($group) ? "Не задана" : $group->title }}</dd>
                 </dl>
                 @can("view", \App\Category::class)
-                    <h3>Категори, в которых используется характеристика</h3>
+                    <h3>Категории, в которых используется характеристика</h3>
                     <ul>
                         @foreach($categories as $category)
                             <li>

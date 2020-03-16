@@ -46,7 +46,7 @@ class CatalogController extends Controller
      */
     public function showCategory(Request $request, Category $category)
     {
-        $categories = $category->children;
+        $categories = $category->children()->orderBy("weight")->get();
 
         $filter = new ProductFilterService($request, $category);
         $products = $filter->makeFilter();

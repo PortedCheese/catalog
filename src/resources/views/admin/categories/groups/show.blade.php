@@ -7,6 +7,8 @@
 @endsection
 
 @section('admin')
+    @include("catalog::admin.categories.groups.includes.pills")
+
     <div class="col-12">
         <div class="card">
             @can("update", $group)
@@ -23,18 +25,6 @@
                                    value="{{ old('title') ? old('title') : $group->title }}"
                                    required
                                    class="form-control{{ $errors->has('title') ? ' is-invalid' : '' }}">
-                        </div>
-
-                        <div class="form-group mb-2 mr-sm-2">
-                            <label for="weight" class="sr-only">Приоритет</label>
-                            <input type="number"
-                                   min="1"
-                                   step="1"
-                                   id="weight"
-                                   name="weight"
-                                   value="{{ old('weight') ? old('weight') : $group->weight }}"
-                                   required
-                                   class="form-control{{ $errors->has('weight') ? ' is-invalid' : '' }}">
                         </div>
 
                         <div class="btn-group mb-2 mr-sm-2"
@@ -55,16 +45,6 @@
                 </div>
             @endcan
             <div class="card-body">
-                <dl class="row">
-                    <dt class="col-sm-3">Заголовок</dt>
-                    <dd class="col-sm-9">{{ $group->title }}</dd>
-
-                    <dt class="col-sm-3">Машинное имя</dt>
-                    <dd class="col-sm-9">{{ $group->machine }}</dd>
-
-                    <dt class="col-sm-3">Приоритет</dt>
-                    <dd class="col-sm-9">{{ $group->weight }}</dd>
-                </dl>
                 @can("view", \App\CategoryField::class)
                     @if ($fields->count())
                         <h5>Поля относящается к группе</h5>
@@ -90,7 +70,6 @@
             <div class="card-body">
                 <div role="toolbar" class="btn-toolbar">
                     <div class="btn-group mr-1">
-                        <a href="{{ route('admin.category.groups.index') }}" class="btn btn-dark">К списку</a>
                         @can("delete", $group)
                             <button type="button" class="btn btn-danger" data-confirm="{{ "delete-form-{$group->id}" }}">
                                 <i class="fas fa-trash-alt"></i>

@@ -7,11 +7,14 @@
 @endsection
 
 @section('admin')
+    @include("catalog::admin.categories.groups.includes.pills")
+
     <div class="col-12">
         <div class="card">
             <div class="card-body">
                 <form action="{{ route("admin.category.groups.store") }}" method="post">
                     @csrf
+                    <input type="hidden" name="weight" value="{{ $weight }}">
 
                     <div class="form-group">
                         <label for="title">Заголовок</label>
@@ -28,30 +31,21 @@
                         @endif
                     </div>
 
-                    <div class="form-group">
-                        <label for="machine">Машинное имя</label>
-                        <input type="text"
-                               id="machine"
-                               name="machine"
-                               value="{{ old('machine') }}"
-                               class="form-control{{ $errors->has('machine') ? ' is-invalid' : '' }}">
-                        @if ($errors->has('machine'))
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $errors->first('machine') }}</strong>
-                            </span>
-                        @endif
-                    </div>
-
-                    <div class="form-group">
-                        <label for="weight">Приоритет</label>
-                        <input type="number"
-                               step="1"
-                               min="1"
-                               id="weight"
-                               name="weight"
-                               value="{{ old('weight') ? old('weight') : $weight }}"
-                               class="form-control">
-                    </div>
+                    @can("settings-management")
+                        <div class="form-group">
+                            <label for="machine">Машинное имя</label>
+                            <input type="text"
+                                   id="machine"
+                                   name="machine"
+                                   value="{{ old('machine') }}"
+                                   class="form-control{{ $errors->has('machine') ? ' is-invalid' : '' }}">
+                            @if ($errors->has('machine'))
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $errors->first('machine') }}</strong>
+                                </span>
+                            @endif
+                        </div>
+                    @endcan
 
                     <div class="btn-group"
                          role="group">

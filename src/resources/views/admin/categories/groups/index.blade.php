@@ -7,24 +7,16 @@
 @endsection
 
 @section('admin')
+    @include("catalog::admin.categories.groups.includes.pills")
+
     <div class="col-12">
         <div class="card">
-            @can("create", \App\CategoryFieldGroup::class)
-                <div class="card-header">
-                    <div class="btn-group"
-                         role="group">
-                        <a href="{{ route("admin.category.groups.create") }}" class="btn btn-success">Добавить</a>
-                    </div>
-                </div>
-            @endcan
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table">
                         <thead>
                         <tr>
                             <th>Заголовок</th>
-                            <th>Машинное имя</th>
-                            <th>Приоритет</th>
                             @canany(["delete", "view"], \App\CategoryFieldGroup::class)
                                 <th>Действия</th>
                             @endcanany
@@ -34,8 +26,6 @@
                         @foreach($groups as $group)
                             <tr>
                                 <td>{{ $group->title }}</td>
-                                <td>{{ $group->machine }}</td>
-                                <td>{{ $group->weight }}</td>
                                 @canany(["view", "delete"], $group)
                                     <td>
                                         <div role="toolbar" class="btn-toolbar">
