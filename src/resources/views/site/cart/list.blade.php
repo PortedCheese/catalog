@@ -4,11 +4,13 @@
         <div id="variation-{{ $variation->model->id }}" class="row py-4 mb-2 mx-2{{ $border ? ' border-bottom' : "" }}">
             <div class="col-6 col-lg-2 mb-2">
                 @if ($product->image)
-                    @image([
-                    'image' => $product->image,
-                    'template' => 'small',
-                    'lightbox' => "image-{$variation->model->id}"
-                    ])@endimage
+                    @img([
+                        "image" => $product->image,
+                        "template" => "small",
+                        "lightbox" => "image-{$variation->model->id}",
+                        "imgClass" => "img-fluid",
+                        "grid" => [],
+                    ])
                 @endif
             </div>
             <div class="col-6 col-lg-5 mb-2">
