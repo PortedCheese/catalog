@@ -46,14 +46,14 @@ class Cart extends Model
      * @param Product $product
      * @param $variationId
      * @param int $quantity
-     * @return bool|mixed|Cart
+     * @return bool|mixed|\App\Cart
      * @throws \Exception
      */
     public static function addToCard(Product $product, $variationId, $quantity = 1)
     {
-        $cart = self::getCart();
+        $cart = \App\Cart::getCart();
         if (!$cart) {
-            $cart = self::initCart();
+            $cart = \App\Cart::initCart();
         }
         $cart->addProductVariation($product->id, $variationId, $quantity);
         return $cart;
@@ -70,7 +70,7 @@ class Cart extends Model
         if (Auth::check()) {
             $userId = Auth::user()->id;
         }
-        $cart = self::create([
+        $cart = \App\Cart::create([
             'user_id' => $userId,
         ]);
         $uuid = $cart->uuid;
@@ -81,7 +81,7 @@ class Cart extends Model
     /**
      * Получить корзину.
      *
-     * @return bool|Cart
+     * @return bool|\App\Cart
      * @throws \Exception
      */
     public static function getCart()
@@ -89,12 +89,12 @@ class Cart extends Model
         $cookie = Cookie::get('cartUuid', false);
         // Ищем по куке.
         if ($cookie) {
-            $cart = self::findByUuid($cookie);
+            $cart = \App\Cart::findByUuid($cookie);
             if ($cart) {
                 // Если авторизован, нужно записать ему эту корзину.
                 if (Auth::check() && empty($cart->user_id)) {
                     $user = Auth::user();
-                    $userCart = self::findByUserId($user->id);
+                    $userCart = \App\Cart::findByUserId($user->id);
                     // Если у пользователя была корзина,
                     // но он заполнил новую под гостем,
                     // новая корзина приоритетней.
@@ -110,7 +110,7 @@ class Cart extends Model
         // Ищем по пользователю.
         if (Auth::check()) {
             $user = Auth::user();
-            $cart = self::findByUserId($user->id);
+            $cart = \App\Cart::findByUserId($user->id);
             if ($cart) {
                 return $cart;
             }
@@ -122,12 +122,12 @@ class Cart extends Model
      * Найти по пользователю.
      *
      * @param $id
-     * @return bool|self
+     * @return bool|Model|\App\Cart
      */
     public static function findByUserId($id)
     {
         try {
-            return self::where('user_id', $id)->firstOrFail();
+            return \App\Cart::query()->where('user_id', $id)->firstOrFail();
         }
         catch (\Exception $e) {
             return false;
@@ -138,12 +138,12 @@ class Cart extends Model
      * Найти корзину по uuid.
      *
      * @param $uiid
-     * @return bool|self
+     * @return bool|Model|\App\Cart
      */
     public static function findByUuid($uiid)
     {
         try {
-            return self::where('uuid', $uiid)->firstOrFail();
+            return \App\Cart::query()->where('uuid', $uiid)->firstOrFail();
         }
         catch (\Exception $e) {
             return false;
