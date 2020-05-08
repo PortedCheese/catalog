@@ -28,6 +28,11 @@
 
 ### Versions
     
+    v1.1.21:
+        - Исправлена опечатка
+    Обновление:
+        - php artisan vendor:publish --provider="PortedCheese\Catalog\ServiceProvider" --tag=public --force
+    
     v1.1.19:
         - В классе Cart вызовы self заменены на App\Cart
         
