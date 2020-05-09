@@ -28,6 +28,11 @@
 
 ### Versions
     
+    v1.1.23:
+        - Изменен метод getTeaser в Cftegory
+    Обновление:
+        - php artisan cache:clear
+        
     v1.1.22:
         - Исправлено постоение дерева каталога
         

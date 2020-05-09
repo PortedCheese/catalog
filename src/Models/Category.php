@@ -438,14 +438,13 @@ class Category extends Model
     public function getTeaser()
     {
         $key = "category-getTeaser:{$this->id}";
-        $cached = Cache::get($key);
-        if (!empty($cached)) {
-            return $cached;
-        }
-        $view = view("catalog::site.categories.teaser", ['category' => $this]);
-        $html = $view->render();
-        Cache::forever($key, $html);
-        return $html;
+        $category = $this;
+        $data = Cache::rememberForever($key, function () use ($category) {
+            $image = $category->image;
+            return $category;
+        });
+        $view = view("catalog::site.categories.teaser", ['category' => $data]);
+        return $view->render();
     }
 
     /**
