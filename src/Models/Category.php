@@ -162,6 +162,7 @@ class Category extends Model
         if (! $children) {
             $tree[$item["parent"]]["children"][$id] = $item;
         }
+        // Обновление дочерних.
         else {
             $tree[$item["parent"]]["children"][$id]["children"] = $children;
         }
