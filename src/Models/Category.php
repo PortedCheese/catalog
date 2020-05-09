@@ -148,12 +148,29 @@ class Category extends Model
             if (empty($item["parent"])) {
                 continue;
             }
-            $tree[$item["parent"]]["children"][$id] = $item;
+            self::addChild($tree, $item, $id);
         }
         foreach ($noParent as $id) {
             self::removeChildren($tree, $id);
         }
         return self::sortByWeight($tree);
+    }
+
+    protected static function addChild(&$tree, $item, $id, $children = false)
+    {
+        // Добавление к дочерним.
+        if (! $children) {
+            $tree[$item["parent"]]["children"][$id] = $item;
+        }
+        else {
+            $tree[$item["parent"]]["children"][$id]["children"] = $children;
+        }
+
+        $parent = $tree[$item["parent"]];
+        if (! empty($parent["parent"])) {
+            $items = $parent["children"];
+            self::addChild($tree, $parent, $parent["id"], $items);
+        }
     }
 
     /**
@@ -162,7 +179,7 @@ class Category extends Model
      * @param $tree
      * @return array
      */
-    private static function sortByWeight($tree)
+    protected static function sortByWeight($tree)
     {
         $sorted = array_values(Arr::sort($tree, function ($value) {
             return $value['weight'];
@@ -181,7 +198,7 @@ class Category extends Model
      * @param $tree
      * @param $id
      */
-    private static function removeChildren(&$tree, $id)
+    protected static function removeChildren(&$tree, $id)
     {
         if (empty($tree[$id])) {
             return;
@@ -639,7 +656,7 @@ class Category extends Model
      *
      * @param $fieldsInfo
      */
-    private function setAdditionalRangeFilter(&$fieldsInfo)
+    protected function setAdditionalRangeFilter(&$fieldsInfo)
     {
         foreach ($fieldsInfo as $key => &$filter) {
             if ($filter->type !== 'range') {
@@ -678,7 +695,7 @@ class Category extends Model
      * @param $fieldsInfo
      * @param $includeSubs
      */
-    private function addPriceFilter(&$fieldsInfo, $includeSubs)
+    protected function addPriceFilter(&$fieldsInfo, $includeSubs)
     {
         $key = "category-addPriceFilter:{$this->id}";
         if ($includeSubs) {
@@ -727,7 +744,7 @@ class Category extends Model
      * @param $fields
      * @return array
      */
-    private function getOnlyFilter($fields)
+    protected function getOnlyFilter($fields)
     {
         $filtered = [];
         foreach ($fields as $field) {
@@ -744,7 +761,7 @@ class Category extends Model
      * @param $fieldsInfo
      * @param $fieldValues
      */
-    private function setProductValuesToFilter(&$fieldsInfo, $fieldValues)
+    protected function setProductValuesToFilter(&$fieldsInfo, $fieldValues)
     {
         // Записываем значения для полей.
         foreach ($fieldsInfo as &$field) {
@@ -772,7 +789,7 @@ class Category extends Model
      * @param $includeSubs
      * @return array
      */
-    private function getProductValues($includeSubs)
+    protected function getProductValues($includeSubs)
     {
         $key = "category-getProductValues:{$this->id}";
         if ($includeSubs) {
@@ -812,7 +829,7 @@ class Category extends Model
      * @param $includeSubs
      * @return array
      */
-    private function getPIds($includeSubs)
+    protected function getPIds($includeSubs)
     {
         $key = "category-getPIds:{$this->id}";
         if ($includeSubs) {
@@ -848,7 +865,7 @@ class Category extends Model
      * @param bool $force
      * @return bool
      */
-    private function addCacheJob($method, $force = false)
+    protected function addCacheJob($method, $force = false)
     {
         // disabled.
         if (false) {
