@@ -28,6 +28,9 @@
 
 ### Versions
     
+    v1.2.0:
+        - Изменены traits
+        
     v1.1.23:
         - Изменен метод getTeaser в Cftegory
     Обновление:
