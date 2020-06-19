@@ -11,15 +11,15 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
-use PortedCheese\BaseSettings\Traits\HasImage;
-use PortedCheese\BaseSettings\Traits\HasSlug;
+use PortedCheese\BaseSettings\Traits\ShouldImage;
+use PortedCheese\BaseSettings\Traits\ShouldSlug;
 use PortedCheese\Catalog\Events\CategoryFieldUpdate;
 use PortedCheese\Catalog\Jobs\CategoryCache;
-use PortedCheese\SeoIntegration\Traits\HasMetas;
+use PortedCheese\SeoIntegration\Traits\ShouldMetas;
 
 class Category extends Model
 {
-    use HasSlug, HasImage, HasMetas;
+    use ShouldSlug, ShouldImage, ShouldMetas;
 
     const PAGE_NAME = "Каталог";
     const PAGE_ROUTE = 'site.catalog.index';
@@ -33,12 +33,9 @@ class Category extends Model
     protected $imageKey = "main_image";
     protected $metaKey = "categories";
 
-    protected static function boot()
+    protected static function booting()
     {
-        parent::boot();
-        static::slugBoot();
-        static::imageBoot();
-        static::metasBoot();
+        parent::booting();
 
         static::created(function (\App\Category $model) {
             // Поля родителя.

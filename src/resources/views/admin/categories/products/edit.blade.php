@@ -73,8 +73,7 @@
                         <textarea class="form-control"
                                   name="description"
                                   id="ckDescription"
-                                  rows="3"
-                                  required>
+                                  rows="3">
                             {{ old('description') ? old('description') : $product->description }}
                         </textarea>
                         @if ($errors->has('description'))

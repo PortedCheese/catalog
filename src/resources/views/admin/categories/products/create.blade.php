@@ -54,8 +54,7 @@
                         <textarea class="form-control"
                                   name="description"
                                   id="ckDescription"
-                                  rows="3"
-                                  required>{{ old('description') }}</textarea>
+                                  rows="3">{{ old('description') }}</textarea>
                         @if ($errors->has('description'))
                             <input type="hidden" class="form-control is-invalid">
                             <div class="invalid-feedback">

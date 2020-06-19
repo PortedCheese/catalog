@@ -8,15 +8,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use PortedCheese\BaseSettings\Traits\HasImage;
-use PortedCheese\BaseSettings\Traits\HasSlug;
+use PortedCheese\BaseSettings\Traits\ShouldGallery;
+use PortedCheese\BaseSettings\Traits\ShouldImage;
+use PortedCheese\BaseSettings\Traits\ShouldSlug;
 use PortedCheese\Catalog\Events\ProductCategoryChange;
 use PortedCheese\Catalog\Events\ProductListChange;
-use PortedCheese\SeoIntegration\Traits\HasMetas;
+use PortedCheese\SeoIntegration\Traits\ShouldMetas;
 
 class Product extends Model
 {
-    use HasSlug, HasImage, HasMetas;
+    use ShouldSlug, ShouldImage, ShouldGallery, ShouldMetas;
 
     const DEFAULT_SORT = "title";
     const DEFAULT_SORT_ORDER = "desc";
@@ -34,12 +35,9 @@ class Product extends Model
     protected $imageKey = "main_image";
     protected $metaKey = "products";
 
-    protected static function boot()
+    protected static function booting()
     {
-        parent::boot();
-        static::slugBoot();
-        static::imageBoot();
-        static::metasBoot();
+        parent::booting();
 
         static::created(function (\App\Product $model) {
             event(new ProductListChange($model));

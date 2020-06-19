@@ -17,9 +17,9 @@ class ProductVariation extends Model
         'available',
     ];
 
-    protected static function boot()
+    protected static function booting()
     {
-        parent::boot();
+        parent::booting();
 
         static::creating(function (\App\ProductVariation $model) {
             $model->fixSku();

@@ -4,10 +4,11 @@ namespace PortedCheese\Catalog\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use PortedCheese\BaseSettings\Traits\HasSlug;
+use PortedCheese\BaseSettings\Traits\ShouldSlug;
 
 class ProductState extends Model
 {
-    use HasSlug;
+    use ShouldSlug;
 
     const COLORS = [
         'primary',
@@ -25,10 +26,9 @@ class ProductState extends Model
         'color',
     ];
 
-    protected static function boot()
+    protected static function booting()
     {
-        parent::boot();
-        static::slugBoot();
+        parent::booting();
 
         static::updated(function (\App\ProductState $model) {
             foreach ($model->products as $product) {
