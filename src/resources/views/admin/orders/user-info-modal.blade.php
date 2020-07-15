@@ -13,6 +13,7 @@
                 </button>
             </div>
             <div class="modal-body">
+                @php($attr = \App\Order::getAttributesForRender())
                 <div class="table-responsive">
                     <table class="table table-borderless">
                         <thead>
@@ -24,7 +25,7 @@
                         <tbody>
                         @foreach ($userData as $key => $value)
                             <tr>
-                                <td>{{ $key }}</td>
+                                <td>{{ ! empty($attr[$key]) ? $attr[$key] : $key }}</td>
                                 <td>{{ $value }}</td>
                             </tr>
                         @endforeach

@@ -25,7 +25,6 @@
                 <form action="{{ route('site.cart.order') }}" id="checkout-form" method="post">
                     @csrf
                     @if ($user)
-                        <input type="hidden" name="user_id" value="{{ $user->id }}">
                         @if (! empty($user->full_name))
                             <input type="hidden" name="name" value="{{ $user->full_name }}">
                         @endif
@@ -41,12 +40,12 @@
                                disabled
                                value="{{ $user->full_name }}"
                                @endif
-                               class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}">
-                        @if ($errors->has('name'))
-                            <span class="invalid-feedback" role="alert">
-                        <strong>{{ $errors->first('name') }}</strong>
-                    </span>
-                        @endif
+                               class="form-control @error("name") is-invalid @enderror">
+                        @error("name")
+                            <div class="invalid-feedback" role="alert">
+                                {{ $message }}
+                            </div>
+                        @enderror
                     </div>
 
 
@@ -59,12 +58,12 @@
                                disabled
                                value="{{ $user->email }}"
                                @endif
-                               class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}">
-                        @if ($errors->has('email'))
-                            <span class="invalid-feedback" role="alert">
-                        <strong>{{ $errors->first('email') }}</strong>
-                    </span>
-                        @endif
+                               class="form-control @error("email") is-invalid @enderror">
+                        @error("email")
+                            <div class="invalid-feedback" role="alert">
+                                {{ $message }}
+                            </div>
+                        @enderror
                     </div>
 
                     <div class="form-group">
@@ -72,17 +71,40 @@
                         <input type="text"
                                id="phone"
                                name="phone"
-                               class="form-control{{ $errors->has('phone') ? ' is-invalid' : '' }}">
-                        @if ($errors->has('phone'))
-                            <span class="invalid-feedback" role="alert">
-                        <strong>{{ $errors->first('phone') }}</strong>
-                    </span>
-                        @endif
+                               class="form-control @error("phone") is-invalid @enderror">
+                        @error("phone")
+                            <div class="invalid-feedback" role="alert">
+                                {{ $message }}
+                            </div>
+                        @enderror
                     </div>
 
                     <div class="form-group">
                         <label for="comment">Комментарий</label>
                         <textarea class="form-control" name="comment" id="comment" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox"
+                                   checked
+                                   required
+                                   name="privacy_policy"
+                                   class="custom-control-input @error("privacy_policy") is-invalid @enderror"
+                                   id="privacy_policy">
+                            <label class="custom-control-label" for="privacy_policy">
+                                @if (\Illuminate\Support\Facades\Route::has("policy"))
+                                    Согласие с "<a href="{{ route("policy") }}" target="_blank">Политикой конфиденциальности</a>"
+                                @else
+                                    Согласие с "Политикой конфиденциальности"
+                                @endif
+                            </label>
+                            @error("privacy_policy")
+                                <div class="invalid-feedback" role="alert">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
                     </div>
                 </form>
             </div>

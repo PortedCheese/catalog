@@ -8,6 +8,7 @@ use App\Order;
 use App\OrderState;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use PortedCheese\Catalog\Events\CreateNewOrder;
 
@@ -118,12 +119,14 @@ class OrderController extends Controller
             'name' => ['required', 'min:2'],
             'email' => ['nullable', 'required_without:phone', 'email'],
             'phone' => ['required_without:email'],
+            "privacy_policy" => ["accepted"],
         ], [
             'name.required' => 'Поле :attribute обязательно для заполнения',
             'name.min' => "Поле :attribute должно быть минимум :min символа",
             'email.required_without' => "Поле :attribute обязательно когда :values не заполнено.",
             'email.email' => "Поле :attribute должно быть валидным e-mail адресом",
             'phone.required_without' => "Поле :attribute обязательно когда :values не заполнено.",
+            "privacy_policy.accepted" => "Требуется согласие с политикой конфиденциальности",
         ], [
             'name' => 'Имя',
             'email' => "E-mail",

@@ -7,6 +7,7 @@ use App\OrderState;
 use App\OrderItem;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
 use PortedCheese\Catalog\Notifications\NewOrderClient;
 use PortedCheese\Catalog\Notifications\NewOrderUser;
 
@@ -34,6 +35,9 @@ class Order extends Model
                 $state = OrderState::getNewState();
                 $model->state_id = $state->id;
             }
+            if (Auth::check()) {
+                $model->user_id = Auth::id();
+            }
         });
 
         static::deleting(function ($model) {
@@ -41,6 +45,17 @@ class Order extends Model
                 $item->delete();
             }
         });
+    }
+
+    public static function getAttributesForRender()
+    {
+        return [
+            "name" => "Имя",
+            "email" => "E-mail",
+            "phone" => "Телефон",
+            "comment" => "Комментарий",
+            "user_id" => "Идентификатор пользователя",
+        ];
     }
 
     /**

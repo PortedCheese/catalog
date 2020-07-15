@@ -3,7 +3,7 @@
     "description": "Catalog with categories for site",
     "type": "library",
     "require": {
-        "portedcheese/base-settings": "^v1.5",
+        "portedcheese/base-settings": "^v1.6",
         "portedcheese/seo-integration": "^v1.2",
         "portedcheese/admin-site-menu": "^v1.3"
     },
