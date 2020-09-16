@@ -204,6 +204,17 @@ class CategoryFieldController extends Controller
             ->with('success', 'Успешно обновлено');
     }
 
+    protected function updateValidator(array $data)
+    {
+        Validator::make($data, [
+            "title" => ["required", "min:2", "max:200"],
+            "weight" => ["required", "numeric", "min:1"],
+        ], [], [
+            "title" => "Заголовок",
+            "weight" => "Вес",
+        ])->validate();
+    }
+
     /**
      * Обновить исходное поле.
      *
@@ -213,7 +224,7 @@ class CategoryFieldController extends Controller
      */
     public function selfUpdate(Request $request, CategoryField $field)
     {
-        $this->updateValidator($request->all());
+        $this->selfUpdateValidator($request->all());
 
         $field->update($request->all());
         $categories = $field->categories;
@@ -227,7 +238,7 @@ class CategoryFieldController extends Controller
             ->with("success", "Обновлено");
     }
 
-    protected function updateValidator(array $data)
+    protected function selfUpdateValidator(array $data)
     {
         Validator::make($data, [
             "title" => ["required", "min:2", "max:200"],

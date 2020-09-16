@@ -64,7 +64,7 @@ class ProductField extends Model
     /**
      * Событие обновления характеристики.
      */
-    private function runEvent()
+    protected function runEvent()
     {
         $product = $this->product;
         if (! empty($product)) {

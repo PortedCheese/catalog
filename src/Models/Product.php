@@ -156,7 +156,7 @@ class Product extends Model
                 $products->orderBy("products.{$field}", $order);
                 $defaultSort = false;
             }
-            elseif ($field == "price" && ! siteconf()->get("catalog", "disablePriceSort")) {
+            elseif ($field == "price" && ! base_config()->get("catalog", "disablePriceSort")) {
                 $products->orderBy("product_price.price", $order);
                 $defaultSort = false;
             }

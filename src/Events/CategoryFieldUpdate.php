@@ -21,7 +21,8 @@ class CategoryFieldUpdate
     /**
      * Create a new event instance.
      *
-     * @return void
+     * CategoryFieldUpdate constructor.
+     * @param Category $category
      */
     public function __construct(Category $category)
     {

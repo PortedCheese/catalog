@@ -9,9 +9,6 @@ use Illuminate\Support\Facades\DB;
 
 class ProductFilterService
 {
-
-    const PAGER = 20;
-
     protected $request;
     protected $category;
     protected $categoryIds;
@@ -72,7 +69,7 @@ class ProductFilterService
         }
         $this->filterRanges();
         $this->products->groupBy('products.id');
-        // Огранициваем значения для чекбокса.
+        // Ограничиваем значения для чекбокса.
         if (!empty($this->having)) {
             $this->products->havingRaw(implode(" and ", $this->having));
         }
@@ -100,7 +97,7 @@ class ProductFilterService
                 $join->on("products.id", '=', "{$machine}.product_id");
             });
         }
-        if (! siteconf()->get("catalog", "disablePriceSort")) {
+        if (! base_config()->get("catalog", "disablePriceSort")) {
             // Если нет фильтра по цене, нужно добавить цены, что бы работала сортировка.
             if (empty($this->ranges['product_price'])) {
                 $prices = Product::queryRangeVariations(0,0, false);

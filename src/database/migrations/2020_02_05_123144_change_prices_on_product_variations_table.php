@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use App\ProductVariation;
 
 class ChangePricesOnProductVariationsTable extends Migration
 {
@@ -21,10 +20,12 @@ class ChangePricesOnProductVariationsTable extends Migration
                 ->nullable();
         });
 
-        foreach (ProductVariation::all() as $item) {
-            $item->buffer_price = $item->price;
-            $item->buffer_sale_price = $item->sale_price;
-            $item->save();
+        if (class_exists(\App\ProductVariation::class)) {
+            foreach (\App\ProductVariation::all() as $item) {
+                $item->buffer_price = $item->price;
+                $item->buffer_sale_price = $item->sale_price;
+                $item->save();
+            }
         }
 
         Schema::table("product_variations", function (Blueprint $table) {
@@ -43,10 +44,12 @@ class ChangePricesOnProductVariationsTable extends Migration
                 ->comment("Цена со скидкой");
         });
 
-        foreach (ProductVariation::all() as $item) {
-            $item->price = $item->buffer_price;
-            $item->sale_price = $item->buffer_sale_price;
-            $item->save();
+        if (class_exists(\App\ProductVariation::class)) {
+            foreach (\App\ProductVariation::all() as $item) {
+                $item->price = $item->buffer_price;
+                $item->sale_price = $item->buffer_sale_price;
+                $item->save();
+            }
         }
 
         Schema::table("product_variations", function (Blueprint $table) {
@@ -68,10 +71,12 @@ class ChangePricesOnProductVariationsTable extends Migration
                 ->nullable();
         });
 
-        foreach (ProductVariation::all() as $item) {
-            $item->buffer_price = $item->price;
-            $item->buffer_sale_price = $item->sale_price;
-            $item->save();
+        if (class_exists(\App\ProductVariation::class)) {
+            foreach (\App\ProductVariation::all() as $item) {
+                $item->buffer_price = $item->price;
+                $item->buffer_sale_price = $item->sale_price;
+                $item->save();
+            }
         }
 
         Schema::table("product_variations", function (Blueprint $table) {
@@ -89,10 +94,12 @@ class ChangePricesOnProductVariationsTable extends Migration
                 ->comment("Цена со скидкой");
         });
 
-        foreach (ProductVariation::all() as $item) {
-            $item->price = $item->buffer_price;
-            $item->sale_price = $item->buffer_sale_price;
-            $item->save();
+        if (class_exists(\App\ProductVariation::class)) {
+            foreach (\App\ProductVariation::all() as $item) {
+                $item->price = $item->buffer_price;
+                $item->sale_price = $item->buffer_sale_price;
+                $item->save();
+            }
         }
 
         Schema::table("product_variations", function (Blueprint $table) {
